@@ -50,39 +50,28 @@ func register(w http.ResponseWriter, r *http.Request){
 		util.Message(w,102)
 		return
 	}
-	user_data_handle(w,user_data)
-	send_verification_link(user_data)
+
+	user_id,ok:=user_data_handle(w,user_data)
+	if ok{
+		user_data.User_id=user_id
+		cookie:=database.Insert_session(user_data.User_id,ip_address)
+		http.SetCookie(w,&cookie)
+		util.Message(w,104)
+	}
 }
 
-func user_data_handle(w http.ResponseWriter, user_data CD.User){
-	_,db_status:=database.Enter_user_data(user_data)
+func user_data_handle(w http.ResponseWriter, user_data CD.User) (string,bool){
+	user_id,db_status:=database.Enter_user_data(user_data)
 	if db_status ==1{
 		log.Println("User Already exist")
 		util.Message(w,103)
-		return
+		return user_id,false
 	} else{
 		log.Println("User data entered successfully")
-		util.Message(w,104)
-		return
+		// util.Message(w,104)
+		return user_id,true
 	}
 }
 
-func send_verification_link(user_data CD.User){
-	if user_data.Phone !=""{
-		send_otp(user_data.User_id,user_data.Phone)
-	}
-	if user_data.Email!=""{
-		send_verification_email(user_data.User_id,user_data.Email)
-	}
-}
-
-
-func send_otp(User_id string,Phone string) {
-	
-}
-
-func send_verification_email(User_id string,Email string){
-	
-}
 
 

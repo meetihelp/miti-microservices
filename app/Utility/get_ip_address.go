@@ -5,7 +5,7 @@ import(
 	"net"
 )
 
-func Get_IP_address(r *http.Request) interface{}{
+func Get_IP_address(r *http.Request) string{
 	ip,_,_ :=net.SplitHostPort(r.RemoteAddr)
 
 	real_ip:=r.Header.Get("X-FORWARDED-FOR")
