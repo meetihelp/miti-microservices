@@ -11,8 +11,15 @@ import(
    util "app/Utility"
 )
 
+type Profile_creation_Header struct{
+	Method1 string `header:"method"`
+	Agent1 string `header:"agent"`
+}
+
 func profile_creation(w http.ResponseWriter, r *http.Request){
-	util.GetHeader(r)
+	header:=Profile_creation_Header{}
+	util.GetHeader(r,&header)
+
 	requestBody,err:=ioutil.ReadAll(r.Body)
 	if err!=nil{
 		fmt.Println("Could not read body")

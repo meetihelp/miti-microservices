@@ -11,11 +11,14 @@ type Sanatize_Data interface{
 }
 
 func (user_data User) do_sanitization() string {
+	fmt.Println(user_data)
 	validate :=validator.New()
 	err:= validate.Struct(user_data)
 	if err!=nil{
+		fmt.Println(err.Error())
 		return "ERROR"
 	}
+	//WE CAN IMPROVE THIS FUCNTION BY CHECKING IF THE PHONE IS NUMERIC OR NOT
 	if (user_data.Phone =="") && (user_data.Email==""){
 		return "ERROR"
 	}

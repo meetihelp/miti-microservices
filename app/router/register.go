@@ -12,8 +12,19 @@ import(
    util "app/Utility"
 )
 
+type Register_Header struct{
+	Method string `header:"Method"`
+	Agent string `header:"User-Agent"`
+}
+
 func register(w http.ResponseWriter, r *http.Request){
-	util.GetHeader(r)
+	//Get ip address of user
+	ip_address:=util.Get_IP_address(r)
+	fmt.Println(ip_address)
+	//GET HEADER 
+	header:=Register_Header{}
+	util.GetHeader(r,&header)
+	fmt.Println(header)
 
 	//Read body data
 	requestBody,err:=ioutil.ReadAll(r.Body)
@@ -40,6 +51,7 @@ func register(w http.ResponseWriter, r *http.Request){
 		return
 	}
 	user_data_handle(w,user_data)
+	send_verification_link(user_data)
 }
 
 func user_data_handle(w http.ResponseWriter, user_data CD.User){
@@ -54,4 +66,23 @@ func user_data_handle(w http.ResponseWriter, user_data CD.User){
 		return
 	}
 }
+
+func send_verification_link(user_data CD.User){
+	if user_data.Phone !=""{
+		send_otp(user_data.User_id,user_data.Phone)
+	}
+	if user_data.Email!=""{
+		send_verification_email(user_data.User_id,user_data.Email)
+	}
+}
+
+
+func send_otp(User_id string,Phone string) {
+	
+}
+
+func send_verification_email(User_id string,Email string){
+	
+}
+
 
