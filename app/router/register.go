@@ -18,6 +18,7 @@ type Register_Header struct{
 }
 
 func register(w http.ResponseWriter, r *http.Request){
+	fmt.Println("Hit register api")
 	//Get ip address of user
 	ip_address:=util.Get_IP_address(r)
 	fmt.Println(ip_address)

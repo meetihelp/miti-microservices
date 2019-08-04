@@ -14,6 +14,7 @@ func server(){
 	r.HandleFunc("/register",register).Methods("POST")
 	r.HandleFunc("/profile_creation",profile_creation).Methods("POST")
 	r.HandleFunc("/send_verification_link",send_verification_link).Methods("GET")
+	r.HandleFunc("/verify_email",verify_email).Methods("GET")
 	// r.HandleFunc("/login",router.login).Methods("POST")
 	http.Handle("/", r)
 	if err := http.ListenAndServe("0.0.0.0:9000", nil); err != nil {

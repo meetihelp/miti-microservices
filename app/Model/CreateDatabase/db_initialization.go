@@ -34,6 +34,7 @@ func init(){
 	createProfileTable(db)
 	createSessionTable(db)
 	createEducationTable(db)
+	createVerification_EmailTable(db)
 }
 
 

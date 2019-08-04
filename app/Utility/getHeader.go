@@ -16,7 +16,10 @@ func GetHeader(r *http.Request,data interface{}){
 		tag:=data_type.Field(i).Tag.Get("header")
 		header_data,ok:= header[tag]
 		if ok{
-			fld.SetString(header_data[0])
+			switch fld.Kind(){
+			case reflect.String:
+				fld.SetString(header_data[0])
+			}
 		}
 	}
 }
