@@ -18,14 +18,13 @@ type Register_Header struct{
 }
 
 func register(w http.ResponseWriter, r *http.Request){
-	fmt.Println("Hit register api")
 	//Get ip address of user
 	ip_address:=util.Get_IP_address(r)
-	fmt.Println(ip_address)
+	fmt.Println("Registeration request from "+ip_address)
+
 	//GET HEADER 
 	header:=Register_Header{}
 	util.GetHeader(r,&header)
-	fmt.Println(header)
 
 	//Read body data
 	requestBody,err:=ioutil.ReadAll(r.Body)
@@ -69,7 +68,6 @@ func user_data_handle(w http.ResponseWriter, user_data CD.User) (string,bool){
 		return user_id,false
 	} else{
 		log.Println("User data entered successfully")
-		// util.Message(w,104)
 		return user_id,true
 	}
 }

@@ -21,9 +21,9 @@ func send_verification_link(w http.ResponseWriter,r *http.Request){
 	x:=strings.Split(session_id,";")
 	x=strings.Split(x[1],"=")
 	session_id=x[1]
-	fmt.Println(session_id)
 	user_id,err:=database.Get_user_id_from_session(session_id)
 	if err==""{
+		fmt.Println("Session Does not exist")
 		util.Message(w,200)
 		return
 	}
@@ -42,6 +42,7 @@ func send_verification_email(w http.ResponseWriter,id string,email string){
 	url:="http://localhost:9000/verify_email?token="+token
 	database.Enter_verification_email(id,token)
 	mail.Send_email(email,url)
+	fmt.Println("Email sent for verification")
 	util.Message(w,201)
 }	
 

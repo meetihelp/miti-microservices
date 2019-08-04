@@ -25,9 +25,8 @@ func Insert_session(User_id string,ip_address string) http.Cookie{
 	session.User_id=User_id
 	session.IP=ip_address
 	session.CreatedAt =time.Now()
-	fmt.Println("Session")
-	fmt.Println(session)
 	db:=GetDB()
 	db.Create(&session)
+	fmt.Println("Session inserted in Session Table")
 	return cookie
 }

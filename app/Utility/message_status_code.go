@@ -18,7 +18,7 @@ func get_message_decode(status_code int) string{
 	message_decode[301]="Could not Unmarshal profile creation data"
 	message_decode[302]="Profile Creation Data Invalid"
 	message_decode[303]="Profile Created SuccessFully"
-
+	message_decode[304]="Session does not exist"
 	
 	return message_decode[status_code]
 }

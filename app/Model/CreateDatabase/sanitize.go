@@ -11,7 +11,6 @@ type Sanatize_Data interface{
 }
 
 func (user_data User) do_sanitization() string {
-	fmt.Println(user_data)
 	validate :=validator.New()
 	err:= validate.Struct(user_data)
 	if err!=nil{
