@@ -18,7 +18,7 @@ func get_cookie() http.Cookie{
 	cookie.MaxAge=90000
 	return cookie
 }
-func Insert_session(User_id string,ip_address string) http.Cookie{
+func Insert_session(User_id string,ip_address string) string{
 	cookie:= get_cookie()
 	session:=CD.Session{}
 	session.Session_id=cookie.Value
@@ -28,5 +28,6 @@ func Insert_session(User_id string,ip_address string) http.Cookie{
 	db:=GetDB()
 	db.Create(&session)
 	fmt.Println("Session inserted in Session Table")
-	return cookie
+	// return cookie
+	return cookie.Value
 }

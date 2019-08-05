@@ -18,8 +18,8 @@ func verify_email(w http.ResponseWriter,r *http.Request){
     token:=tokens[0]
     
 
-    user_id,verify:=database.Verify_Email(token)
-    if verify{
+    user_id,email_verify:=database.Verify_Email(token)
+    if email_verify{
     	//CHANGE STATUS OF USER TO VERIFIED
     	database.Change_Verification_Status(user_id)
     }

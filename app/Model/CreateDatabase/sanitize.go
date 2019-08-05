@@ -40,6 +40,16 @@ func (profile_data Profile) do_sanitization() string{
 	return "OK"
 }
 
+func (otp_verification OTP_verification) do_sanitization() string{
+	validate:=validator.New()
+	err:=validate.Struct(otp_verification)
+	if err!=nil{
+		fmt.Println(err.Error())
+		return "ERROR"
+	}
+	return "OK"
+}
+
 func Sanatize(s Sanatize_Data) string{
 	return s.do_sanitization()
 }

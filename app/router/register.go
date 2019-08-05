@@ -30,7 +30,7 @@ func register(w http.ResponseWriter, r *http.Request){
 	requestBody,err:=ioutil.ReadAll(r.Body)
 	if err!=nil{
 		fmt.Println("Could not read body")
-		util.Message(w,100)
+		util.Message(w,1000)
 		return 
 	}
 
@@ -39,7 +39,7 @@ func register(w http.ResponseWriter, r *http.Request){
 	err_user_data:=json.Unmarshal(requestBody,&user_data)
 	if err_user_data!=nil{
 		fmt.Println("Could not Unmarshall user data")
-		util.Message(w,101)
+		util.Message(w,1001)
 		return 
 	}
 
@@ -47,7 +47,7 @@ func register(w http.ResponseWriter, r *http.Request){
 	sanatization_status :=CD.Sanatize(user_data)
 	if sanatization_status =="ERROR"{
 		fmt.Println("User data invalid")
-		util.Message(w,102)
+		util.Message(w,1002)
 		return
 	}
 
@@ -55,8 +55,9 @@ func register(w http.ResponseWriter, r *http.Request){
 	if ok{
 		user_data.User_id=user_id
 		cookie:=database.Insert_session(user_data.User_id,ip_address)
-		http.SetCookie(w,&cookie)
-		util.Message(w,104)
+		w.Header().Set("miti-Cookie",cookie)
+		// http.SetCookie(w,&cookie)
+		util.Message(w,200)
 	}
 }
 
@@ -64,7 +65,7 @@ func user_data_handle(w http.ResponseWriter, user_data CD.User) (string,bool){
 	user_id,db_status:=database.Enter_user_data(user_data)
 	if db_status ==1{
 		log.Println("User Already exist")
-		util.Message(w,103)
+		util.Message(w,1101)
 		return user_id,false
 	} else{
 		log.Println("User data entered successfully")

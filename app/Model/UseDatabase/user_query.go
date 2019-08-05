@@ -10,8 +10,6 @@ func Check_user(user_data CD.User)(string,string){
 	email:=user_data.Email
 	phone:=user_data.Phone
 	password:=user_data.Password
-	// hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user_data.Password), bcrypt.DefaultCost)
-	// password := string(hashedPassword)
 
 	user:=CD.User{}
 	if email!=""{
@@ -47,4 +45,22 @@ func Check_user(user_data CD.User)(string,string){
 
 	}
 	return "","ERROR"
+}
+
+func IsUserVerified(id string) bool{
+	db:=GetDB()
+	user:=CD.User{}
+	db.Where("user_id=?",id).First(&user)
+	if user.Status=="U"{
+		return false
+	} else{
+		return true
+	}
+}
+
+func Get_user_detail(user_id string) (string,string){
+	db:=GetDB()
+	user:=CD.User{}
+	db.Where("user_id=?",user_id).First(&user)
+	return user.Email , user.Phone
 }
