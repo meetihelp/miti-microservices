@@ -35,6 +35,7 @@ func init(){
 	createSessionTable(db)
 	createEducationTable(db)
 	createVerification_EmailTable(db)
+	createVerification_OTPTable(db)
 }
 
 

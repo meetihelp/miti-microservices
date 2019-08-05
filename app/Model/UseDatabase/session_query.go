@@ -12,5 +12,5 @@ func Get_user_id_from_session(session_id string) (string,string){
 	if session.User_id==""{
 		return "",""
 	}
-	return session.User_id,"Ok"
+	return session.User_id,"OK"
 }

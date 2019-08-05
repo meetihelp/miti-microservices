@@ -19,6 +19,13 @@ func get_message_decode(status_code int) string{
 	message_decode[302]="Profile Creation Data Invalid"
 	message_decode[303]="Profile Created SuccessFully"
 	message_decode[304]="Session does not exist"
+
+	message_decode[400]="Could not read Login Body"
+	message_decode[401]="Could not Unmarshall user data"
+	message_decode[402]="User data invalid"
+	message_decode[403]="Invalid user id or password"
+	message_decode[404]="User is not verified"
+	message_decode[405]="User Login SuccessFully"
 	
 	return message_decode[status_code]
 }

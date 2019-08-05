@@ -46,6 +46,11 @@ func send_verification_email(w http.ResponseWriter,id string,email string){
 	util.Message(w,201)
 }	
 
-func send_verification_otp(w http.ResponseWriter,id string,email string){
+func send_verification_otp(w http.ResponseWriter,id string,phone string){
+	//WRITE CODE FOR GENERATING OTP
+	otp:=1234
+	database.Enter_verification_otp(id,otp)
+	// mail.Send_sms(phone,otp)
+	fmt.Println("OTP sent")
 	util.Message(w,202)
 }
