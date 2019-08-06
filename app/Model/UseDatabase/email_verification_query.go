@@ -3,6 +3,7 @@ package UseDatabase
 import(
 	"time"
 	CD "app/Model/CreateDatabase"
+	"fmt"
 )
 
 
@@ -16,11 +17,14 @@ func Enter_email_verification(id string,token string){
 }
 
 func Get_Email_verification_count(id string)(int,time.Time){
+	count:=0
 	email_verification:=CD.Email_verification{}
 	db:=GetDB()
-	db.Where("user_id=?",id).Find(&email_verification)
+	db.Where("user_id=?",id).Find(&email_verification).Count(&count)
+	fmt.Println(email_verification)
 	// return len(email_verification),email_verification.CreatedAt
-	return 2,email_verification.CreatedAt
+	fmt.Println(count)
+	return count,email_verification.CreatedAt
 
 }
 

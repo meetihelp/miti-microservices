@@ -52,7 +52,6 @@ func login(w http.ResponseWriter,r *http.Request){
 	}
 
 	user_id,login_status=database.Check_user(user_data)
-
 	if login_status=="WRONG_PASSWORD"{
 		util.Message(w,1501)
 		return

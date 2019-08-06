@@ -25,9 +25,10 @@ func Enter_verification_otp(id string,otp string){
 }
 
 func Get_otp_verification_count(id string)(int,time.Time){
+	count:=0
 	otp_verification:=CD.OTP_verification{}
 	db:=GetDB()
-	db.Where("user_id=?",id).Find(&otp_verification)
+	db.Where("user_id=?",id).Find(&otp_verification).Count(&count)
 	// return len(otp_verification),otp_verification.CreatedAt
-	return 2,otp_verification.CreatedAt
+	return count,otp_verification.CreatedAt
 }

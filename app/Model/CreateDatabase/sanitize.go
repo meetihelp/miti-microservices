@@ -50,6 +50,16 @@ func (otp_verification OTP_verification) do_sanitization() string{
 	return "OK"
 }
 
+func (password_change_data Password_change) do_sanitization() string{
+	validate:=validator.New()
+	err:=validate.Struct(password_change_data)
+	if err!=nil{
+		fmt.Println(err.Error())
+		return "ERROR"
+	}
+	return "OK"
+}
+
 func Sanatize(s Sanatize_Data) string{
 	return s.do_sanitization()
 }
