@@ -8,10 +8,12 @@ import (
 	database "app/Model/UseDatabase"
 	util "app/Utility"
 	mail "app/Notification/Mail"
-	"github.com/nu7hatch/gouuid"
 	// "net/smtp"
 )
 
+const(
+	domain="http://localhost:9000"
+)
 
 type Email_Verification_Header struct{
 	Cookie string `header:"Miti-Cookie"`
@@ -23,7 +25,7 @@ func generate_verification_email(w http.ResponseWriter,r *http.Request){
 	session_id:=email_verification_header.Cookie
 
 	user_id,err:=database.Get_user_id_from_session(session_id)
-	if err==""{
+	if err=="ERROR"{
 		fmt.Println("Session Does not exist")
 		util.Message(w,1003)
 		return
@@ -48,9 +50,8 @@ func generate_verification_email(w http.ResponseWriter,r *http.Request){
 func send_verification_email(w http.ResponseWriter,id string,email string){
 	count,last_modified:=database.Get_Email_verification_count(id)
 	if count < MAX_COUNT{
-		u, _ := uuid.NewV4()
-		token:=u.String()
-		url:="http://localhost:9000/verify_email?token="+token
+		token:=util.Generate_token()
+		url:=domain+"/verify_email?token="+token
 		database.Enter_email_verification(id,token)
 		mail.Send_email(email,url)
 		fmt.Println("Email sent for verification")
@@ -65,9 +66,8 @@ func send_verification_email(w http.ResponseWriter,id string,email string){
 		return
 	} else{
 		database.Delete_all_email_verification(id)
-		u, _ := uuid.NewV4()
-		token:=u.String()
-		url:="http://localhost:9000/verify_email?token="+token
+		token:=util.Generate_token()
+		url:=domain+"/verify_email?token="+token
 		database.Enter_email_verification(id,token)
 		mail.Send_email(email,url)
 		fmt.Println("Email sent for verification")

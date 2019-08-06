@@ -3,16 +3,15 @@ package UseDatabase
 import(
 	// "fmt"
 	"time"
-	"golang.org/x/crypto/bcrypt"
+	// "golang.org/x/crypto/bcrypt"
 	"github.com/jinzhu/gorm"
  _ 	"github.com/jinzhu/gorm/dialects/postgres"
    CD "app/Model/CreateDatabase"
-    ut "app/Utility"
+    util "app/Utility"
 )
 
 func Enter_user_data(user_data CD.User) (string,int){
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user_data.Password), bcrypt.DefaultCost)
-	user_data.Password = string(hashedPassword)
+	user_data.Password = util.Generate_encrypted_password(user_data.Password)
 	
 	db:=GetDB()
 	//CHECK IF USER EMAIL ID OR PHONE ALREADY EXISTS
@@ -21,7 +20,7 @@ func Enter_user_data(user_data CD.User) (string,int){
 		return "",1
 	}
 	//GENERATE USER ID
-	user_data.User_id =ut.Generate_user_Id()
+	user_data.User_id =util.Generate_token()
 	user_data.Status="U"
 	user_data.CreatedAt =time.Now()
 	//INSERT IN DATABASE

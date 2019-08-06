@@ -27,7 +27,7 @@ func generate_otp(w http.ResponseWriter,r *http.Request){
 	session_id:=verification_header.Cookie
 
 	user_id,err:=database.Get_user_id_from_session(session_id)
-	if err==""{
+	if err=="ERROR"{
 		fmt.Println("Session Does not exist")
 		util.Message(w,1003)
 		return
@@ -52,11 +52,12 @@ func generate_otp(w http.ResponseWriter,r *http.Request){
 func send_verification_otp(w http.ResponseWriter,id string,phone string){
 	count,last_modified:=database.Get_otp_verification_count(id)
 	if count<MAX_COUNT{
-		otp:="1234"
+		otp:=util.Generate_otp_string()
 		database.Enter_verification_otp(id,otp)
 		sms.Send_sms(phone,otp)
 		fmt.Println("OTP sent")
 		util.Message(w,200)
+		return
 	}
 
 	time_elasped:=time.Since(last_modified)
@@ -65,7 +66,7 @@ func send_verification_otp(w http.ResponseWriter,id string,phone string){
 		util.Message(w,1302)
 		return
 	} else{
-		otp:="1234"
+		otp:=util.Generate_otp_string()
 		database.Enter_verification_otp(id,otp)
 		sms.Send_sms(phone,otp)
 		fmt.Println("OTP sent")

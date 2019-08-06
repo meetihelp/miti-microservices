@@ -10,7 +10,7 @@ func Get_user_id_from_session(session_id string) (string,string){
 	session:=CD.Session{}
 	db.Where("session_id=?",session_id).First(&session)
 	if session.User_id==""{
-		return "",""
+		return "","ERROR"
 	}
 	return session.User_id,"OK"
 }

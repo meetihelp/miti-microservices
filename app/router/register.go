@@ -56,7 +56,6 @@ func register(w http.ResponseWriter, r *http.Request){
 		user_data.User_id=user_id
 		cookie:=database.Insert_session(user_data.User_id,ip_address)
 		w.Header().Set("miti-Cookie",cookie)
-		// http.SetCookie(w,&cookie)
 		util.Message(w,200)
 	}
 }

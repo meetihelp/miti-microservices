@@ -18,8 +18,12 @@ func verify_otp(w http.ResponseWriter,r *http.Request){
     verify_otp_header:=Verify_OTP_Header{}
     util.GetHeader(r,&verify_otp_header)
     session_id:=verify_otp_header.Cookie
-    user_id,_:=database.Get_user_id_from_session(session_id)
-
+    user_id,session_err:=database.Get_user_id_from_session(session_id)
+    if session_err=="ERROR"{
+        fmt.Println("Session Does not exist")
+        util.Message(w,1003)
+        return
+    }
     //Read body data
     requestBody,err:=ioutil.ReadAll(r.Body)
     if err!=nil{

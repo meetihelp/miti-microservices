@@ -1,8 +1,9 @@
 package UseDatabase
 
 import (
-	"golang.org/x/crypto/bcrypt"
+	
 	CD "app/Model/CreateDatabase"
+	util "app/Utility"
 	// "fmt"
 )
 
@@ -15,8 +16,9 @@ func Check_user(user_data CD.User)(string,string){
 	user:=CD.User{}
 	if email!=""{
 		db.Where("email=?",email).First(&user)
-		err:=bcrypt.CompareHashAndPassword([]byte(user.Password),[]byte(password))
-		if err!=nil{
+		// err:=bcrypt.CompareHashAndPassword([]byte(user.Password),[]byte(password))
+		status:=util.Comapare_password(user.Password,password)
+		if !status{
 			return "","WRONG_PASSWORD"
 		}
 		if user.User_id==""{
@@ -31,8 +33,9 @@ func Check_user(user_data CD.User)(string,string){
 
 	if phone!=""{
 		db.Where("phone=?",phone).First(&user)
-		err:=bcrypt.CompareHashAndPassword([]byte(user.Password),[]byte(password))
-		if err!=nil{
+		// err:=bcrypt.CompareHashAndPassword([]byte(user.Password),[]byte(password))
+		status:=util.Comapare_password(user.Password,password)
+		if !status{
 			// fmt.Println(err.Error())
 			return "","WRONG_PASSWORD"
 		}
@@ -53,8 +56,8 @@ func Check_user_by_id(id string,password string) string{
 	db:=GetDB()
 	user:=CD.User{}
 	db.Where("user_id=?",id).First(&user)
-	err:=bcrypt.CompareHashAndPassword([]byte(user.Password),[]byte(password))
-	if err!=nil{
+	status:=util.Comapare_password(user.Password,password)
+	if !status{
 		// fmt.Println(err.Error())
 		return "WRONG_PASSWORD"
 	}
@@ -86,9 +89,10 @@ func Get_user_detail(user_id string) (string,string){
 }
 
 func Update_Password(user_id string,new_Password string){
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(new_Password), bcrypt.DefaultCost)
-	new_Password = string(hashedPassword)
+	// hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(new_Password), bcrypt.DefaultCost)
+	// new_Password = string(hashedPassword)
+	new_Password = util.Generate_encrypted_password(new_Password)
 
 	user:=CD.User{}
-	db.Model(&user).Where("user_id = ?", user_id).Update("password", new_Password	)
+	db.Model(&user).Where("user_id = ?", user_id).Update("password", new_Password)
 }
