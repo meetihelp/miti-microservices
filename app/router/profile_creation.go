@@ -26,7 +26,7 @@ func profile_creation(w http.ResponseWriter, r *http.Request){
 	session_id:=header.Cookie
 
 	user_id,d_err:=database.Get_user_id_from_session(session_id)
-	if d_err==""{
+	if d_err=="ERROR"{
 		fmt.Println("Session Does not exist")
 		util.Message(w,1003)
 		return

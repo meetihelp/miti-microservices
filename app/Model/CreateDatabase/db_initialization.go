@@ -36,6 +36,11 @@ func init(){
 	createEducationTable(db)
 	createVerification_EmailTable(db)
 	createVerification_OTPTable(db)
+
+	createAnonymousUserTable(db)
+	createChatTable(db)
+	createChatDetailTable(db)
+	createReadByTable(db)
 }
 
 

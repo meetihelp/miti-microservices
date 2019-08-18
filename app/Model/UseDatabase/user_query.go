@@ -96,3 +96,15 @@ func Update_Password(user_id string,new_Password string){
 	user:=CD.User{}
 	db.Model(&user).Where("user_id = ?", user_id).Update("password", new_Password)
 }
+
+func GetAllUser() ([]string){
+	db:=GetDB()
+	user:=[]CD.User{}
+	db.Find(&user)
+
+	UserList:=make([]string,0)
+	for _,id := range user{
+		UserList=append(UserList,id.User_id)
+	}
+	return UserList
+}

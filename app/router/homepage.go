@@ -17,4 +17,6 @@ func homepage(w http.ResponseWriter, r *http.Request){
     enc := json.NewEncoder(w)
 	err := enc.Encode(d)
 	fmt.Println(err)
+
+	
 }
