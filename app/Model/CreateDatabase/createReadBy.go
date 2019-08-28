@@ -10,9 +10,9 @@ import (
 
 
 type ReadBy struct{
-	User_id string `gorm:"varchar(100)"  json:"user_id"`
-	Message_id string `gorm:"primary_key;unique;varchar(100)"  json:"message_id"`
-	Status string `gorm:"type:varchar(6)" json:"status"`
+	User_id string `gorm:"primary_key;varchar(100)"  json:"user_id"`
+	Message_id string `gorm:"primary_key;varchar(100)"  json:"message_id"`
+	Status string `gorm:"type:varchar(10)" json:"status"`
 	ReadAt time.Time `gorm:"type:time"`
 }
 

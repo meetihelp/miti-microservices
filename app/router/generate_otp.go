@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"fmt"
 	// "strings"
-	"time"
+	// "time"	
 	database "app/Model/UseDatabase"
 	util "app/Utility"
 	sms "app/Notification/SMS"
@@ -60,17 +60,20 @@ func send_verification_otp(w http.ResponseWriter,id string,phone string){
 		return
 	}
 
-	time_elasped:=time.Since(last_modified)
-	if time_elasped.Hours() < MAX_HOUR{
-		fmt.Println("otp sent more than limit")
-		util.Message(w,1302)
-		return
-	} else{
-		otp:=util.Generate_otp_string()
-		database.Enter_verification_otp(id,otp)
-		sms.Send_sms(phone,otp)
-		fmt.Println("OTP sent")
+	// time_elasped:=time.Since(last_modified)
+	// if time_elasped.Hours() < MAX_HOUR{
+	// 	fmt.Println("otp sent more than limit")
+	// 	util.Message(w,1302)
+	// 	return
+	// } else{
+	// 	otp:=util.Generate_otp_string()
+	// 	database.Enter_verification_otp(id,otp)
+	// 	sms.Send_sms(phone,otp)
+	// 	fmt.Println("OTP sent")
+	// 	util.Message(w,200)
+	// }
+	fmt.Println(last_modified)
+	fmt.Println("OTP sent")
 		util.Message(w,200)
-	}
 	
 }

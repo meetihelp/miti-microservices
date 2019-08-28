@@ -36,6 +36,9 @@ func get_message_decode(status_code int) string{
 	//MESSAGE STATUS CODE FOR PROFILE CREATION
 
 	//MESSAGE STATUS CODE FOR LOGOUT	
+
+	//MESSAGE STATUS CODE FOR GETCHATDETAIL
+	message_decode[7000]="Error in retrieving database"
 	
 	return message_decode[status_code]
 }

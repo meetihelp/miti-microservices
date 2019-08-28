@@ -3,7 +3,7 @@ package CreateDatabase
 import (
 	// "log"
 	// "fmt"
-	"time"
+	// "time"
 	"github.com/jinzhu/gorm"
  _ 	"github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -15,7 +15,8 @@ type Chat struct{
 	Message_id string `gorm:"primary_key;unique;varchar(100)"  json:"message_id"`
 	Message_type string `gorm:"varchar(100)"  json:"message_type"`
 	Message_content string `gorm:"varchar(100)"  json:"message_content"`
-	CreatedAt time.Time `gorm:"type:time"`
+	CreatedAt string `gorm:"type:varchar" json:"createdat"`
+	Index int `gorm:"type:int" json:"index"`
 }
 func createChatTable(db *gorm.DB){	
 	db.AutoMigrate(&Chat{})

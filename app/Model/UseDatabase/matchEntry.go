@@ -3,7 +3,7 @@ package UseDatabase
 import(
 	CD "app/Model/CreateDatabase"
 	util "app/Utility"
-	"time"
+	// "time"
 )
 
 func Enter_Match_user(user_id1 string,user_id2 string){	
@@ -23,7 +23,8 @@ func Enter_Anonymous_User(user_id string,temp_user_id string,chat_id string,chat
 	anonymousUser.User_id=user_id
 	anonymousUser.Anonymous_id=temp_user_id
 	anonymousUser.Chat_id=chat_id
-	anonymousUser.CreatedAt=time.Now()
+	// anonymousUser.CreatedAt=time.Now()
+	anonymousUser.CreatedAt=util.GetTime()
 	anonymousUser.Status="None"
 
 	chatDetail:=CD.ChatDetail{}

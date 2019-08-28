@@ -1,0 +1,141 @@
+1.login
+Required
+{
+	"phone" or "email"
+	"password"
+}
+
+return
+{
+	"code"
+	"message"
+}
+
+2.logout
+Required
+{
+	nothing
+}
+return
+{
+	"code"
+	"message"
+}
+
+3.register
+Required
+{
+	"phone" or "email"
+	"password"
+}
+return
+{
+	"code"
+	"message"
+}
+
+4.generate_verification_email
+Required
+{
+	nothing
+}
+return
+{
+	nothing
+}
+
+5.verify_email
+Required
+{
+	nothing
+}
+return
+{
+	nothing
+}
+
+6.generate_otp
+Required
+{
+	nothing
+}
+return
+{
+	"code"
+	"message"
+}
+
+7.verify_otp
+Required
+{
+	"verification_otp"
+}
+return
+{
+	"code"
+	"message"
+}
+
+8.update_password
+Required
+{
+	"old_password"
+	"new_password"
+}
+return
+{
+	"code"
+	"message"
+}
+
+9.getChatDetail
+Required
+{
+	"offset"
+	"num_of_chat"
+}
+return
+{
+	"ChatDetail":[]array of chatDetail
+	each element of chat detail contain
+	{
+		"temp_user_id": 
+        "actaul_user_id":
+        "chat_id":
+        "chat_type":
+      	"CreatedAt":
+        "user_index":
+	}
+}
+
+10.getChat
+Required
+{
+	"chat_id"
+	"offset"
+	"num_of_chat"
+}
+return
+{	"chat":[]{
+		"user_id": 
+	    "chat_id":
+	    "message_id": 
+	    "message_type": 
+	    "message_content":
+	    "CreatedAt": 
+	}
+}
+
+11.chat
+Required
+{
+	"user_id":"temp_user_id"
+	"chat_id"
+	"message_type"
+	"message_content"
+}
+return
+{
+	"code"
+	"status"
+}

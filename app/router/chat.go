@@ -4,12 +4,14 @@ import (
 	"net/http"
 	"fmt"
 	CD "app/Model/CreateDatabase"
+	// redis "app/Model/Redis"
 	database "app/Model/UseDatabase"
 	util "app/Utility"
 	"io/ioutil"
 	"encoding/json"
 	"time"
 )
+
 
 type Chat_header struct{
 	Cookie string `header:"Miti-Cookie"`
@@ -45,7 +47,23 @@ func chat(w http.ResponseWriter,r *http.Request){
 		return 
 	}
 	chat_data.Message_id=util.Generate_token()
-	chat_data.CreatedAt=time.Now()
+	temp_time:=time.Now()
+	chat_data.CreatedAt=temp_time.Format("2006-01-02 15:04:05")
+	index:=database.GetLastChatIndex(chat_data.Chat_id)
+	// index=util.GetNextLexString(index)
+	index=index+1
+	chat_data.Index=index
+	fmt.Println(chat_data.CreatedAt)
 	db:=database.GetDB()
 	db.Create(&chat_data)
+	e:=database.UpdateChatTime(chat_data.Chat_id,chat_data.CreatedAt)
+	if e!=nil{
+		return
+	}
+	// redis.EnterChat(chat_data)
+	// database.EnterReadBy(chat_data)
+	//Get user list from chatid
+	user_list:=database.GetUserListFromChatId(chat_data.Chat_id)
+	database.EnterReadBy(user_list,chat_data.Message_id)
+	util.Message(w,200)
 }

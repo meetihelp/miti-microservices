@@ -3,7 +3,7 @@ package CreateDatabase
 import (
 	// "log"
 	// "fmt"
-	"time"
+	// "time"
 	"github.com/jinzhu/gorm"
  _ 	"github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -14,7 +14,7 @@ type AnonymousUser struct{
 	Anonymous_id string `gorm:"primary_key;unique;varchar(100)"  json:"anonymous_user_id"`
 	Chat_id string `gorm:"primary_key;varchar(100)"  json:"chat_id"`
 	Status string `gorm:"type:varchar(6)" json:"status"`
-	CreatedAt time.Time `gorm:"type:time" json:"created_at"`
+	CreatedAt string `gorm:"type:varchar" json:"created_at"`
 }
 func createAnonymousUserTable(db *gorm.DB){	
 	db.AutoMigrate(&AnonymousUser{})

@@ -4,20 +4,26 @@ import(
 	"fmt"
 	// CD "app/Model/CreateDatabase"
 	database "app/Model/UseDatabase"
+	// redis "app/Model/Redis"
 	util "app/Utility"
 	"io/ioutil"
 	"encoding/json"
 )
 
-type GetUnreadChat_header struct{
+
+type GetChat_header struct{
 	Cookie string `header:"Miti-Cookie"`
 }
 
-
-func getUnreadChat(w http.ResponseWriter, r *http.Request){
-	getUnreadChat_header:=GetUnreadChat_header{}
-	util.GetHeader(r,&getUnreadChat_header)
-	session_id:=getUnreadChat_header.Cookie
+type Chat struct{
+	Chat_id string `json:"chat_id"`
+	Offset int `json:"offset"`
+	Num_of_chat int `json:"num_of_chat"`
+}
+func getChat(w http.ResponseWriter, r *http.Request){
+	getChat_header:=GetChat_header{}
+	util.GetHeader(r,&getChat_header)
+	session_id:=getChat_header.Cookie
 	user_id,getChat_status:=database.Get_user_id_from_session(session_id)
 	fmt.Println(user_id)
 	if getChat_status=="ERROR"{
@@ -40,10 +46,13 @@ func getUnreadChat(w http.ResponseWriter, r *http.Request){
 		return 
 	}
 
-	message_id:=database.GetUnreadMessage(user_id)
-	chat:=database.GetChatByMessageId(message_id)
+	status:=database.Check_correct_chat(user_id,chat_data.Chat_id)
+	if status=="ERROR"{
+		util.Message(w,1002)
+		return
+	}
 
-	//Code for changing status of unfetched data
-	database.ChangeFetchStatus(user_id,message_id)
+	chat:=database.GetChatMessages(chat_data.Chat_id,chat_data.Offset,chat_data.Num_of_chat)
+
 	util.SendChat(w,chat)
 }

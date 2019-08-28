@@ -43,11 +43,13 @@ func Send_Match_list(w http.ResponseWriter,matchList []string,chatIdList []strin
 
 type SendChat_Content struct{
 	Code int `json:"code"`
+	Message string `json:"message"`
 	Chat []CD.Chat `json:"chat"`
 }
 func SendChat(w http.ResponseWriter,chat []CD.Chat){
 	w.Header().Set("Content-Type", "application/json")
-	p:=&SendChat_Content{Code:6000,Chat:chat}
+	msg:=get_message_decode(200)
+	p:=&SendChat_Content{Code:200,Message:msg,Chat:chat}
 	enc := json.NewEncoder(w)
 	err:= enc.Encode(p)
 	if err != nil {
@@ -57,11 +59,14 @@ func SendChat(w http.ResponseWriter,chat []CD.Chat){
 }
 
 type ChatDetail_Content struct{
-	ChatDetail []CD.ChatDetail `json:chatdetail`
+	ChatDetail []CD.ChatDetail `json:"chatdetail"`
+	Code int `json:"status"`
+	Message string `json:"message"`
 }
-func Send_ChatDetail(w http.ResponseWriter, chatDetail []CD.ChatDetail){
+func Send_ChatDetail(w http.ResponseWriter, chatDetail []CD.ChatDetail,status_code int){
 	w.Header().Set("Content-Type", "application/json")
-	p:=&ChatDetail_Content{ChatDetail:chatDetail}
+	msg:=get_message_decode(status_code)
+	p:=&ChatDetail_Content{ChatDetail:chatDetail,Code:status_code,Message:msg}
 	enc := json.NewEncoder(w)
 	err:= enc.Encode(p)
 	if err != nil {

@@ -6,4 +6,5 @@ go install $PATH1/Model/UseDatabase
 go install $PATH1/Notification/Mail
 go install $PATH1/router
 go install $PATH1/Notification/SMS
+go install $PATH1/Model/Redis
 

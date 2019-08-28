@@ -4,25 +4,24 @@ import(
 	"fmt"
 	// CD "app/Model/CreateDatabase"
 	database "app/Model/UseDatabase"
+	// redis "app/Model/Redis"
 	util "app/Utility"
 	"io/ioutil"
 	"encoding/json"
 )
-
-
-type GetChat_header struct{
+type GetChatAfterIndex_header struct{
 	Cookie string `header:"Miti-Cookie"`
 }
-
-type Chat struct{
+type ChatAfterIndex struct{
 	Chat_id string `json:"chat_id"`
 	Offset int `json:"offset"`
 	Num_of_chat int `json:"num_of_chat"`
+	Index int `json:"index"`
 }
-func getAllChat(w http.ResponseWriter, r *http.Request){
-	getChat_header:=GetChat_header{}
-	util.GetHeader(r,&getChat_header)
-	session_id:=getChat_header.Cookie
+func getChatAfterIndex(w http.ResponseWriter,r *http.Request){
+	getChatAfterIndex_header:=GetChatAfterIndex_header{}
+	util.GetHeader(r,&getChatAfterIndex_header)
+	session_id:=getChatAfterIndex_header.Cookie
 	user_id,getChat_status:=database.Get_user_id_from_session(session_id)
 	fmt.Println(user_id)
 	if getChat_status=="ERROR"{
@@ -37,7 +36,7 @@ func getAllChat(w http.ResponseWriter, r *http.Request){
 		return 
 	}
 
-	chat_data:=Chat{}
+	chat_data:=ChatAfterIndex{}
 	err_user_data:=json.Unmarshal(requestBody,&chat_data)
 	if err_user_data!=nil{
 		fmt.Println("Could not Unmarshall user data")
@@ -51,7 +50,7 @@ func getAllChat(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	chat:=database.GetChatMessages(chat_data.Chat_id,chat_data.Offset,chat_data.Num_of_chat)
+	chat:=database.GetChatAfterIndexMessages(chat_data.Chat_id,chat_data.Offset,chat_data.Num_of_chat,chat_data.Index)
 
 	util.SendChat(w,chat)
 }
