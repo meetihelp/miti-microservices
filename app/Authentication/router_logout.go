@@ -11,7 +11,7 @@ import(
 )
 
 
-func logout(w http.ResponseWriter,r *http.Request){
+func Logout(w http.ResponseWriter,r *http.Request){
 	// ip_address:=util.Get_IP_address(r)
 	fmt.Println("Delete")
 	logout_header:=Logout_header{}

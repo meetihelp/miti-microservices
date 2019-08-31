@@ -9,7 +9,7 @@ import(
     "io/ioutil"
 )
 
-func verify_otp(w http.ResponseWriter,r *http.Request){
+func Verify_otp(w http.ResponseWriter,r *http.Request){
     verify_otp_header:=Verify_OTP_Header{}
     util.GetHeader(r,&verify_otp_header)
     session_id:=verify_otp_header.Cookie

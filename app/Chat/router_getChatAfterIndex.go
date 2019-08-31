@@ -8,7 +8,7 @@ import(
 	"encoding/json"
 )
 
-func getChatAfterIndex(w http.ResponseWriter,r *http.Request){
+func GetChatAfterIndex(w http.ResponseWriter,r *http.Request){
 	getChatAfterIndex_header:=GetChatAfterIndex_header{}
 	util.GetHeader(r,&getChatAfterIndex_header)
 	session_id:=getChatAfterIndex_header.Cookie

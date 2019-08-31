@@ -10,7 +10,7 @@ import(
    util "app/Util"
 )
 
-func register(w http.ResponseWriter, r *http.Request){
+func Register(w http.ResponseWriter, r *http.Request){
 	//Get ip address of user
 	ip_address:=util.Get_IP_address(r)
 	fmt.Println("Registeration request from "+ip_address)

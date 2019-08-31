@@ -9,7 +9,7 @@ import (
 )
 
 
-func login(w http.ResponseWriter,r *http.Request){
+func Login(w http.ResponseWriter,r *http.Request){
 	ip_address:=util.Get_IP_address(r)
 	login_header:=Login_header{}
 	util.GetHeader(r,&login_header)

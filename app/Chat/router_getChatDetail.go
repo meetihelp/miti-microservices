@@ -7,7 +7,7 @@ import(
 	"io/ioutil"
 	"encoding/json"
 )
-func getChatDetail(w http.ResponseWriter, r *http.Request){
+func GetChatDetailroute(w http.ResponseWriter, r *http.Request){
 	getChatDetail_header:=GetChatDetail_header{}
 	util.GetHeader(r,&getChatDetail_header)
 	session_id:=getChatDetail_header.Cookie

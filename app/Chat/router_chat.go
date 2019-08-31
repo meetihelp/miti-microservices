@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func chat(w http.ResponseWriter,r *http.Request){
+func Chatinsert(w http.ResponseWriter,r *http.Request){
 	chat_header:=Chat_header{}
 	util.GetHeader(r,&chat_header)
 	session_id:=chat_header.Cookie

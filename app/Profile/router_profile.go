@@ -11,7 +11,7 @@ import(
 )
 
 
-func profile_creation(w http.ResponseWriter, r *http.Request){
+func Profile_creation(w http.ResponseWriter, r *http.Request){
 	header:=Profile_creation_Header{}
 	util.GetHeader(r,&header)
 

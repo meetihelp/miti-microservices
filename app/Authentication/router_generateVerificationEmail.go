@@ -17,7 +17,7 @@ type Email_Verification_Header struct{
 	Cookie string `header:"Miti-Cookie"`
 }
 
-func generate_verification_email(w http.ResponseWriter,r *http.Request){
+func Generate_verification_email(w http.ResponseWriter,r *http.Request){
 	email_verification_header:=Email_Verification_Header{}
 	util.GetHeader(r,&email_verification_header)
 	session_id:=email_verification_header.Cookie

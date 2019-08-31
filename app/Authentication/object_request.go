@@ -1,4 +1,7 @@
 package Authentication
+type Verification_Header struct{
+	Cookie string `header:"Miti-Cookie"`
+}
 type Login_header struct{
 	Cookie string `header:"Miti-Cookie"`
 }

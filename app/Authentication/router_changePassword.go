@@ -9,7 +9,7 @@ import(
 )
 
 
-func update_password(w http.ResponseWriter,r *http.Request){
+func Update_password(w http.ResponseWriter,r *http.Request){
 	update_password_header:=Update_password_header{}
 	util.GetHeader(r,&update_password_header)
 	session_id:=update_password_header.Cookie

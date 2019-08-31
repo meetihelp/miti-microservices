@@ -15,11 +15,9 @@ const (
 	MAX_HOUR = 4
 )
 
-type Verification_Header struct{
-	Cookie string `header:"Miti-Cookie"`
-}
 
-func generate_otp(w http.ResponseWriter,r *http.Request){
+
+func Generate_otp(w http.ResponseWriter,r *http.Request){
 	verification_header:=Verification_Header{}
 	util.GetHeader(r,&verification_header)
 	session_id:=verification_header.Cookie
