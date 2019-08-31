@@ -1,10 +1,9 @@
+set -euo pipefail
+
 PATH1=$GOPATH/src/app
 echo $PATH1
-go install $PATH1/Model/CreateDatabase
-go install $PATH1/Utility
-go install $PATH1/Model/UseDatabase
-go install $PATH1/Notification/Mail
-go install $PATH1/router
-go install $PATH1/Notification/SMS
-go install $PATH1/Model/Redis
-
+go install $PATH1/Util
+go install $PATH1/Database
+go install $PATH1/Chat
+go install $PATH1/Authentication
+go install $PATH1/Profile
