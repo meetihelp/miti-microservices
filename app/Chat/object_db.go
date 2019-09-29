@@ -3,9 +3,10 @@ package Chat
 import (
 	// "log"
 	// "fmt"
+	database "app/Database"
 	"time"
-	"github.com/jinzhu/gorm"
- _ 	"github.com/jinzhu/gorm/dialects/postgres"
+	// "github.com/jinzhu/gorm"
+ // _ 	"github.com/jinzhu/gorm/dialects/postgres"
 )
 
 type ChatDetail struct{
@@ -33,7 +34,8 @@ type ReadBy struct{
 	ReadAt time.Time `gorm:"type:time"`
 }
 
-func createChatDetailTable(db *gorm.DB){	
+func init(){	
+	db:=database.GetDB()
 	db.AutoMigrate(&ChatDetail{})
 	db.AutoMigrate(&Chat{})
 	db.AutoMigrate(&ReadBy{})
