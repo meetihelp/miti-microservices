@@ -2,6 +2,7 @@ package Profile
 import(
 	"fmt"
    database "app/Database"
+   "reflect"
 )
 
 func Enter_profile_data(profile_data Profile){
@@ -98,10 +99,12 @@ func InsertQuestionInDB(content string,TypeofQuestion int,factor int){
 }
 
 
-func InsertQuestionResponse(userId string,response []Response){
+func InsertQuestionResponse(userId string,response map[string]int){
 	db:=database.GetDB()
-	for _,data := range response{
-		db.Table("question_responses").Where("user_id=?",userId).Update(data.QuestionId,data.Response)
+
+    keys := reflect.ValueOf(response).MapKeys()
+	for _,key := range keys{
+		db.Table("question_responses").Where("user_id=?",userId).Update(key.Interface().(string),response[key.Interface().(string)])
 	}
 }
 func UpdateJob(userId string,job string){

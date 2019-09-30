@@ -121,19 +121,22 @@ func UpdateQuestionResponse(w http.ResponseWriter, r *http.Request){
 		return 
 	}
 	
-
-	responseWrapper:=ResponseWrapper{}
-	// questionResponse.UserId=userId
-	err_question_data:=json.Unmarshal(requestBody,&responseWrapper)
-	fmt.Println(responseWrapper.IPIP)
-	response:=[]Response{}
-	response=responseWrapper.IPIP
-	fmt.Println(response[0].QuestionId)
-	if err_question_data!=nil{
-		fmt.Println("Could not Unmarshall profile data")
-		util.Message(w,1001)
-		return
-	}
+	var data map[string]int
+	if err := json.Unmarshal(requestBody, &data); err != nil {
+        panic(err)
+    }
+    fmt.Println(data)
+	// responseWrapper:=ResponseWrapper{}
+	// err_question_data:=json.Unmarshal(requestBody,&responseWrapper)
+	// fmt.Println(responseWrapper.IPIP)
+	// response:=[]Response{}
+	// response=responseWrapper.IPIP
+	// fmt.Println(response[0].QuestionId)
+	// if err_question_data!=nil{
+	// 	fmt.Println("Could not Unmarshall profile data")
+	// 	util.Message(w,1001)
+	// 	return
+	// }
 
 	// sanatization_status:=Sanatize(questionResponse)
 	// if sanatization_status =="ERROR"{
@@ -142,7 +145,7 @@ func UpdateQuestionResponse(w http.ResponseWriter, r *http.Request){
 	// 	return
 	// }
 
-	InsertQuestionResponse(userId,responseWrapper.IPIP)
+	InsertQuestionResponse(userId,data)
 
 	// score:=GetScore(responseWrapper.IPIP)
 	// UpdateScore(userId,score)
