@@ -39,8 +39,6 @@ func Profile_creation(w http.ResponseWriter, r *http.Request){
 		util.Message(w,1001)
 		return
 	}
-	// profile_data:=Profile{}
-	// GetData(r,&profile_data)
 	fmt.Println(profile_data.Name)
 	profile_data.UserId=user_id
 	sanatization_status:=Sanatize(profile_data)
@@ -51,6 +49,7 @@ func Profile_creation(w http.ResponseWriter, r *http.Request){
 	}
 	// profile_data_handle(w,profile_data)
 	Enter_profile_data(profile_data)
+
 	util.Message(w,200)
 
 }
@@ -121,15 +120,21 @@ func UpdateQuestionResponse(w http.ResponseWriter, r *http.Request){
 		util.Message(w,1000)
 		return 
 	}
+	
 
-	questionResponse:=QuestionResponse{}
-	questionResponse.UserId=userId
-	err_question_data:=json.Unmarshal(requestBody,&questionResponse)
+	responseWrapper:=ResponseWrapper{}
+	// questionResponse.UserId=userId
+	err_question_data:=json.Unmarshal(requestBody,&responseWrapper)
+	fmt.Println(responseWrapper.IPIP)
+	response:=[]Response{}
+	response=responseWrapper.IPIP
+	fmt.Println(response[0].QuestionId)
 	if err_question_data!=nil{
 		fmt.Println("Could not Unmarshall profile data")
 		util.Message(w,1001)
 		return
 	}
+
 	// sanatization_status:=Sanatize(questionResponse)
 	// if sanatization_status =="ERROR"{
 	// 	fmt.Println("profile creation data invalid")
@@ -137,7 +142,10 @@ func UpdateQuestionResponse(w http.ResponseWriter, r *http.Request){
 	// 	return
 	// }
 
-	InsertQuestionResponse(questionResponse)
+	InsertQuestionResponse(userId,responseWrapper.IPIP)
+
+	// score:=GetScore(responseWrapper.IPIP)
+	// UpdateScore(userId,score)
 	util.Message(w,200)
 }
 
@@ -176,6 +184,6 @@ func InsertQuestion(w http.ResponseWriter, r *http.Request){
 	// 	return
 	// }
 
-	InsertQuestionInDB(question.Content)
+	InsertQuestionInDB(question.Content,question.Type,question.Factor)
 	util.Message(w,200)
 }

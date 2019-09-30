@@ -21,3 +21,12 @@ type QuestionRequest struct{
 	Offset int `json:"Offset"`
 	NumOfQuestion int `json:"NumOfQuestion"`
 }
+
+type Response struct{
+	QuestionId string `json:"QuestionID"`
+	Response int `json:"Response"`
+}
+
+type ResponseWrapper struct{
+	IPIP []Response `json:"IPIP"`
+}

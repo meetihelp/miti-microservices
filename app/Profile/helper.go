@@ -21,20 +21,3 @@ func SendQuestion(w http.ResponseWriter,question []Question){
 	}
 }
 
-// func GetData(r *http.Request,data interface{}){
-// 	val:=reflect.ValueOf(data).Elem()
-// 	data_type:=reflect.TypeOf(data).Elem()
-// 	body,_:=ioutil.ReadAll(r.Body)
-// 	fmt.Println(body)
-// 	for i:=0 ;i<val.NumField();i++{
-// 		fld:=val.Field(i)
-// 		tag:=data_type.Field(i).Tag.Get("json")
-// 		body_data,ok:= body[tag]
-// 		if ok{
-// 			switch fld.Kind(){
-// 			case reflect.String:
-// 				fld.SetString(body_data[0])
-// 			}
-// 		}
-// 	}
-// }

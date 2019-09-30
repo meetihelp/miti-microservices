@@ -1,18 +1,16 @@
 package Profile
 import(
 	"fmt"
-	// "golang.org/x/crypto/bcrypt"
-	// "github.com/jinzhu/gorm"
- // _ 	"github.com/jinzhu/gorm/dialects/postgres"
-   // CD "app/Model/CreateDatabase"
    database "app/Database"
-    // ut "app/Utility"
 )
 
 func Enter_profile_data(profile_data Profile){
 	fmt.Println("Enter_profile_data")
 	db:=database.GetDB()
 	db.Create(&profile_data)
+	questionResponse:=QuestionResponse{}
+	questionResponse.UserId=profile_data.UserId
+	db.Create(&questionResponse)
 }
 
 func GetProfile(userId string) Profile{
@@ -42,7 +40,7 @@ func UpdateScore(userId string,score []int){
 	score[2]=profile.Conscientiousness+score[2]
 	score[3]=profile.EmotionalStability+score[3]
 	score[4]=profile.Intellect+score[4]
-	db.Table("Profile").Where("UserId=?",userId).Updates(Profile{Extraversion:score[0],
+	db.Table("profiles").Where("UserId=?",userId).Updates(Profile{Extraversion:score[0],
 		Agreeableness:score[1],Conscientiousness:score[2],EmotionalStability:score[3],Intellect:score[4]})
 }
 
@@ -51,7 +49,7 @@ func UpdateExtraversionScore(userId string,score int){
 	profile:=Profile{}
 	db.Where("UserId=?",userId).Find(&profile)
 	newScore:=profile.Extraversion+score
-	db.Table("Profile").Where("UserId=?",userId).Update("Extraversion",newScore)
+	db.Table("profiles").Where("UserId=?",userId).Update("Extraversion",newScore)
 }
 
 func UpdateAgreeablenessScore(userId string,score int){
@@ -59,7 +57,7 @@ func UpdateAgreeablenessScore(userId string,score int){
 	profile:=Profile{}
 	db.Where("UserId=?",userId).Find(&profile)
 	newScore:=profile.Agreeableness+score
-	db.Table("Profile").Where("UserId=?",userId).Update("Agreeableness",newScore)
+	db.Table("profiles").Where("UserId=?",userId).Update("Agreeableness",newScore)
 }
 
 func UpdateConscientiousnessScore(userId string,score int){
@@ -67,7 +65,7 @@ func UpdateConscientiousnessScore(userId string,score int){
 	profile:=Profile{}
 	db.Where("UserId=?",userId).Find(&profile)
 	newScore:=profile.Conscientiousness+score
-	db.Table("Profile").Where("UserId=?",userId).Update("Conscientiousness",newScore)
+	db.Table("profiles").Where("UserId=?",userId).Update("Conscientiousness",newScore)
 }
 
 func UpdateEmotionalStabilityScore(userId string,score int){
@@ -75,7 +73,7 @@ func UpdateEmotionalStabilityScore(userId string,score int){
 	profile:=Profile{}
 	db.Where("UserId=?",userId).Find(&profile)
 	newScore:=profile.EmotionalStability+score
-	db.Table("Profile").Where("UserId=?",userId).Update("EmotionalStability",newScore)
+	db.Table("profiles").Where("UserId=?",userId).Update("EmotionalStability",newScore)
 }
 
 func UpdateIntellectScore(userId string,score int){
@@ -83,7 +81,7 @@ func UpdateIntellectScore(userId string,score int){
 	profile:=Profile{}
 	db.Where("UserId=?",userId).Find(&profile)
 	newScore:=profile.EmotionalStability+score
-	db.Table("Profile").Where("UserId=?",userId).Update("Intellect",newScore)
+	db.Table("profiles").Where("UserId=?",userId).Update("Intellect",newScore)
 }
 
 func GetQuestionById(questionId int) string{
@@ -93,38 +91,41 @@ func GetQuestionById(questionId int) string{
 	return question.Content
 }
 
-func InsertQuestionInDB(content string){
+func InsertQuestionInDB(content string,TypeofQuestion int,factor int){
 	db:=database.GetDB()
-	question:=Question{Content:content}
+	question:=Question{Content:content,Type:TypeofQuestion,Factor:factor}
 	db.Create(&question)
 }
 
-func InsertQuestionResponse(response QuestionResponse){
+
+func InsertQuestionResponse(userId string,response []Response){
 	db:=database.GetDB()
-	db.Create(&response)
+	for _,data := range response{
+		db.Table("question_responses").Where("user_id=?",userId).Update(data.QuestionId,data.Response)
+	}
 }
 func UpdateJob(userId string,job string){
 	db:=database.GetDB()
-	db.Table("Profile").Where("UserId=?",userId).Update("Job",job)
+	db.Table("profiles").Where("UserId=?",userId).Update("Job",job)
 }
 
 func UpdateName(userId string,name string){
 	db:=database.GetDB()
-	db.Table("Profile").Where("UserId=?",userId).Update("Name",name)
+	db.Table("profiles").Where("UserId=?",userId).Update("Name",name)
 }
 
 func UpdatePicURL(userId string,url string){
 	db:=database.GetDB()
-	db.Table("Profile").Where("UserId=?",userId).Update("PicUrl",url)
+	db.Table("profiles").Where("UserId=?",userId).Update("PicUrl",url)
 }
 func UpdateDOB(userId string,dob string){
 	db:=database.GetDB()
-	db.Table("Profile").Where("UserId=?",userId).Update("DataOfBirth",dob)	
+	db.Table("profiles").Where("UserId=?",userId).Update("DataOfBirth",dob)	
 }
 
 func UpdateLanguage(userId string,language string){
 	db:=database.GetDB()
-	db.Table("Profile").Where("UserId=?",userId).Update("Language",language)
+	db.Table("profiles").Where("UserId=?",userId).Update("Language",language)
 }
 
 func GetQuestionFromDB(offset int,num_of_question int)([]Question){
@@ -132,4 +133,15 @@ func GetQuestionFromDB(offset int,num_of_question int)([]Question){
 	question:=[]Question{}
 	db.Offset(offset).Limit(num_of_question).Find(&question)
 	return question
+}
+
+func GetScore(response []Response) ([]int){
+	db:=database.GetDB()
+	score:=make([]int,5)
+	for _,data:=range response{
+		question:=Question{}
+		db.Where("QuestionId=?",data.QuestionId).Find(&question)
+		score[question.Factor]=score[question.Factor]+question.Type*data.Response
+	}
+	return score
 }
