@@ -2,9 +2,10 @@ package Util
 import (
 	// "log"
 	// "fmt"
+	database "app/Database"
 	"time"
-	"github.com/jinzhu/gorm"
- _ 	"github.com/jinzhu/gorm/dialects/postgres"
+	// "github.com/jinzhu/gorm"
+ // _ 	"github.com/jinzhu/gorm/dialects/postgres"
 )
 
 type Session struct{
@@ -18,6 +19,7 @@ type Session struct{
 	// OS string `gorm:"type:varchar(30)" validate:"required"`
 }
 
-func createSessionTable(db *gorm.DB){
+func init(){
+	db:=database.GetDB()
 	db.AutoMigrate(&Session{})
 }

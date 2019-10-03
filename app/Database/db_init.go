@@ -8,12 +8,7 @@ import (
 )
 
 var db *gorm.DB
-const (
-  dbUser = "postgres"
-  dbName = "mytestdb"
-  sslmode = "disable"
-  password ="peetal"
-)
+
 
 func init() {
 	db_credentials:=fmt.Sprintf("host=localhost port=5432 user=postgres dbname=mytestdb password=mypassword")

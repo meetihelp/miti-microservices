@@ -148,3 +148,4 @@ func GetScore(response []Response) ([]int){
 	}
 	return score
 }
+
