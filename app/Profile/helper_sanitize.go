@@ -5,19 +5,19 @@ import(
 )
 
 
-type Sanatize_Data interface{
-	do_sanitization() string
+type SanatizeData interface{
+	doSanitization() string
 }
 
-func (profile_data Profile) do_sanitization() string{
+func (profileData Profile) doSanitization() string{
 	validate :=validator.New()
-	err:= validate.Struct(profile_data)
+	err:= validate.Struct(profileData)
 	if err!=nil{
 		fmt.Println(err.Error())
-		return "ERROR"
+		return "Error"
 	}
-	return "OK"
+	return "Ok"
 }
-func Sanatize(s Sanatize_Data) string{
-	return s.do_sanitization()
+func Sanatize(s SanatizeData) string{
+	return s.doSanitization()
 }

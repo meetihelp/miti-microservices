@@ -5,20 +5,27 @@ import (
 	util "app/Util"
 	"io/ioutil"
 	"encoding/json"
-	// "strings"
 )
 
 
 func Login(w http.ResponseWriter,r *http.Request){
-	ip_address:=util.Get_IP_address(r)
-	login_header:=Login_header{}
-	util.GetHeader(r,&login_header)
-	session_id:=login_header.Cookie
-	fmt.Println(session_id)
-	user_id,login_status:=util.Get_user_id_from_session(session_id)
-	fmt.Println("session "+login_status)
-	if login_status=="OK"{
+	ipAddress:=util.GetIPAddress(r)
+	loginHeader:=LoginHeader{}
+	util.GetHeader(r,&loginHeader)
+	sessionId:=loginHeader.Cookie
+	fmt.Println(sessionId)
+	userId,loginStatus:=util.GetUserIdFromSession(sessionId)
+	fmt.Println("session "+loginStatus)
+	if loginStatus=="Ok"{
 		util.Message(w,200)
+		return
+	}
+	userId,loginStatus=util.GetUserIdFromUserVerificationSession(sessionId)
+	fmt.Println("session "+loginStatus)
+	if loginStatus=="Ok"{
+		cookie:=sessionId
+		w.Header().Set("Miti-Cookie",cookie)
+		util.Message(w,1005)
 		return
 	}
 
@@ -31,41 +38,42 @@ func Login(w http.ResponseWriter,r *http.Request){
 	}
 
 	//UNMARSHILING DATA
-	user_data :=User{}
-	err_user_data:=json.Unmarshal(requestBody,&user_data)
-	if err_user_data!=nil{
+	userData :=User{}
+	errUserData:=json.Unmarshal(requestBody,&userData)
+	if errUserData!=nil{
 		fmt.Println("Could not Unmarshall user data")
 		util.Message(w,1001)
 		return 
 	}
 
-	sanatization_status :=Sanatize(user_data)
-	if sanatization_status =="ERROR"{
+	sanatizationStatus :=Sanatize(userData)
+	if sanatizationStatus =="Error"{
 		fmt.Println("User data invalid")
 		util.Message(w,1002)
 		return
 	}
 
-	user_id,login_status=Check_user(user_data)
-	if login_status=="WRONG_PASSWORD"{
+	userId,loginStatus=CheckUser(userData)
+	if loginStatus=="WrongPassword"{
 		util.Message(w,1501)
 		return
 	}
-	if login_status=="NO_USER"{
+	if loginStatus=="NoUser"{
 		util.Message(w,1501)
 		return
 	}
-	if login_status=="UNVERIFIED"{
-		cookie:=util.Insert_session(user_id,ip_address)
+	if loginStatus=="Unverified"{
+		cookie:=util.InsertUserVerificationSession(userId,ipAddress)
 		// http.SetCookie(w,&cookie)
-		w.Header().Set("miti-Cookie",cookie)
+		w.Header().Set("Miti-Cookie",cookie)
 		util.Message(w,1005)
 		return
 	} 
-	if login_status=="OK"{
-		cookie:=util.Insert_session(user_id,ip_address)
+	if loginStatus=="Ok"{
+		cookie:=util.InsertSession(userId,ipAddress)
+		fmt.Println("gaurav1")
 		// http.SetCookie(w,&cookie)
-		w.Header().Set("miti-Cookie",cookie)
+		w.Header().Set("Miti-Cookie",cookie)
 		util.Message(w,200)
 		return
 	}

@@ -1,22 +1,22 @@
 package Authentication
-type Verification_Header struct{
+type VerificationHeader struct{
 	Cookie string `header:"Miti-Cookie"`
 }
-type Login_header struct{
+type LoginHeader struct{
 	Cookie string `header:"Miti-Cookie"`
 }
 
-type Verify_OTP_Header struct{
+type VerifyOTPHeader struct{
     Cookie string `header:"Miti-Cookie"`
 }
 
-type Update_password_header struct{
+type UpdatePasswordHeader struct{
 	Cookie string `header:"Miti-Cookie"`
 }
-type Logout_header struct{
+type LogoutHeader struct{
 	Cookie string `header:"Miti-Cookie"`
 }
-type Register_Header struct{
+type RegisterHeader struct{
 	Method string `header:"Method"`
-	Agent string `header:"User-Agent"`
+	Agent string `header:"UserAgent"`
 }

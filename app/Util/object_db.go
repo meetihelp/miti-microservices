@@ -3,23 +3,31 @@ import (
 	// "log"
 	// "fmt"
 	database "app/Database"
-	"time"
+	// "time"
 	// "github.com/jinzhu/gorm"
  // _ 	"github.com/jinzhu/gorm/dialects/postgres"
 )
 
 type Session struct{
-	User_id string `gorm:"primary_key;type:varchar(100)"  validate:"required"`
-	Session_id string `gorm:"primary_key;type:varchar(100)"  validate:"required"`
-	IP string `gorm:"type:varchar(100)" validate:"required"`
-	CreatedAt time.Time `gorm:"type:time" json:"created_at"`
+	UserId string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"UserId"`
+	SessionId string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"SessionId"`
+	IP string `gorm:"type:varchar(100)" validate:"required" json:"IP"`
+	CreatedAt string `gorm:"type:varchar(100)" json:"CreatedAt"`
 	// User_agent string `gorm:"type:varchar(30)" validate:"required"`
 	// Latitude string `gorm:"type:varchar(30)" validate:"required"`
 	// Longitude string `gorm:"type:varchar(30)" validate:"required"`
 	// OS string `gorm:"type:varchar(30)" validate:"required"`
 }
 
+type UserVerificationSession struct{
+	UserId string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"UserId"`
+	UserVerificationSessionId string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"SessionId"`
+	IP string `gorm:"type:varchar(100)" validate:"required" json:"IP"`
+	CreatedAt string `gorm:"type:varchar(100)" json:"CreatedAt"`
+}
+
 func init(){
 	db:=database.GetDB()
 	db.AutoMigrate(&Session{})
+	db.AutoMigrate(&UserVerificationSession{})
 }

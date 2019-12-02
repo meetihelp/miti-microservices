@@ -1,6 +1,6 @@
 package Profile
 
-type SendQuestion_Content struct{
+type SendQuestionContent struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
 	Question []Question `json:"Question"`

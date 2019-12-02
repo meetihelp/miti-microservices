@@ -8,12 +8,12 @@ import(
 	"encoding/json"
 )
 func GetChatDetailroute(w http.ResponseWriter, r *http.Request){
-	getChatDetail_header:=GetChatDetail_header{}
-	util.GetHeader(r,&getChatDetail_header)
-	session_id:=getChatDetail_header.Cookie
-	user_id,getChat_status:=util.Get_user_id_from_session(session_id)
-	fmt.Println(user_id)
-	if getChat_status=="ERROR"{
+	getChatDetailHeader:=GetChatDetailHeader{}
+	util.GetHeader(r,&getChatDetailHeader)
+	sessionId:=getChatDetailHeader.Cookie
+	userId,getChatStatus:=util.GetUserIdFromSession(sessionId)
+	fmt.Println(userId)
+	if getChatStatus=="Error"{
 		util.Message(w,1003)
 		return
 	}
@@ -28,19 +28,26 @@ func GetChatDetailroute(w http.ResponseWriter, r *http.Request){
 	}
 
 	chatDetailDs :=ChatDetailDs{}
-	err_user_data:=json.Unmarshal(requestBody,&chatDetailDs)
-	if err_user_data!=nil{
+	errUserData:=json.Unmarshal(requestBody,&chatDetailDs)
+	if errUserData!=nil{
 		fmt.Println("Could not Unmarshall user data")
 		util.Message(w,1001)
 		return 
 	}
 
-	chatDetail,chatDetail_err:=GetChatDetail(user_id,chatDetailDs.Offset,chatDetailDs.Num_of_chat)
-	if chatDetail_err=="ERROR"{
-		Send_ChatDetail(w,chatDetail,7000)
+	sanatizationStatus :=Sanatize(chatDetailDs)
+	if sanatizationStatus =="Error"{
+		fmt.Println("User data invalid")
+		util.Message(w,1002)
+		return
+	}
+
+	chatDetail,chatDetailErr:=GetChatDetail(userId,chatDetailDs.Offset,chatDetailDs.NumOfChat)
+	if chatDetailErr=="Error"{
+		SendChatDetail(w,chatDetail,7000)
 		return
 	}else{
-		Send_ChatDetail(w,chatDetail,200)
+		SendChatDetail(w,chatDetail,200)
 		return
 	}
 }

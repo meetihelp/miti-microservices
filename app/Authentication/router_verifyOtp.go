@@ -3,18 +3,18 @@ package Authentication
 import(
 	"net/http"
 	"fmt"
-	// "log"
 	util "app/Util"
     "encoding/json"
     "io/ioutil"
 )
 
-func Verify_otp(w http.ResponseWriter,r *http.Request){
-    verify_otp_header:=Verify_OTP_Header{}
-    util.GetHeader(r,&verify_otp_header)
-    session_id:=verify_otp_header.Cookie
-    user_id,session_err:=util.Get_user_id_from_session(session_id)
-    if session_err=="ERROR"{
+func VerifyOtp(w http.ResponseWriter,r *http.Request){
+    ipAddress:=util.GetIPAddress(r)
+    verifyOtpHeader:=VerifyOTPHeader{}
+    util.GetHeader(r,&verifyOtpHeader)
+    sessionId:=verifyOtpHeader.Cookie
+    userId,sessionErr:=util.GetUserIdFromUserVerificationSession(sessionId)
+    if sessionErr=="Error"{
         fmt.Println("Session Does not exist")
         util.Message(w,1003)
         return
@@ -27,28 +27,30 @@ func Verify_otp(w http.ResponseWriter,r *http.Request){
         return 
     }
 
-    otp_verification:=OTP_verification{}
-    err_user_data:=json.Unmarshal(requestBody,&otp_verification)
-    if err_user_data!=nil{
+    otpVerification:=OTPVerification{}
+    errUserData:=json.Unmarshal(requestBody,&otpVerification)
+    if errUserData!=nil{
         fmt.Println("Could not Unmarshall user data")
         util.Message(w,1001)
         return 
     }
 
-    otp_verification.User_id=user_id
+    otpVerification.UserId=userId
 
     //SANITIZE USER AND PROFILE DATA
-    sanatization_status :=Sanatize(otp_verification)
-    if sanatization_status =="ERROR"{
+    sanatizationStatus :=Sanatize(otpVerification)
+    if sanatizationStatus =="Error"{
         fmt.Println("User data invalid")
         util.Message(w,1002)
         return
     }
 
-    otp_verify:=Verify_OTP(otp_verification.User_id,otp_verification.Verification_otp)
-    if otp_verify{
+    otpVerify:=VerifyOTP(otpVerification.UserId,otpVerification.VerificationOtp)
+    if otpVerify{
         //CHANGE STATUS OF USER TO VERIFIED
-        Change_Verification_Status(user_id)
+        ChangeVerificationStatus(userId)
+        util.InsertSessionValue(sessionId,userId,ipAddress)
+        util.DeleteUserVerificationSession(sessionId)
         util.Message(w,200)
     } else{
         util.Message(w,1401)

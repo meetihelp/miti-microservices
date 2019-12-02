@@ -12,8 +12,8 @@ import(
 
 func SendQuestion(w http.ResponseWriter,question []Question){
 	w.Header().Set("Content-Type", "application/json")
-	msg:=util.Get_message_decode(200)
-	p:=&SendQuestion_Content{Code:200,Message:msg,Question:question}
+	msg:=util.GetMessageDecode(200)
+	p:=&SendQuestionContent{Code:200,Message:msg,Question:question}
 	enc := json.NewEncoder(w)
 	err:= enc.Encode(p)
 	if err != nil {

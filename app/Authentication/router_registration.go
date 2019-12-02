@@ -5,18 +5,17 @@ import(
 	"net/http"
 	"log"
 	"io/ioutil"
-	// "io"
 	"encoding/json"
-   util "app/Util"
+   	util "app/Util"
 )
 
 func Register(w http.ResponseWriter, r *http.Request){
 	//Get ip address of user
-	ip_address:=util.Get_IP_address(r)
-	fmt.Println("Registeration request from "+ip_address)
+	ipAddress:=util.GetIPAddress(r)
+	fmt.Println("Registeration request from "+ipAddress)
 
 	//GET HEADER 
-	header:=Register_Header{}
+	header:=RegisterHeader{}
 	util.GetHeader(r,&header)
 
 	//Read body data
@@ -28,40 +27,41 @@ func Register(w http.ResponseWriter, r *http.Request){
 	}
 
 	//UNMARSHILING DATA
-	user_data :=User{}
-	err_user_data:=json.Unmarshal(requestBody,&user_data)
-	if err_user_data!=nil{
+	userData :=User{}
+	errUserData:=json.Unmarshal(requestBody,&userData)
+	if errUserData!=nil{
 		fmt.Println("Could not Unmarshall user data")
 		util.Message(w,1001)
 		return 
 	}
 
 	//SANITIZE USER AND PROFILE DATA
-	sanatization_status :=Sanatize(user_data)
-	if sanatization_status =="ERROR"{
+	sanatizationStatus :=Sanatize(userData)
+	if sanatizationStatus =="Error"{
 		fmt.Println("User data invalid")
 		util.Message(w,1002)
 		return
 	}
 
-	user_id,ok:=user_data_handle(w,user_data)
+	//Check if user exists or not and take  action accordingly
+	userId,ok:=userDataHandle(w,userData)
 	if ok{
-		user_data.User_id=user_id
-		cookie:=util.Insert_session(user_data.User_id,ip_address)
-		w.Header().Set("miti-Cookie",cookie)
+		userData.UserId=userId
+		cookie:=util.InsertUserVerificationSession(userData.UserId,ipAddress)
+		w.Header().Set("Miti-Cookie",cookie)
 		util.Message(w,200)
 	}
 }
 
-func user_data_handle(w http.ResponseWriter, user_data User) (string,bool){
-	user_id,db_status:=Enter_user_data(user_data)
-	if db_status ==1{
+func userDataHandle(w http.ResponseWriter, userData User) (string,bool){
+	userId,dbStatus:=EnterUserData(userData)
+	if dbStatus ==1{
 		log.Println("User Already exist")
 		util.Message(w,1101)
-		return user_id,false
+		return userId,false
 	} else{
 		log.Println("User data entered successfully")
-		return user_id,true
+		return userId,true
 	}
 }
 

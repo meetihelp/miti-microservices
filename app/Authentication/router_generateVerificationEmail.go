@@ -2,38 +2,35 @@ package Authentication
 import (
 	"net/http"
 	"fmt"
-	// "strings"
-	"time"
 	util "app/Util"
 	mail "app/Notification/Mail"
-	// "net/smtp"
 )
 
 const(
 	domain="http://localhost:9000"
 )
 
-type Email_Verification_Header struct{
-	Cookie string `header:"Miti-Cookie"`
+type EmailVerificationHeader struct{
+	Cookie string `header:"MitiCookie"`
 }
 
-func Generate_verification_email(w http.ResponseWriter,r *http.Request){
-	email_verification_header:=Email_Verification_Header{}
-	util.GetHeader(r,&email_verification_header)
-	session_id:=email_verification_header.Cookie
+func GenerateVerificationEmail(w http.ResponseWriter,r *http.Request){
+	emailVerificationHeader:=EmailVerificationHeader{}
+	util.GetHeader(r,&emailVerificationHeader)
+	sessionId:=emailVerificationHeader.Cookie
 
-	user_id,err:=util.Get_user_id_from_session(session_id)
-	if err=="ERROR"{
+	userId,err:=util.GetUserIdFromSession(sessionId)
+	if err=="Error"{
 		fmt.Println("Session Does not exist")
 		util.Message(w,1003)
 		return
 	}
-	verified:= IsUserVerified(user_id)
+	verified:= IsUserVerified(userId)
 	if !verified{
-		user_email,_:=Get_user_detail(user_id)
+		userEmail,_:=GetUserDetail(userId)
 
-		if user_email!=""{
-			send_verification_email(w,user_id,user_email)
+		if userEmail!=""{
+			sendVerificationEmail(w,userId,userEmail)
 		} else{
 			fmt.Println("Email id does not exist")
 			util.Message(w,1201)
@@ -45,31 +42,31 @@ func Generate_verification_email(w http.ResponseWriter,r *http.Request){
 
 }
 
-func send_verification_email(w http.ResponseWriter,id string,email string){
-	count,last_modified:=Get_Email_verification_count(id)
-	if count < MAX_COUNT{
-		token:=util.Generate_token()
+func sendVerificationEmail(w http.ResponseWriter,id string,email string){
+	count,lastModified:=GetEmailVerificationCount(id)
+	if count < MAXCOUNT{
+		token:=util.GenerateToken()
 		url:=domain+"/verify_email?token="+token
-		Enter_email_verification(id,token)
-		mail.Send_email(email,url)
+		EnterEmailVerification(id,token)
+		mail.SendEmail(email,url)
 		fmt.Println("Email sent for verification")
 		util.Message(w,200)
 		return
 	}
-
-	time_elasped:=time.Since(last_modified)
-	if time_elasped.Hours() < MAX_HOUR{
-		fmt.Println("Link sent more than limit")
-		util.Message(w,1202)
-		return
-	} else{
-		Delete_all_email_verification(id)
-		token:=util.Generate_token()
-		url:=domain+"/verify_email?token="+token
-		Enter_email_verification(id,token)
-		mail.Send_email(email,url)
-		fmt.Println("Email sent for verification")
-		util.Message(w,200)
-		return
-	}
+	fmt.Println(lastModified)
+	// timeElasped:=time.Since(lastModified)
+	// if timeElasped.Hours() < MAXHOUR{
+	// 	fmt.Println("Link sent more than limit")
+	// 	util.Message(w,1202)
+	// 	return
+	// } else{
+	// 	DeleteAllEmailVerification(id)
+	// 	token:=util.GenerateToken()
+	// 	url:=domain+"/verify_email?token="+token
+	// 	EnterEmailVerification(id,token)
+	// 	mail.SendEmail(email,url)
+	// 	fmt.Println("Email sent for verification")
+	// 	util.Message(w,200)
+	// 	return
+	// }
 }

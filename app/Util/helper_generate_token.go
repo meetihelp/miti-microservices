@@ -5,7 +5,7 @@ import(
 	"github.com/nu7hatch/gouuid"
 )
 
-func Generate_token() string{
+func GenerateToken() string{
 	u, _ := uuid.NewV4()
 	token:=u.String()
 	token= strings.Replace(token, "-", "", -1)

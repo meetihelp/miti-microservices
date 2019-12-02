@@ -1,5 +1,5 @@
 package Util
 
-func Generate_otp_string() string{
+func GenerateOtpString() string{
 	return "1234"
 }

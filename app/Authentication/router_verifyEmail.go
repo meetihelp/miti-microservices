@@ -2,13 +2,11 @@ package Authentication
 
 import(
 	"net/http"
-	// "fmt"
 	"log"
-	// util "app/Utility"
 )
 
 
-func Verify_email(w http.ResponseWriter,r *http.Request){
+func VerifyEmail(w http.ResponseWriter,r *http.Request){
 	tokens, ok := r.URL.Query()["token"]
     if !ok || len(tokens[0]) < 1 {
         log.Println("Url Param 'token' is missing")
@@ -17,9 +15,9 @@ func Verify_email(w http.ResponseWriter,r *http.Request){
     token:=tokens[0]
     
 
-    user_id,email_verify:=Verify_Email(token)
-    if email_verify{
+    userId,emailVerify:=VerifyEmailFunc(token)
+    if emailVerify{
     	//CHANGE STATUS OF USER TO VERIFIED
-    	Change_Verification_Status(user_id)
+    	ChangeVerificationStatus(userId)
     }
 }

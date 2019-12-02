@@ -4,21 +4,21 @@ import (
 	"net/http"
 	"fmt"
 	// redis "app/Model/Redis"
-	database "app/Database"
+	// database "app/Database"
 	util "app/Util"
 	"io/ioutil"
 	"encoding/json"
-	"time"
+	// "time"
 )
 
-func Chatinsert(w http.ResponseWriter,r *http.Request){
-	chat_header:=Chat_header{}
-	util.GetHeader(r,&chat_header)
-	session_id:=chat_header.Cookie
+func ChatInsert(w http.ResponseWriter,r *http.Request){
+	chatHeader:=ChatHeader{}
+	util.GetHeader(r,&chatHeader)
+	sessionId:=chatHeader.Cookie
 
-	_,login_status:=util.Get_user_id_from_session(session_id)
+	_,loginStatus:=util.GetUserIdFromSession(sessionId)
 
-	if login_status=="ERROR"{
+	if loginStatus=="Error"{
 		util.Message(w,1003)
 		return
 	}
@@ -30,31 +30,38 @@ func Chatinsert(w http.ResponseWriter,r *http.Request){
 		return 
 	}
 
-	chat_data :=Chat{}
-	err_user_data:=json.Unmarshal(requestBody,&chat_data)
-	if err_user_data!=nil{
+	chatData :=Chat{}
+	errUserData:=json.Unmarshal(requestBody,&chatData)
+	if errUserData!=nil{
 		fmt.Println("Could not Unmarshall user data")
 		util.Message(w,1001)
 		return 
 	}
-	chat_data.Message_id=util.Generate_token()
-	temp_time:=time.Now()
-	chat_data.CreatedAt=temp_time.Format("2006-01-02 15:04:05")
-	index:=GetLastChatIndex(chat_data.Chat_id)
+
+	sanatizationStatus :=Sanatize(chatData)
+	if sanatizationStatus =="Error"{
+		fmt.Println("User data invalid")
+		util.Message(w,1002)
+		return
+	}
+	chatData.MessageId=util.GenerateToken()
+	chatData.CreatedAt=util.GetTime()
+	// tempTime:=time.Now()
+	// chatData.CreatedAt=tempTime.Format("2006-01-02 15:04:05")
+	// index:=GetLastChatIndex(chatData.ChatId)
 	// index=util.GetNextLexString(index)
-	index=index+1
-	chat_data.Index=index
-	fmt.Println(chat_data.CreatedAt)
-	db:=database.GetDB()
-	db.Create(&chat_data)
-	e:=UpdateChatTime(chat_data.Chat_id,chat_data.CreatedAt)
+	// index=index+1
+	// chatData.Index=index
+	// fmt.Println(chatData.CreatedAt)
+	// db:=database.GetDB()
+	ChatInsertDB(chatData)
+	// db.Create(&chatData)
+	e:=UpdateChatTime(chatData.ChatId,chatData.CreatedAt)
 	if e!=nil{
 		return
 	}
-	// redis.EnterChat(chat_data)
-	// database.EnterReadBy(chat_data)
-	//Get user list from chatid
-	user_list:=GetUserListFromChatId(chat_data.Chat_id)
-	EnterReadBy(user_list,chat_data.Message_id)
+	
+	userList:=GetUserListFromChatId(chatData.ChatId)
+	EnterReadBy(userList,chatData.MessageId)
 	util.Message(w,200)
 }

@@ -5,12 +5,12 @@ import(
 	"net"
 )
 
-func Get_IP_address(r *http.Request) string{
+func GetIPAddress(r *http.Request) string{
 	ip,_,_ :=net.SplitHostPort(r.RemoteAddr)
 
-	real_ip:=r.Header.Get("X-FORWARDED-FOR")
-	if real_ip !=""{
-		return real_ip
+	realIp:=r.Header.Get("X-FORWARDED-FOR")
+	if realIp !=""{
+		return realIp
 	} else{
 		return ip
 	}

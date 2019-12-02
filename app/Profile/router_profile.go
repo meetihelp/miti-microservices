@@ -11,15 +11,15 @@ import(
 )
 
 
-func Profile_creation(w http.ResponseWriter, r *http.Request){
-	header:=Profile_creation_Header{}
+func ProfileCreation(w http.ResponseWriter, r *http.Request){
+	header:=ProfileCreationHeader{}
 	util.GetHeader(r,&header)
 
 
-	session_id:=header.Cookie
+	sessionId:=header.Cookie
 
-	user_id,d_err:=util.Get_user_id_from_session(session_id)
-	if d_err=="ERROR"{
+	userId,dErr:=util.GetUserIdFromSession(sessionId)
+	if dErr=="Error"{
 		fmt.Println("Session Does not exist")
 		util.Message(w,1003)
 		return
@@ -32,23 +32,23 @@ func Profile_creation(w http.ResponseWriter, r *http.Request){
 		util.Message(w,1000)
 		return 
 	}
-	profile_data:=Profile{}
-	err_profile_data:=json.Unmarshal(requestBody,&profile_data)
-	if err_profile_data!=nil{
+	profileData:=Profile{}
+	errProfileData:=json.Unmarshal(requestBody,&profileData)
+	if errProfileData!=nil{
 		fmt.Println("Could not Unmarshall profile data")
 		util.Message(w,1001)
 		return
 	}
-	fmt.Println(profile_data.Name)
-	profile_data.UserId=user_id
-	sanatization_status:=Sanatize(profile_data)
-	if sanatization_status =="ERROR"{
+	fmt.Println(profileData.Name)
+	profileData.UserId=userId
+	sanatizationStatus:=Sanatize(profileData)
+	if sanatizationStatus =="Error"{
 		fmt.Println("profile creation data invalid")
 		util.Message(w,1002)
 		return
 	}
 	// profile_data_handle(w,profile_data)
-	Enter_profile_data(profile_data)
+	EnterProfileData(profileData)
 
 	util.Message(w,200)
 
@@ -61,14 +61,14 @@ func Profile_creation(w http.ResponseWriter, r *http.Request){
 // }
 
 func GetQuestion(w http.ResponseWriter, r *http.Request){
-	header:=Profile_creation_Header{}
+	header:=ProfileCreationHeader{}
 	util.GetHeader(r,&header)
 
 
-	session_id:=header.Cookie
+	sessionId:=header.Cookie
 
-	_,d_err:=util.Get_user_id_from_session(session_id)
-	if d_err=="ERROR"{
+	_,dErr:=util.GetUserIdFromSession(sessionId)
+	if dErr=="Error"{
 		fmt.Println("Session Does not exist")
 		util.Message(w,1003)
 		return
@@ -82,8 +82,8 @@ func GetQuestion(w http.ResponseWriter, r *http.Request){
 	}
 
 	questionRequest:=QuestionRequest{}
-	err_question_data:=json.Unmarshal(requestBody,&questionRequest)
-	if err_question_data!=nil{
+	errQuestionData:=json.Unmarshal(requestBody,&questionRequest)
+	if errQuestionData!=nil{
 		fmt.Println("Could not Unmarshall profile data")
 		util.Message(w,1001)
 		return
@@ -101,14 +101,14 @@ func GetQuestion(w http.ResponseWriter, r *http.Request){
 
 
 func UpdateQuestionResponse(w http.ResponseWriter, r *http.Request){
-	header:=UpdateQuestionResponse_Header{}
+	header:=UpdateQuestionResponseHeader{}
 	util.GetHeader(r,&header)
 
 
-	session_id:=header.Cookie
+	sessionId:=header.Cookie
 
-	userId,d_err:=util.Get_user_id_from_session(session_id)
-	if d_err=="ERROR"{
+	userId,dErr:=util.GetUserIdFromSession(sessionId)
+	if dErr=="Error"{
 		fmt.Println("Session Does not exist")
 		util.Message(w,1003)
 		return
@@ -153,14 +153,14 @@ func UpdateQuestionResponse(w http.ResponseWriter, r *http.Request){
 }
 
 func InsertQuestion(w http.ResponseWriter, r *http.Request){
-	header:=InsertQuestion_Header{}
+	header:=InsertQuestionHeader{}
 	util.GetHeader(r,&header)
 
 
-	session_id:=header.Cookie
+	sessionId:=header.Cookie
 
-	_,d_err:=util.Get_user_id_from_session(session_id)
-	if d_err=="ERROR"{
+	_,dErr:=util.GetUserIdFromSession(sessionId)
+	if dErr=="Error"{
 		fmt.Println("Session Does not exist")
 		util.Message(w,1003)
 		return
@@ -174,8 +174,8 @@ func InsertQuestion(w http.ResponseWriter, r *http.Request){
 	}
 
 	question:=Question{}
-	err_question_data:=json.Unmarshal(requestBody,&question)
-	if err_question_data!=nil{
+	errQuestionData:=json.Unmarshal(requestBody,&question)
+	if errQuestionData!=nil{
 		fmt.Println("Could not Unmarshall profile data")
 		util.Message(w,1001)
 		return

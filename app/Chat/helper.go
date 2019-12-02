@@ -8,8 +8,8 @@ import(
 )
 func SendChat(w http.ResponseWriter,chat []Chat){
 	w.Header().Set("Content-Type", "application/json")
-	msg:=util.Get_message_decode(200)
-	p:=&SendChat_Content{Code:200,Message:msg,Chat:chat}
+	msg:=util.GetMessageDecode(200)
+	p:=&SendChatContent{Code:200,Message:msg,Chat:chat}
 	enc := json.NewEncoder(w)
 	err:= enc.Encode(p)
 	if err != nil {
@@ -17,10 +17,10 @@ func SendChat(w http.ResponseWriter,chat []Chat){
 	}
 }
 
-func Send_ChatDetail(w http.ResponseWriter, chatDetail []ChatDetail,status_code int){
+func SendChatDetail(w http.ResponseWriter, chatDetail []ChatDetail,statusCode int){
 	w.Header().Set("Content-Type", "application/json")
-	msg:=util.Get_message_decode(status_code)
-	p:=&ChatDetail_Content{ChatDetail:chatDetail,Code:status_code,Message:msg}
+	msg:=util.GetMessageDecode(statusCode)
+	p:=&ChatDetailContent{ChatDetail:chatDetail,Code:statusCode,Message:msg}
 	enc := json.NewEncoder(w)
 	err:= enc.Encode(p)
 	if err != nil {

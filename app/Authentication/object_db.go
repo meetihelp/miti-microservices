@@ -1,47 +1,42 @@
 package Authentication
 import (
-	// "log"
-	// "fmt"
 	database "app/Database"
-	"time"
-	// "github.com/jinzhu/gorm"
- // _ 	"github.com/jinzhu/gorm/dialects/postgres"
 )
 
 
 type User struct{
-	User_id string `gorm:"primary_key;unique;varchar(100)"  json:"user_id"`
-	Phone string `gorm:"type:varchar(13)" validate:"omitempty" json:"phone"`
-	Email string  `gorm:"type:varchar(30)" validate:"omitempty,email" json:"email"`
-	Password string `gorm:"type:varchar(100)" validate:"required" json:"password"`
-	Status string `gorm:"type:varchar(3)" json:"Status"`
-	CreatedAt time.Time `gorm:"type:time" json:"created_at"`
+	UserId string `gorm:"primary_key;unique;varchar(100)"  json:"UserId"`
+	Phone string `gorm:"type:varchar(13)" validate:"omitempty" json:"Phone"`
+	Email string  `gorm:"type:varchar(30)" validate:"omitempty,email" json:"Email"`
+	Password string `gorm:"type:varchar(100)" validate:"required" json:"Password"`
+	Status string `gorm:"type:varchar(3)" json:"Status"`  //Verified/Unverified/Deleted
+	CreatedAt string `gorm:"type:Varchar(100)" json:"CreatedAt"`
 }
-type OTP_verification struct{
-	User_id string `gorm:"primary_key;type:varchar(100)"  validate:"required"`
-	Verification_otp string `gorm:"primary_key;varchar(100)" validate:"required"`
-	CreatedAt string `gorm:"type:varchar"`
+type OTPVerification struct{
+	UserId string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"UserId"`
+	VerificationOtp string `gorm:"primary_key;varchar(100)" validate:"required"  json:"VerificationOTP"`
+	CreatedAt string `gorm:"type:varchar" json:"CreatedAt"`
 }
 
-type Email_verification struct{
-	User_id string `gorm:"primary_key;type:varchar(100)"  validate:"required"`
-	Verification_token string `gorm:"primary_key;varchar(100)" validate:"required"`
-	CreatedAt time.Time `gorm:"type:time"`
+type EmailVerification struct{
+	UserId string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"UserId"`
+	VerificationToken string `gorm:"primary_key;varchar(100)" validate:"required" json:"VerificationToken"`
+	CreatedAt string `gorm:"type:varchar(100)" json:"CreatedAt"`
 }
 
 
 type AnonymousUser struct{
-	User_id string `gorm:"primary_key;varchar(100)"  json:"user_id"`
-	Anonymous_id string `gorm:"primary_key;unique;varchar(100)"  json:"anonymous_user_id"`
-	Chat_id string `gorm:"primary_key;varchar(100)"  json:"chat_id"`
-	Status string `gorm:"type:varchar(6)" json:"status"`
-	CreatedAt string `gorm:"type:varchar" json:"created_at"`
+	UserId string `gorm:"primary_key;varchar(100)"  json:"UserId"`
+	AnonymousId string `gorm:"primary_key;unique;varchar(100)"  json:"AnonymousId"`
+	ChatId string `gorm:"primary_key;varchar(100)"  json:"ChatId"`
+	Status string `gorm:"type:varchar(6)" json:"Status"`  // status for Liked/not liked/ none
+	CreatedAt string `gorm:"type:varchar(100)" json:"CreatedAt"`
 }
 
 func init(){	
 	db:=database.GetDB()
 	db.AutoMigrate(&User{})
-	db.AutoMigrate(&OTP_verification{})
-	db.AutoMigrate(&Email_verification{})
+	db.AutoMigrate(&OTPVerification{})
+	db.AutoMigrate(&EmailVerification{})
 	db.AutoMigrate(&AnonymousUser{})
 }

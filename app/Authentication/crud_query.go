@@ -1,151 +1,145 @@
 package Authentication
 import(
 	"fmt"
-	"time"
-	// "golang.org/x/crypto/bcrypt"
 	"github.com/jinzhu/gorm"
  _ 	"github.com/jinzhu/gorm/dialects/postgres"
-   database "app/Database"
-   chat "app/Chat"
+   	database "app/Database"
+   	chat "app/Chat"
     util "app/Util"
 )
 
-func Enter_Match_user(user_id1 string,user_id2 string){	
+func EnterMatchUser(userId1 string,userId2 string){	
 
-	chatID:=util.Generate_token()
-	temp_user1:=util.Generate_token()
-	temp_user2:=util.Generate_token()
+	chatID:=util.GenerateToken()
+	tempUser1:=util.GenerateToken()
+	tempUser2:=util.GenerateToken()
 
-	Enter_Anonymous_User(user_id1,temp_user2,chatID,"one-to-one",1)
-	Enter_Anonymous_User(user_id2,temp_user1,chatID,"one-to-one",2)
+	EnterAnonymousUser(userId1,tempUser2,chatID,"OneToOne",1)
+	EnterAnonymousUser(userId2,tempUser1,chatID,"OneToOne",2)
 
 }
 
-func Enter_Anonymous_User(user_id string,temp_user_id string,chat_id string,chat_type string,user_index int){
+func EnterAnonymousUser(userId string,tempUserId string,chatId string,chatType string,userIndex int){
 	db:=database.GetDB()
 	anonymousUser:=AnonymousUser{}
-	anonymousUser.User_id=user_id
-	anonymousUser.Anonymous_id=temp_user_id
-	anonymousUser.Chat_id=chat_id
-	// anonymousUser.CreatedAt=time.Now()
+	anonymousUser.UserId=userId
+	anonymousUser.AnonymousId=tempUserId
+	anonymousUser.ChatId=chatId
 	anonymousUser.CreatedAt=util.GetTime()
 	anonymousUser.Status="None"
 
 	chatDetail:=chat.ChatDetail{}
-	chatDetail.Temp_User_id=temp_user_id
-	chatDetail.Actual_User_id=user_id
-	chatDetail.Chat_id=chat_id
-	chatDetail.Chat_type=chat_type
+	chatDetail.TempUserId=tempUserId
+	chatDetail.ActualUserId=userId
+	chatDetail.ChatId=chatId
+	chatDetail.ChatType=chatType
 	chatDetail.CreatedAt=anonymousUser.CreatedAt
-	chatDetail.User_index=user_index
+	chatDetail.UserIndex=userIndex
 
 	db.Create(&anonymousUser)
 	db.Create(&chatDetail)
 }
 
-func Enter_user_data(user_data User) (string,int){
-	user_data.Password = util.Generate_encrypted_password(user_data.Password)
+func EnterUserData(userData User) (string,int){
+	userData.Password = util.GenerateEncryptedPassword(userData.Password)
 	
 	db:=database.GetDB()
 	//CHECK IF USER EMAIL ID OR PHONE ALREADY EXISTS
-	checking_status:=is_user_exist(db,user_data)
-	if checking_status == true{
+	checkingStatus:=IsUserExist(db,userData)
+	if checkingStatus == true{
 		return "",1
 	}
 	//GENERATE USER ID
-	user_data.User_id =util.Generate_token()
-	user_data.Status="U"
-	user_data.CreatedAt =time.Now()
+	userData.UserId =util.GenerateToken()
+	userData.Status="U"
+	// userData.CreatedAt =time.Now()
+	userData.CreatedAt =util.GetTime()
 	//INSERT IN DATABASE
-	db.Create(&user_data)
-	return user_data.User_id,2
+	db.Create(&userData)
+	return userData.UserId,2
 }
 
-func is_user_exist(db *gorm.DB,user_data User) bool{
-	temp_user:=User{}
-	if user_data.Phone!=""{
-		db.Where("phone=?",user_data.Phone).First(&temp_user)
-		if temp_user.User_id!=""{
+func IsUserExist(db *gorm.DB,userData User) bool{
+	tempUser:=User{}
+	if userData.Phone!=""{
+		db.Where("phone=?",userData.Phone).First(&tempUser)
+		if tempUser.UserId!=""{
 			return true
 		}
 	}
 
-	if user_data.Email!=""{
-		db.Where("email=?",user_data.Email).First(&temp_user)
-		if temp_user.User_id!=""{
+	if userData.Email!=""{
+		db.Where("email=?",userData.Email).First(&tempUser)
+		if tempUser.UserId!=""{
 			return true
 		}
 	}
 
 	return false
 }
-func Check_user(user_data User)(string,string){
+func CheckUser(userData User)(string,string){
 	db:=database.GetDB()
-	email:=user_data.Email
-	phone:=user_data.Phone
-	password:=user_data.Password
+	email:=userData.Email
+	phone:=userData.Phone
+	password:=userData.Password
 
 	user:=User{}
 	if email!=""{
 		db.Where("email=?",email).First(&user)
-		// err:=bcrypt.CompareHashAndPassword([]byte(user.Password),[]byte(password))
-		status:=util.Comapare_password(user.Password,password)
+		status:=util.ComaparePassword(user.Password,password)
 		if !status{
-			return "","WRONG_PASSWORD"
+			return "","WrongPassword"
 		}
-		if user.User_id==""{
-			return user.User_id,"NO_USER"
+		if user.UserId==""{
+			return user.UserId,"NoUser"
 		} 
-		if user.User_id !="" && user.Status=="U"{
-			return user.User_id,"UNVERIFIED"
+		if user.UserId !="" && user.Status=="U"{
+			return user.UserId,"Unverified"
 		}
 
-		return user.User_id,"OK"
+		return user.UserId,"Ok"
 	}
 
 	if phone!=""{
 		db.Where("phone=?",phone).First(&user)
-		// err:=bcrypt.CompareHashAndPassword([]byte(user.Password),[]byte(password))
-		status:=util.Comapare_password(user.Password,password)
+		status:=util.ComaparePassword(user.Password,password)
 		if !status{
-			// fmt.Println(err.Error())
-			return "","WRONG_PASSWORD"
+			return "","WrongPassword"
 		}
-		if user.User_id==""{
-			return user.User_id,"NO_USER"
+		if user.UserId==""{
+			return user.UserId,"NoUser"
 		} 
-		if user.User_id !="" && user.Status=="U"{
-			return user.User_id,"UNVERIFIED"
+		if user.UserId !="" && user.Status=="U"{
+			return user.UserId,"Unverified"
 		}
 
-		return user.User_id,"OK"
+		return user.UserId,"Ok"
 
 	}
-	return "","ERROR"
+	return "","Error"
 }
 
-func Check_user_by_id(id string,password string) string{
+func CheckUserById(id string,password string) string{
 	db:=database.GetDB()
 	user:=User{}
-	db.Where("user_id=?",id).First(&user)
-	status:=util.Comapare_password(user.Password,password)
+	db.Where("userId=?",id).First(&user)
+	status:=util.ComaparePassword(user.Password,password)
 	if !status{
-		// fmt.Println(err.Error())
-		return "WRONG_PASSWORD"
+		return "WrongPassword"
 	}
-	if user.User_id==""{
-		return "NO_USER"
+	if user.UserId==""{
+		return "NoUser"
 	} 
-	if user.User_id !="" && user.Status=="U"{
-		return "UNVERIFIED"
+	if user.UserId !="" && user.Status=="U"{
+		return "Unverified"
 	}
 
-	return "OK"
+	return "Ok"
 }
 func IsUserVerified(id string) bool{
 	db:=database.GetDB()
 	user:=User{}
-	db.Where("user_id=?",id).First(&user)
+	db.Where("userId=?",id).First(&user)
 	if user.Status=="U"{
 		return false
 	} else{
@@ -153,21 +147,19 @@ func IsUserVerified(id string) bool{
 	}
 }
 
-func Get_user_detail(user_id string) (string,string){
+func GetUserDetail(userId string) (string,string){
 	db:=database.GetDB()
 	user:=User{}
-	db.Where("user_id=?",user_id).First(&user)
+	db.Where("userId=?",userId).First(&user)
 	return user.Email , user.Phone
 }
 
-func Update_Password(user_id string,new_Password string){
-	// hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(new_Password), bcrypt.DefaultCost)
-	// new_Password = string(hashedPassword)
+func UpdatePasswordFunc(userId string,newPassword string){
 	db:=database.GetDB()
-	new_Password = util.Generate_encrypted_password(new_Password)
+	newPassword = util.GenerateEncryptedPassword(newPassword)
 
 	user:=User{}
-	db.Model(&user).Where("user_id = ?", user_id).Update("password", new_Password)
+	db.Model(&user).Where("userId = ?", userId).Update("password", newPassword)
 }
 
 func GetAllUser() ([]string){
@@ -177,77 +169,74 @@ func GetAllUser() ([]string){
 
 	UserList:=make([]string,0)
 	for _,id := range user{
-		UserList=append(UserList,id.User_id)
+		UserList=append(UserList,id.UserId)
 	}
 	return UserList
 }
 
-func Verify_OTP(user_id string,otp string) (bool){
+func VerifyOTP(userId string,otp string) (bool){
 	db:=database.GetDB()
-	otp_verification:=OTP_verification{}
-	db.Where("user_id=? AND verification_otp=?",user_id,otp).First(&otp_verification)
-	if otp_verification.User_id==""{
+	otpVerification:=OTPVerification{}
+	db.Where("userId=? AND verification_otp=?",userId,otp).First(&otpVerification)
+	if otpVerification.UserId==""{
 		return false
 	}
 	return true
 }
 
-func Enter_verification_otp(id string,otp string){
+func EnterVerificationOtp(id string,otp string){
 	db:=database.GetDB()
-	otp_verification:=OTP_verification{}
-	otp_verification.User_id=id
-	otp_verification.Verification_otp=otp
-	// otp_verification.CreatedAt =time.Now()
-	otp_verification.CreatedAt=util.GetTime()
-	db.Create(&otp_verification)
+	otpVerification:=OTPVerification{}
+	otpVerification.UserId=id
+	otpVerification.VerificationOtp=otp
+	otpVerification.CreatedAt=util.GetTime()
+	db.Create(&otpVerification)
 }
 
-func Get_otp_verification_count(id string)(int,string){
+func GetOtpVerificationCount(id string)(int,string){
 	count:=0
-	otp_verification:=OTP_verification{}
+	otpVerification:=OTPVerification{}
 	db:=database.GetDB()
-	db.Where("user_id=?",id).Find(&otp_verification).Count(&count)
-	// return len(otp_verification),otp_verification.CreatedAt
-	return count,otp_verification.CreatedAt
+	db.Where("userId=?",id).Find(&otpVerification).Count(&count)
+	return count,otpVerification.CreatedAt
 }
-func Change_Verification_Status(user_id string){
+func ChangeVerificationStatus(userId string){
 	db:=database.GetDB()
 	user:=User{}
-	db.Model(&user).Where("user_id=?",user_id).Update("status","V")
+	db.Model(&user).Where("userId=?",userId).Update("status","V")
 }
-func Enter_email_verification(id string,token string){
+func EnterEmailVerification(id string,token string){
 	db:=database.GetDB()
-	email_verification:=Email_verification{}
-	email_verification.User_id=id
-	email_verification.Verification_token=token
-	email_verification.CreatedAt=time.Now()
-	db.Create(&email_verification)
+	emailVerification:=EmailVerification{}
+	emailVerification.UserId=id
+	emailVerification.VerificationToken=token
+	emailVerification.CreatedAt=util.GetTime()
+	db.Create(&emailVerification)
 }
 
-func Get_Email_verification_count(id string)(int,time.Time){
+
+func GetEmailVerificationCount(id string)(int,string){
 	count:=0
-	email_verification:=Email_verification{}
+	emailVerification:=EmailVerification{}
 	db:=database.GetDB()
-	db.Where("user_id=?",id).Find(&email_verification).Count(&count)
-	fmt.Println(email_verification)
-	// return len(email_verification),email_verification.CreatedAt
+	db.Where("userId=?",id).Find(&emailVerification).Count(&count)
 	fmt.Println(count)
-	return count,email_verification.CreatedAt
+	return count,emailVerification.CreatedAt
 
 }
 
 
-func Delete_all_email_verification(id string){
+func DeleteAllEmailVerification(id string){
 	db:=database.GetDB()
-	db.Where("user_id=?",id).Delete(&Email_verification{})
+	db.Where("userId=?",id).Delete(&EmailVerification{})
 }
 
-func Verify_Email(token string) (string,bool){
+func VerifyEmailFunc(token string) (string,bool){
 	db:=database.GetDB()
-	email_verification:=Email_verification{}
-	db.Where("verification_token=?",token).First(&email_verification)
-	if email_verification.User_id==""{
+	emailVerification:=EmailVerification{}
+	db.Where("verification_token=?",token).First(&emailVerification)
+	if emailVerification.UserId==""{
 		return "",false
 	}
-	return email_verification.User_id,true
+	return emailVerification.UserId,true
 }

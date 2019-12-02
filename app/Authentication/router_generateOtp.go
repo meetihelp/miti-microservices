@@ -1,39 +1,34 @@
 package Authentication
 import (
 	"net/http"
-	"fmt"
-	// "strings"
-	// "time"	
+	"fmt"	
 	util "app/Util"
-	sms "app/Notification/SMS"
-	// "github.com/nu7hatch/gouuid"
-	// "net/smtp"
-)
+	sms "app/Notification/SMS")
 
 const (
-	MAX_COUNT = 5
-	MAX_HOUR = 4
+	MAXCOUNT = 5
+	MAXHOUR = 4
 )
 
 
 
-func Generate_otp(w http.ResponseWriter,r *http.Request){
-	verification_header:=Verification_Header{}
-	util.GetHeader(r,&verification_header)
-	session_id:=verification_header.Cookie
+func GenerateOtp(w http.ResponseWriter,r *http.Request){
+	verificationHeader:=VerificationHeader{}
+	util.GetHeader(r,&verificationHeader)
+	sessionId:=verificationHeader.Cookie
 
-	user_id,err:=util.Get_user_id_from_session(session_id)
-	if err=="ERROR"{
+	userId,err:=util.GetUserIdFromUserVerificationSession(sessionId)
+	if err=="Error"{
 		fmt.Println("Session Does not exist")
 		util.Message(w,1003)
 		return
 	}
-	verified:= IsUserVerified(user_id)
+	verified:= IsUserVerified(userId)
 	if !verified{
-		_,user_phone:=Get_user_detail(user_id)
+		_,userPhone:=GetUserDetail(userId)
 
-		if user_phone!=""{
-			send_verification_otp(w,user_id,user_phone)
+		if userPhone!=""{
+			sendVerificationOtp(w,userId,userPhone)
 		} else{
 			fmt.Println("Mobile no does not exist")
 			util.Message(w,1301)
@@ -45,12 +40,12 @@ func Generate_otp(w http.ResponseWriter,r *http.Request){
 
 }
 
-func send_verification_otp(w http.ResponseWriter,id string,phone string){
-	count,last_modified:=Get_otp_verification_count(id)
-	if count<MAX_COUNT{
-		otp:=util.Generate_otp_string()
-		Enter_verification_otp(id,otp)
-		sms.Send_sms(phone,otp)
+func sendVerificationOtp(w http.ResponseWriter,id string,phone string){
+	count,lastModified:=GetOtpVerificationCount(id)
+	if count<MAXCOUNT{
+		otp:=util.GenerateOtpString()
+		EnterVerificationOtp(id,otp)
+		sms.SendSMS(phone,otp)
 		fmt.Println("OTP sent")
 		util.Message(w,200)
 		return
@@ -68,7 +63,7 @@ func send_verification_otp(w http.ResponseWriter,id string,phone string){
 	// 	fmt.Println("OTP sent")
 	// 	util.Message(w,200)
 	// }
-	fmt.Println(last_modified)
+	fmt.Println(lastModified)
 	fmt.Println("OTP sent")
 		util.Message(w,200)
 	

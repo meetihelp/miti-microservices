@@ -9,12 +9,12 @@ import(
 )
 
 func GetChatAfterIndex(w http.ResponseWriter,r *http.Request){
-	getChatAfterIndex_header:=GetChatAfterIndex_header{}
-	util.GetHeader(r,&getChatAfterIndex_header)
-	session_id:=getChatAfterIndex_header.Cookie
-	user_id,getChat_status:=util.Get_user_id_from_session(session_id)
-	fmt.Println(user_id)
-	if getChat_status=="ERROR"{
+	getChatAfterIndexHeader:=GetChatAfterIndexHeader{}
+	util.GetHeader(r,&getChatAfterIndexHeader)
+	sessionId:=getChatAfterIndexHeader.Cookie
+	userId,getChatStatus:=util.GetUserIdFromSession(sessionId)
+	fmt.Println(userId)
+	if getChatStatus=="Error"{
 		util.Message(w,1003)
 		return
 	}
@@ -26,21 +26,27 @@ func GetChatAfterIndex(w http.ResponseWriter,r *http.Request){
 		return 
 	}
 
-	chat_data:=ChatAfterIndex{}
-	err_user_data:=json.Unmarshal(requestBody,&chat_data)
-	if err_user_data!=nil{
+	chatData:=ChatAfterIndex{}
+	errUserData:=json.Unmarshal(requestBody,&chatData)
+	if errUserData!=nil{
 		fmt.Println("Could not Unmarshall user data")
 		util.Message(w,1001)
 		return 
 	}
-
-	status:=Check_correct_chat(user_id,chat_data.Chat_id)
-	if status=="ERROR"{
+	sanatizationStatus :=Sanatize(chatData)
+	if sanatizationStatus =="Error"{
+		fmt.Println("User data invalid")
 		util.Message(w,1002)
 		return
 	}
 
-	chat:=GetChatAfterIndexMessages(chat_data.Chat_id,chat_data.Offset,chat_data.Num_of_chat,chat_data.Index)
+	status:=CheckCorrectChat(userId,chatData.ChatId)
+	if status=="Error"{
+		util.Message(w,1002)
+		return
+	}
+
+	chat:=GetChatAfterIndexMessages(chatData.ChatId,chatData.Offset,chatData.NumOfChat,chatData.Index)
 
 	SendChat(w,chat)
 }

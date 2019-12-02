@@ -1,12 +1,12 @@
 package Chat
-type SendChat_Content struct{
-	Code int `json:"code"`
-	Message string `json:"message"`
-	Chat []Chat `json:"chat"`
+type SendChatContent struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	Chat []Chat `json:"Chat"`
 }
 
-type ChatDetail_Content struct{
-	ChatDetail []ChatDetail `json:"chatdetail"`
-	Code int `json:"status"`
-	Message string `json:"message"`
+type ChatDetailContent struct{
+	ChatDetail []ChatDetail `json:"ChatDetail"`
+	Code int `json:"Code"`
+	Message string `json:"Message"`
 }

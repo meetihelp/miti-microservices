@@ -9,13 +9,13 @@ import(
 )
 
 
-func Update_password(w http.ResponseWriter,r *http.Request){
-	update_password_header:=Update_password_header{}
-	util.GetHeader(r,&update_password_header)
-	session_id:=update_password_header.Cookie
+func UpdatePassword(w http.ResponseWriter,r *http.Request){
+	updatePasswordHeader:=UpdatePasswordHeader{}
+	util.GetHeader(r,&updatePasswordHeader)
+	sessionId:=updatePasswordHeader.Cookie
 
-	user_id,status:=util.Get_user_id_from_session(session_id)
-	if status!="OK"{
+	userId,status:=util.GetUserIdFromSession(sessionId)
+	if status!="Ok"{
 		fmt.Println("Session does not exist")
 		util.Message(w,1003)
 		return
@@ -30,26 +30,26 @@ func Update_password(w http.ResponseWriter,r *http.Request){
 	}
 
 	//UNMARSHILING DATA
-	password_change_data :=Password_change{}
-	err_user_data:=json.Unmarshal(requestBody,&password_change_data)
-	if err_user_data!=nil{
+	passwordChangeData :=PasswordChange{}
+	errUserData:=json.Unmarshal(requestBody,&passwordChangeData)
+	if errUserData!=nil{
 		fmt.Println("Could not Unmarshall user data")
 		util.Message(w,1001)
 		return 
 	}
 
-	sanatization_status :=Sanatize(password_change_data)
-	if sanatization_status =="ERROR"{
+	sanatizationStatus :=Sanatize(passwordChangeData)
+	if sanatizationStatus =="Error"{
 		fmt.Println("User data invalid")
 		util.Message(w,1002)
 		return
 	}
 
-	status=Check_user_by_id(user_id,password_change_data.Old_Password)
+	status=CheckUserById(userId,passwordChangeData.OldPassword)
 
-	if status=="OK"{
+	if status=="Ok"{
 		//UPDATE PASSWORD
-		Update_Password(user_id,password_change_data.New_Password)
+		UpdatePasswordFunc(userId,passwordChangeData.NewPassword)
 		util.Message(w,200)
 	} else{
 		//SEND ERROR MESSAGE

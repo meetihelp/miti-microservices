@@ -1,7 +1,7 @@
 package Util
 
 
-func Get_message_decode(status_code int) string{
+func GetMessageDecode(status_code int) string{
 	message_decode:=make(map[int]string)
 
 	message_decode[200]="Successfull"

@@ -4,50 +4,50 @@ import(
 	"fmt"
 )
 
-type Sanatize_Data interface{
-	do_sanitization() string
+type SanatizeData interface{
+	doSanitization() string
 }
 
-func (user_data User) do_sanitization() string {
+func (userData User) doSanitization() string {
 	validate :=validator.New()
-	err:= validate.Struct(user_data)
+	err:= validate.Struct(userData)
 	if err!=nil{
 		fmt.Println(err.Error())
-		return "ERROR"
+		return "Error"
 	}
 	//WE CAN IMPROVE THIS FUCNTION BY CHECKING IF THE PHONE IS NUMERIC OR NOT
-	if (user_data.Phone =="") && (user_data.Email==""){
-		return "ERROR"
+	if (userData.Phone =="") && (userData.Email==""){
+		return "Error"
 	}
 
-	if (user_data.Phone!="") && (len(user_data.Phone)!=10){
-		return "ERROR"
+	if (userData.Phone!="") && (len(userData.Phone)!=10){
+		return "Error"
 	}
 
 
-	return "OK"
+	return "Ok"
 }
 
-func (otp_verification OTP_verification) do_sanitization() string{
+func (otpVerification OTPVerification) doSanitization() string{
 	validate:=validator.New()
-	err:=validate.Struct(otp_verification)
+	err:=validate.Struct(otpVerification)
 	if err!=nil{
 		fmt.Println(err.Error())
-		return "ERROR"
+		return "Error"
 	}
-	return "OK"
+	return "Ok"
 }
 
-func (password_change_data Password_change) do_sanitization() string{
+func (passwordChangeData PasswordChange) doSanitization() string{
 	validate:=validator.New()
-	err:=validate.Struct(password_change_data)
+	err:=validate.Struct(passwordChangeData)
 	if err!=nil{
 		fmt.Println(err.Error())
-		return "ERROR"
+		return "Error"
 	}
-	return "OK"
+	return "Ok"
 }
 
-func Sanatize(s Sanatize_Data) string{
-	return s.do_sanitization()
+func Sanatize(s SanatizeData) string{
+	return s.doSanitization()
 }

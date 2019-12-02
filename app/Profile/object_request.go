@@ -1,18 +1,18 @@
 package Profile
 
-type Profile_creation_Header struct{
+type ProfileCreationHeader struct{
 	Method1 string `header:"method"`
 	Agent1 string `header:"agent"`
 	Cookie string `header:"Miti-Cookie"`
 }
 
-type InsertQuestion_Header struct{
+type InsertQuestionHeader struct{
 	Method1 string `header:"method"`
 	Agent1 string `header:"agent"`
 	Cookie string `header:"Miti-Cookie"`
 }
 
-type UpdateQuestionResponse_Header struct{
+type UpdateQuestionResponseHeader struct{
 	Method1 string `header:"method"`
 	Agent1 string `header:"agent"`
 	Cookie string `header:"Miti-Cookie"`	

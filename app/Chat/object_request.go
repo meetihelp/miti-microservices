@@ -1,32 +1,32 @@
 package Chat
 
-type GetChatDetail_header struct{
+type GetChatDetailHeader struct{
 	Cookie string `header:"Miti-Cookie"`
 }
 
 type ChatDetailDs struct{
-	Offset int `json:"offset"`
-	Num_of_chat int `json:"num_of_chat"`
+	Offset int `json:"Offset"`
+	NumOfChat int `json:"NumOfChat"`
 }
-type GetChat_header struct{
-	Cookie string `header:"MitiCookie"`
+type GetChatHeader struct{
+	Cookie string `header:"Miti-Cookie"`
 }
-type Chat_header struct{
+type ChatHeader struct{
 	Cookie string `header:"Miti-Cookie"`
 }
 
 type ChatRequest struct{
-	Chat_id string `json:"ChatId"`
+	ChatId string `json:"ChatId"`
 	Offset int `json:"Offset"`
-	Num_of_chat int `json:"NumOfChat"`
+	NumOfChat int `json:"NumOfChat"`
 }
 
-type GetChatAfterIndex_header struct{
+type GetChatAfterIndexHeader struct{
 	Cookie string `header:"Miti-Cookie"`
 }
 type ChatAfterIndex struct{
-	Chat_id string `json:"ChatId"`
+	ChatId string `json:"ChatId"`
 	Offset int `json:"Offset"`
-	Num_of_chat int `json:"NumOfChat"`
+	NumOfChat int `json:"NumOfChat"`
 	Index int `json:"Index"`
 }

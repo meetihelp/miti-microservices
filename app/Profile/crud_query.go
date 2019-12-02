@@ -5,12 +5,12 @@ import(
    "reflect"
 )
 
-func Enter_profile_data(profile_data Profile){
+func EnterProfileData(profileData Profile){
 	fmt.Println("Enter_profile_data")
 	db:=database.GetDB()
-	db.Create(&profile_data)
+	db.Create(&profileData)
 	questionResponse:=QuestionResponse{}
-	questionResponse.UserId=profile_data.UserId
+	questionResponse.UserId=profileData.UserId
 	db.Create(&questionResponse)
 }
 
@@ -21,10 +21,10 @@ func GetProfile(userId string) Profile{
 	return profile
 }
 
-func GetUserIdByName(Offset int,num_of_profile int,name string) ([]string){
+func GetUserIdByName(Offset int,numOfProfile int,name string) ([]string){
 	db:=database.GetDB()
 	profile:=[]Profile{}
-	db.Offset(Offset).Limit(num_of_profile).Where("Name=?",name).Find(&profile)
+	db.Offset(Offset).Limit(numOfProfile).Where("Name=?",name).Find(&profile)
 	userId:=make([]string,0)
 	for _,data:=range profile{
 		userId=append(userId,data.UserId)
@@ -131,10 +131,10 @@ func UpdateLanguage(userId string,language string){
 	db.Table("profiles").Where("UserId=?",userId).Update("Language",language)
 }
 
-func GetQuestionFromDB(offset int,num_of_question int)([]Question){
+func GetQuestionFromDB(offset int,numOfQuestion int)([]Question){
 	db:=database.	GetDB()
 	question:=[]Question{}
-	db.Offset(offset).Limit(num_of_question).Find(&question)
+	db.Offset(offset).Limit(numOfQuestion).Find(&question)
 	return question
 }
 

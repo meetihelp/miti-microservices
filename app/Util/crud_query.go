@@ -6,7 +6,7 @@ import(
 	"net/http"
 	"fmt"
 )
-func get_cookie() http.Cookie{
+func getCookie() http.Cookie{
 	expire := time.Now().Add(10 * time.Minute)
 	cookie:=http.Cookie{}
 	cookie.Name="cookie"
@@ -17,13 +17,14 @@ func get_cookie() http.Cookie{
 	cookie.MaxAge=90000
 	return cookie
 }
-func Insert_session(User_id string,ip_address string) string{
-	cookie:= get_cookie()
+func InsertSession(UserId string,ipAddress string) string{
+	cookie:= getCookie()
 	session:=Session{}
-	session.Session_id=cookie.Value
-	session.User_id=User_id
-	session.IP=ip_address
-	session.CreatedAt =time.Now()
+	session.SessionId=cookie.Value
+	session.UserId=UserId
+	session.IP=ipAddress
+	// session.CreatedAt =time.Now()
+	session.CreatedAt=GetTime()
 	db:=database.GetDB()
 	db.Create(&session)
 	fmt.Println("Session inserted in Session Table")
@@ -31,19 +32,64 @@ func Insert_session(User_id string,ip_address string) string{
 	return cookie.Value
 }
 
-func Get_user_id_from_session(session_id string) (string,string){
-	db:=database.GetDB()
+func InsertSessionValue(tempSession string,userId string,ipAddress string){
 	session:=Session{}
-	db.Where("session_id=?",session_id).First(&session)
-	if session.User_id==""{
-		return "","ERROR"
-	}
-	return session.User_id,"OK"
+	session.SessionId=tempSession
+	session.UserId=userId
+	session.IP=ipAddress
+	// session.CreatedAt =time.Now()
+	session.CreatedAt=GetTime()
+	db:=database.GetDB()
+	db.Create(&session)
+	fmt.Println("Session inserted in Session Table")
 }
 
-func Delete_session(session_id string) (string){
+func InsertUserVerificationSession(UserId string,ipAddress string) string{
+	cookie:= getCookie()
+	session:=UserVerificationSession{}
+	session.UserVerificationSessionId=cookie.Value
+	session.UserId=UserId
+	session.IP=ipAddress
+	// session.CreatedAt =time.Now()
+	session.CreatedAt=GetTime()
 	db:=database.GetDB()
-	fmt.Println("Delete ",session_id)
-	db.Where("session_id=?",session_id).Delete(&Session{})
-	return "OK"
+	db.Create(&session)
+	fmt.Println("Session inserted in User Verification Session Table")
+	// return cookie
+	return cookie.Value
+}
+
+func GetUserIdFromSession(sessionId string) (string,string){
+	db:=database.GetDB()
+	session:=Session{}
+	db.Where("session_id=?",sessionId).First(&session)
+	if session.UserId==""{
+		return "","Error"
+	}
+	return session.UserId,"Ok"
+}
+func GetUserIdFromUserVerificationSession(sessionId string) (string,string){
+	db:=database.GetDB()
+	session:=UserVerificationSession{}
+	db.Where("user_verification_session_id=?",sessionId).First(&session)
+	if session.UserId==""{
+		return "","Error"
+	}
+	return session.UserId,"Ok"
+}
+
+
+
+func DeleteSession(sessionId string) (string){
+	db:=database.GetDB()
+	fmt.Println("Delete ",sessionId)
+	db.Where("session_id=?",sessionId).Delete(&Session{})
+	return "Ok"
+}
+
+func DeleteUserVerificationSession(sessionId string) (string){
+	db:=database.GetDB()
+	fmt.Println("Delete ",sessionId)
+	db.Where("session_id=?",sessionId).Delete(&UserVerificationSession{})
+	return "Ok"
 }
