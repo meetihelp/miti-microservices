@@ -221,7 +221,8 @@ func GetProfile(w http.ResponseWriter, r *http.Request){
 	}
 	profileViewAuthorization:=ProfileViewAuthorization(userId,profileRequest.UserId)
 	if profileViewAuthorization=="Error"{
-
+		util.Message(w,2001)
+		return
 	}
 
 	//RETURN PROFILE

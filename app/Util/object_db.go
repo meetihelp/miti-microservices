@@ -26,8 +26,14 @@ type UserVerificationSession struct{
 	CreatedAt string `gorm:"type:varchar(100)" json:"CreatedAt"`
 }
 
+type Match struct{
+	UserId1 string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"UserId1"`
+	UserId2 string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"UserId2"`
+}
+
 func init(){
 	db:=database.GetDB()
 	db.AutoMigrate(&Session{})
 	db.AutoMigrate(&UserVerificationSession{})
+	db.AutoMigrate(&Match{})
 }

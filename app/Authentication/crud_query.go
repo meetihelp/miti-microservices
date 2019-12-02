@@ -17,8 +17,16 @@ func EnterMatchUser(userId1 string,userId2 string){
 	EnterAnonymousUser(userId1,tempUser2,chatID,"OneToOne",1)
 	EnterAnonymousUser(userId2,tempUser1,chatID,"OneToOne",2)
 
+	EnterMatchData(userId1,userId2)
 }
 
+func EnterMatchData(userId1 string,userId2 string){
+	db:=database.GetDB()
+	match:=util.Match{}
+	match.UserId1=userId1
+	match.UserId2=userId2
+	db.Create(&match)
+}
 func EnterAnonymousUser(userId string,tempUserId string,chatId string,chatType string,userIndex int){
 	db:=database.GetDB()
 	anonymousUser:=AnonymousUser{}
@@ -38,6 +46,8 @@ func EnterAnonymousUser(userId string,tempUserId string,chatId string,chatType s
 
 	db.Create(&anonymousUser)
 	db.Create(&chatDetail)
+
+
 }
 
 func EnterUserData(userData User) (string,int){

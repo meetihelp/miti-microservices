@@ -2,6 +2,7 @@ package Profile
 import(
 	"fmt"
    database "app/Database"
+   util "app/Util"
    "reflect"
 )
 
@@ -23,7 +24,7 @@ func EnterProfileData(profileData Profile){
 func GetProfileDB(userId string) ProfileResponse{
 	db:=database.GetDB()
 	profile:=Profile{}
-	db.Where("UserId=?",userId).First(&profile)
+	db.Where("user_id=?",userId).First(&profile)
 	profileResponse:=ProfileResponse{}
 	profileResponse.UserId=profile.UserId
 	profileResponse.Name=profile.Name
@@ -166,5 +167,15 @@ func GetScore(response []Response) ([]int){
 }
 
 func ProfileViewAuthorization(userId1 string,userId2 string) string{
-	return "Ok"
+	db:=database.GetDB()
+	match:=util.Match{}
+	db.Where("user_id1=? AND user_id2=?",userId1,userId2).First(&match)
+	if match.UserId1!=""{
+		return "Ok"
+	}
+	db.Where("user_id1=? AND user_id2=?",userId2,userId1).First(&match)
+	if match.UserId1!=""{
+		return "Ok"
+	}
+	return "Error"
 }

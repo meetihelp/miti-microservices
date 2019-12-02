@@ -34,7 +34,7 @@ func GetMessageDecode(status_code int) string{
 	message_decode[1501]="Invalid user id or password"
 
 	//MESSAGE STATUS CODE FOR PROFILE CREATION
-
+	message_decode[2001]="Cannot Access this Profile"
 	//MESSAGE STATUS CODE FOR LOGOUT	
 
 	//MESSAGE STATUS CODE FOR GETCHATDETAIL

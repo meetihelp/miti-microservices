@@ -44,6 +44,7 @@ func server(){
 	r.HandleFunc("/getQuestion",profile.GetQuestion).Methods("GET")
 	r.HandleFunc("/insertQuestion",profile.InsertQuestion).Methods("POST")
 	r.HandleFunc("/updateQuestionResponse",profile.UpdateQuestionResponse).Methods("POST")
+	r.HandleFunc("/getProfile",profile.GetProfile).Methods("POST")
 	http.Handle("/", r)
 	
 
