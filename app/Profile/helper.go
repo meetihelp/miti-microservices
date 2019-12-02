@@ -21,4 +21,13 @@ func SendQuestion(w http.ResponseWriter,question []Question){
 	}
 }
 
-	
+func SendProfile(w http.ResponseWriter,profileResponse ProfileResponse){
+	w.Header().Set("Content-Type", "application/json")
+	msg:=util.GetMessageDecode(200)
+	p:=ProfileResponseContent{Code:200,Message:msg,ProfileResponse:profileResponse}
+	enc := json.NewEncoder(w)
+	err:= enc.Encode(p)
+	if err != nil {
+		log.Fatal(err)
+	}
+}

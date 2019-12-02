@@ -139,7 +139,7 @@ func CheckUserById(id string,password string) string{
 func IsUserVerified(id string) bool{
 	db:=database.GetDB()
 	user:=User{}
-	db.Where("userId=?",id).First(&user)
+	db.Where("user_id=?",id).First(&user)
 	if user.Status=="U"{
 		return false
 	} else{
@@ -150,7 +150,7 @@ func IsUserVerified(id string) bool{
 func GetUserDetail(userId string) (string,string){
 	db:=database.GetDB()
 	user:=User{}
-	db.Where("userId=?",userId).First(&user)
+	db.Where("user_id=?",userId).First(&user)
 	return user.Email , user.Phone
 }
 
@@ -177,7 +177,7 @@ func GetAllUser() ([]string){
 func VerifyOTP(userId string,otp string) (bool){
 	db:=database.GetDB()
 	otpVerification:=OTPVerification{}
-	db.Where("userId=? AND verification_otp=?",userId,otp).First(&otpVerification)
+	db.Where("user_id=? AND verification_otp=?",userId,otp).First(&otpVerification)
 	if otpVerification.UserId==""{
 		return false
 	}
@@ -197,13 +197,13 @@ func GetOtpVerificationCount(id string)(int,string){
 	count:=0
 	otpVerification:=OTPVerification{}
 	db:=database.GetDB()
-	db.Where("userId=?",id).Find(&otpVerification).Count(&count)
+	db.Where("user_id=?",id).Find(&otpVerification).Count(&count)
 	return count,otpVerification.CreatedAt
 }
 func ChangeVerificationStatus(userId string){
 	db:=database.GetDB()
 	user:=User{}
-	db.Model(&user).Where("userId=?",userId).Update("status","V")
+	db.Model(&user).Where("user_id=?",userId).Update("status","V")
 }
 func EnterEmailVerification(id string,token string){
 	db:=database.GetDB()

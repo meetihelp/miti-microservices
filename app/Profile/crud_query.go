@@ -14,11 +14,27 @@ func EnterProfileData(profileData Profile){
 	db.Create(&questionResponse)
 }
 
-func GetProfile(userId string) Profile{
+// func GetProfile(userId string) Profile{
+// 	db:=database.GetDB()
+// 	profile:=Profile{}
+// 	db.Where("UserId=?",userId).First(&profile)
+// 	return profile
+// }
+func GetProfileDB(userId string) ProfileResponse{
 	db:=database.GetDB()
 	profile:=Profile{}
 	db.Where("UserId=?",userId).First(&profile)
-	return profile
+	profileResponse:=ProfileResponse{}
+	profileResponse.UserId=profile.UserId
+	profileResponse.Name=profile.Name
+	profileResponse.DateOfBirth=profile.DateOfBirth
+	profileResponse.Job=profile.Job
+	profileResponse.PicUrl=profile.PicUrl
+	profileResponse.Gender=profile.Gender
+	profileResponse.Language=profile.Language
+	profileResponse.Country=profile.Country
+	// _=reflect.Copy(profileResponse,profile)
+	return profileResponse
 }
 
 func GetUserIdByName(Offset int,numOfProfile int,name string) ([]string){
@@ -149,3 +165,6 @@ func GetScore(response []Response) ([]int){
 	return score
 }
 
+func ProfileViewAuthorization(userId1 string,userId2 string) string{
+	return "Ok"
+}

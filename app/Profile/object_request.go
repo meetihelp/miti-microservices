@@ -30,3 +30,7 @@ type Response struct{
 type ResponseWrapper struct{
 	IPIP []Response `json:"IPIP"`
 }
+
+type ProfileRequest struct{
+	UserId string `gorm:"primary_key;type:varchar(100)"  json:"UserId"`
+}

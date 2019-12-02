@@ -5,7 +5,7 @@ import(
 	"log"
 )
 
-func Send_email(email string,url string){
+func SendEmail(email string,url string){
 	auth := smtp.PlainAuth("", "kumar93sunny91@iitkgp.ac.in", "01.14.2000", "iitkgpmail.iitkgp.ac.in")
 
 	// Connect to the server, authenticate, set the sender and recipient,

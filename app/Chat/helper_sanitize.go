@@ -1,7 +1,8 @@
 package Chat
 
 import(
-	"gopkg.in/go-playground/validator.v9"
+	//"gopkg.in/go-playground/validator.v9"
+	"gopkg.in/go-playground/validator"
 	"fmt"
 )
 

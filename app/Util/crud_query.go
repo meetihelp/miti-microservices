@@ -71,6 +71,7 @@ func GetUserIdFromSession(sessionId string) (string,string){
 func GetUserIdFromUserVerificationSession(sessionId string) (string,string){
 	db:=database.GetDB()
 	session:=UserVerificationSession{}
+	fmt.Println(sessionId)
 	db.Where("user_verification_session_id=?",sessionId).First(&session)
 	if session.UserId==""{
 		return "","Error"
@@ -90,6 +91,6 @@ func DeleteSession(sessionId string) (string){
 func DeleteUserVerificationSession(sessionId string) (string){
 	db:=database.GetDB()
 	fmt.Println("Delete ",sessionId)
-	db.Where("session_id=?",sessionId).Delete(&UserVerificationSession{})
+	db.Where("user_verification_session_id=?",sessionId).Delete(&UserVerificationSession{})
 	return "Ok"
 }

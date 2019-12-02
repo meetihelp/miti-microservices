@@ -13,10 +13,9 @@ const (
 
 
 func GenerateOtp(w http.ResponseWriter,r *http.Request){
-	verificationHeader:=VerificationHeader{}
+	verificationHeader:=LoginHeader{}
 	util.GetHeader(r,&verificationHeader)
 	sessionId:=verificationHeader.Cookie
-
 	userId,err:=util.GetUserIdFromUserVerificationSession(sessionId)
 	if err=="Error"{
 		fmt.Println("Session Does not exist")

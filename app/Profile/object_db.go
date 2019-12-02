@@ -32,6 +32,7 @@ type Profile struct{
 	Longitude string `gorm:"type:varchar(20)" json:"Longitude"`
 }
 
+
 type QuestionResponse struct{
 	UserId string `gorm:"primary_key;type:varchar(100)"  json:"UserId"`
 	QuestionId1 int `gorm:"type:int" json:"QuestionId1"`
