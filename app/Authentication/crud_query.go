@@ -4,6 +4,7 @@ import(
 	"github.com/jinzhu/gorm"
  _ 	"github.com/jinzhu/gorm/dialects/postgres"
    	database "app/Database"
+   	sms "app/Notification/SMS"
    	chat "app/Chat"
     util "app/Util"
 )
@@ -87,7 +88,7 @@ func IsUserExist(db *gorm.DB,userData User) bool{
 
 	return false
 }
-func CheckUser(userData User)(string,string){
+func CheckUserCredentials(userData User)(string,string){
 	db:=database.GetDB()
 	email:=userData.Email
 	phone:=userData.Phone
@@ -132,7 +133,7 @@ func CheckUser(userData User)(string,string){
 func CheckUserById(id string,password string) string{
 	db:=database.GetDB()
 	user:=User{}
-	db.Where("userId=?",id).First(&user)
+	db.Where("user_id=?",id).First(&user)
 	status:=util.ComaparePassword(user.Password,password)
 	if !status{
 		return "WrongPassword"
@@ -169,7 +170,7 @@ func UpdatePasswordFunc(userId string,newPassword string){
 	newPassword = util.GenerateEncryptedPassword(newPassword)
 
 	user:=User{}
-	db.Model(&user).Where("userId = ?", userId).Update("password", newPassword)
+	db.Model(&user).Where("user_id = ?", userId).Update("password", newPassword)
 }
 
 func GetAllUser() ([]string){
@@ -184,10 +185,10 @@ func GetAllUser() ([]string){
 	return UserList
 }
 
-func VerifyOTP(userId string,otp string) (bool){
+func VerifyOTPDB(userId string,otp string) (bool){
 	db:=database.GetDB()
 	otpVerification:=OTPVerification{}
-	db.Where("user_id=? AND verification_otp=?",userId,otp).First(&otpVerification)
+	db.Where("user_id=? AND otp=?",userId,otp).First(&otpVerification)
 	if otpVerification.UserId==""{
 		return false
 	}
@@ -198,17 +199,17 @@ func EnterVerificationOtp(id string,otp string){
 	db:=database.GetDB()
 	otpVerification:=OTPVerification{}
 	otpVerification.UserId=id
-	otpVerification.VerificationOtp=otp
+	otpVerification.OTP=otp
 	otpVerification.CreatedAt=util.GetTime()
 	db.Create(&otpVerification)
 }
 
 func GetOtpVerificationCount(id string)(int,string){
 	count:=0
-	otpVerification:=OTPVerification{}
+	otpVerification:=[]OTPVerification{}
 	db:=database.GetDB()
 	db.Where("user_id=?",id).Find(&otpVerification).Count(&count)
-	return count,otpVerification.CreatedAt
+	return count,otpVerification[count-1].CreatedAt
 }
 func ChangeVerificationStatus(userId string){
 	db:=database.GetDB()
@@ -229,7 +230,7 @@ func GetEmailVerificationCount(id string)(int,string){
 	count:=0
 	emailVerification:=EmailVerification{}
 	db:=database.GetDB()
-	db.Where("userId=?",id).Find(&emailVerification).Count(&count)
+	db.Where("userId=?",id).Order("created_at").Find(&emailVerification).Count(&count)
 	fmt.Println(count)
 	return count,emailVerification.CreatedAt
 
@@ -249,4 +250,72 @@ func VerifyEmailFunc(token string) (string,bool){
 		return "",false
 	}
 	return emailVerification.UserId,true
+}
+
+func DeleteOtp(id string){
+	db:=database.GetDB()
+	db.Where("user_id=?",id).Delete(&OTPVerification{})
+}
+
+func GetUserIdFromPhone(phone string) (string,string){
+	db:=database.GetDB()
+	user:=User{}
+	db.Where("phone=?",phone).Find(&user)
+	if user.UserId!=""{
+		return user.UserId,"Ok"
+	}
+	return "","Error"
+}
+
+func GetPhoneFromUserId(userId string) (string,string){
+	db:=database.GetDB()
+	user:=User{}
+	db.Where("user_id=?",userId).Find(&user)
+	if user.Phone!=""{
+		return user.Phone,"Ok"
+	}
+	return "","Error"
+}
+
+func SendOTP(phone string,otp string){
+	sms.SendSMS(phone,otp)
+}
+
+func InsertOTP(userId string,sessionId string) string{
+	db:=database.GetDB()
+	otp:=util.GenerateOTP()
+	otpVerification:=OTPVerification{}
+	otpVerification.UserId=userId
+	otpVerification.SessionId=sessionId
+	otpVerification.OTP=otp
+	otpVerification.CreatedAt=util.GetTime()
+	db.Create(&otpVerification)
+	return otp
+}
+func InsertForgetPasswordStatus(sessionId string){
+	db:=database.GetDB()
+	forgetPasswordStatus:=ForgetPasswordStatus{}
+	forgetPasswordStatus.SessionId=sessionId
+	forgetPasswordStatus.VerificationStatus="U"
+	db.Create(&forgetPasswordStatus)
+}
+func UpdateForgetPasswordStatus(sessionId string){
+	db:=database.GetDB()
+	forgetPasswordStatus:=ForgetPasswordStatus{}
+	db.Model(&forgetPasswordStatus).Where("session_id = ?", sessionId).Update("verification_status", "V")
+}
+
+func CanUserUpdatePassword(sessionId string) string{
+	db:=database.GetDB()
+	forgetPasswordStatus:=ForgetPasswordStatus{}
+	db.Where("session_id=? AND verification_status=?",sessionId,"V").Find(&forgetPasswordStatus)
+	if forgetPasswordStatus.SessionId==""{
+		return "Error"
+	}
+	return "Ok"
+}
+
+func DeleteForgetPasswordSession(sessionId string){
+	db:=database.GetDB()
+	db.Where("session_id=?",sessionId).Delete(&ForgetPasswordStatus{})
 }

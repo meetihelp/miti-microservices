@@ -44,10 +44,10 @@ func InsertSessionValue(tempSession string,userId string,ipAddress string){
 	fmt.Println("Session inserted in Session Table")
 }
 
-func InsertUserVerificationSession(UserId string,ipAddress string) string{
+func InsertTemporarySession(UserId string,ipAddress string) string{
 	cookie:= getCookie()
-	session:=UserVerificationSession{}
-	session.UserVerificationSessionId=cookie.Value
+	session:=TemporarySession{}
+	session.TemporarySessionId=cookie.Value
 	session.UserId=UserId
 	session.IP=ipAddress
 	// session.CreatedAt =time.Now()
@@ -68,11 +68,11 @@ func GetUserIdFromSession(sessionId string) (string,string){
 	}
 	return session.UserId,"Ok"
 }
-func GetUserIdFromUserVerificationSession(sessionId string) (string,string){
+func GetUserIdFromTemporarySession(sessionId string) (string,string){
 	db:=database.GetDB()
-	session:=UserVerificationSession{}
+	session:=TemporarySession{}
 	fmt.Println(sessionId)
-	db.Where("user_verification_session_id=?",sessionId).First(&session)
+	db.Where("temporary_session_id=?",sessionId).First(&session)
 	if session.UserId==""{
 		return "","Error"
 	}
@@ -88,9 +88,21 @@ func DeleteSession(sessionId string) (string){
 	return "Ok"
 }
 
-func DeleteUserVerificationSession(sessionId string) (string){
+func DeleteTemporarySession(sessionId string) (string){
 	db:=database.GetDB()
 	fmt.Println("Delete ",sessionId)
-	db.Where("user_verification_session_id=?",sessionId).Delete(&UserVerificationSession{})
+	db.Where("temporary_session_id=?",sessionId).Delete(&TemporarySession{})
 	return "Ok"
 }
+
+// func InsertOtp(userId string,sessionId string) string{
+// 	db:=database.GetDB()
+// 	otp:=util.GenerateOtp()
+// 	otpVerification:=OtpVerification{}
+// 	otpVerification.UserId=userId
+// 	otpVerification.SessionId=sessionId
+// 	otpVerification.OTP=otp
+// 	otpVerification.CreatedAt=GetTime()
+// 	db.Create(&otpVerification)
+// 	return otp
+// }

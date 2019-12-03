@@ -2,13 +2,12 @@ package Authentication
 
 import(
 	"net/http"
-	"fmt"
+	// "fmt"
 	util "app/Util"
 )
 
 
 func Logout(w http.ResponseWriter,r *http.Request){
-	fmt.Println("Delete")
 	logoutHeader:=LogoutHeader{}
 	util.GetHeader(r,&logoutHeader)
 	sessionId:=logoutHeader.Cookie

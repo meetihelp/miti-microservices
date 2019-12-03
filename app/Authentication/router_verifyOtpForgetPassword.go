@@ -8,7 +8,7 @@ import(
     "io/ioutil"
 )
 
-func VerifyOTP(w http.ResponseWriter,r *http.Request){
+func VerifyOTPForgetPassword(w http.ResponseWriter,r *http.Request){
     // ipAddress:=util.GetIPAddress(r)
     verifyOtpHeader:=VerifyOTPHeader{}
     util.GetHeader(r,&verifyOtpHeader)
@@ -50,7 +50,8 @@ func VerifyOTP(w http.ResponseWriter,r *http.Request){
         //CHANGE STATUS OF USER TO VERIFIED
         // ChangeVerificationStatus(userId)
         // util.InsertSessionValue(sessionId,userId,ipAddress)
-        util.DeleteTemporarySession(sessionId)
+        UpdateForgetPasswordStatus(sessionId)
+        // util.DeleteTemporarySession(sessionId)
         util.Message(w,200)
     } else{
         util.Message(w,1401)

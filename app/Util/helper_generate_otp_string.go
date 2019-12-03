@@ -1,5 +1,5 @@
 package Util
 
-func GenerateOtpString() string{
+func GenerateOTP() string{
 	return "1234"
 }

@@ -9,22 +9,24 @@ import (
 
 
 func Login(w http.ResponseWriter,r *http.Request){
+	//Get IP Address of Client
 	ipAddress:=util.GetIPAddress(r)
+	//Read header of the client packet
 	loginHeader:=LoginHeader{}
 	util.GetHeader(r,&loginHeader)
 	sessionId:=loginHeader.Cookie
-	fmt.Println(sessionId)
+	//Check if the user is already logged in? Using session value
 	userId,loginStatus:=util.GetUserIdFromSession(sessionId)
 	fmt.Println("session "+loginStatus)
 	if loginStatus=="Ok"{
 		util.Message(w,200)
 		return
 	}
-	userId,loginStatus=util.GetUserIdFromUserVerificationSession(sessionId)
-	fmt.Println("session "+loginStatus)
+	//Check if User is verified or not
+	//session of Unverified user is stored separately to reduce the risk.... 
+	//...of accesing the unauthorized data without verification 
+	userId,loginStatus=util.GetUserIdFromTemporarySession(sessionId)
 	if loginStatus=="Ok"{
-		cookie:=sessionId
-		w.Header().Set("Miti-Cookie",cookie)
 		util.Message(w,1005)
 		return
 	}
@@ -46,6 +48,7 @@ func Login(w http.ResponseWriter,r *http.Request){
 		return 
 	}
 
+	//Check if the user data is proper or not
 	sanatizationStatus :=Sanatize(userData)
 	if sanatizationStatus =="Error"{
 		fmt.Println("User data invalid")
@@ -53,7 +56,8 @@ func Login(w http.ResponseWriter,r *http.Request){
 		return
 	}
 
-	userId,loginStatus=CheckUser(userData)
+	//Check if the credentials given by user is Proper or not
+	userId,loginStatus=CheckUserCredentials(userData)
 	if loginStatus=="WrongPassword"{
 		util.Message(w,1501)
 		return
@@ -63,16 +67,13 @@ func Login(w http.ResponseWriter,r *http.Request){
 		return
 	}
 	if loginStatus=="Unverified"{
-		cookie:=util.InsertUserVerificationSession(userId,ipAddress)
-		// http.SetCookie(w,&cookie)
+		cookie:=util.InsertTemporarySession(userId,ipAddress)
 		w.Header().Set("Miti-Cookie",cookie)
 		util.Message(w,1005)
 		return
 	} 
 	if loginStatus=="Ok"{
 		cookie:=util.InsertSession(userId,ipAddress)
-		fmt.Println("gaurav1")
-		// http.SetCookie(w,&cookie)
 		w.Header().Set("Miti-Cookie",cookie)
 		util.Message(w,200)
 		return

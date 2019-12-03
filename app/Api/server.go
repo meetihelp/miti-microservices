@@ -24,12 +24,16 @@ func server(){
 	r.HandleFunc("/createMatch",apnaauth.CreateMatch).Methods("GET")
 	r.HandleFunc("/register",apnaauth.Register).Methods("POST")
 	r.HandleFunc("/generateVerificationEmail",apnaauth.GenerateVerificationEmail).Methods("GET")
-	r.HandleFunc("/generateOtp",apnaauth.GenerateOtp).Methods("GET")
+	// r.HandleFunc("/generateOtp",apnaauth.GenerateOtp).Methods("GET")
 	r.HandleFunc("/verifyEmail",apnaauth.VerifyEmail).Methods("GET")
-	r.HandleFunc("/verifyOtp",apnaauth.VerifyOtp).Methods("POST")
+	r.HandleFunc("/verifyUser",apnaauth.VerifyUser).Methods("GET")
+	r.HandleFunc("/verifyOTPUserverification",apnaauth.VerifyOTPUserverification).Methods("POST")
 	r.HandleFunc("/login",apnaauth.Login).Methods("POST")
 	r.HandleFunc("/logout",apnaauth.Logout).Methods("GET")
 	r.HandleFunc("/updatePassword",apnaauth.UpdatePassword).Methods("POST")
+	r.HandleFunc("/forgetPassword",apnaauth.ForgetPassword).Methods("POST")
+	r.HandleFunc("/verifyOTPForgetPassword",apnaauth.VerifyOTPForgetPassword).Methods("POST")
+	r.HandleFunc("/updateForgetPassword",apnaauth.UpdateForgetPassword).Methods("POST")
 
 
 	//Chat related APIs

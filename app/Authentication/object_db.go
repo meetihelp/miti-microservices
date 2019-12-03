@@ -14,7 +14,8 @@ type User struct{
 }
 type OTPVerification struct{
 	UserId string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"UserId"`
-	VerificationOtp string `gorm:"primary_key;varchar(100)" validate:"required"  json:"VerificationOTP"`
+	SessionId string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"SessionId"`
+	OTP string `gorm:"primary_key;varchar(100)" validate:"required"  json:"OTP"`
 	CreatedAt string `gorm:"type:varchar" json:"CreatedAt"`
 }
 
@@ -33,10 +34,15 @@ type AnonymousUser struct{
 	CreatedAt string `gorm:"type:varchar(100)" json:"CreatedAt"`
 }
 
+type ForgetPasswordStatus struct{
+	SessionId string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"SessionId"`
+	VerificationStatus string `gorm:"type:varchar" json:"VerificationStatus"`
+}
 func init(){	
 	db:=database.GetDB()
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&OTPVerification{})
 	db.AutoMigrate(&EmailVerification{})
 	db.AutoMigrate(&AnonymousUser{})
+	db.AutoMigrate(&ForgetPasswordStatus{})
 }

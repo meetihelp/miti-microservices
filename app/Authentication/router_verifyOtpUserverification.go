@@ -8,8 +8,8 @@ import(
     "io/ioutil"
 )
 
-func VerifyOTP(w http.ResponseWriter,r *http.Request){
-    // ipAddress:=util.GetIPAddress(r)
+func VerifyOTPUserverification(w http.ResponseWriter,r *http.Request){
+    ipAddress:=util.GetIPAddress(r)
     verifyOtpHeader:=VerifyOTPHeader{}
     util.GetHeader(r,&verifyOtpHeader)
     sessionId:=verifyOtpHeader.Cookie
@@ -48,8 +48,8 @@ func VerifyOTP(w http.ResponseWriter,r *http.Request){
     otpVerify:=VerifyOTPDB(otpVerification.UserId,otpVerification.OTP)
     if otpVerify{
         //CHANGE STATUS OF USER TO VERIFIED
-        // ChangeVerificationStatus(userId)
-        // util.InsertSessionValue(sessionId,userId,ipAddress)
+        ChangeVerificationStatus(userId)
+        util.InsertSessionValue(sessionId,userId,ipAddress)
         util.DeleteTemporarySession(sessionId)
         util.Message(w,200)
     } else{

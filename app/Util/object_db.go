@@ -19,9 +19,9 @@ type Session struct{
 	// OS string `gorm:"type:varchar(30)" validate:"required"`
 }
 
-type UserVerificationSession struct{
+type TemporarySession struct{
 	UserId string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"UserId"`
-	UserVerificationSessionId string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"SessionId"`
+	TemporarySessionId string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"SessionId"`
 	IP string `gorm:"type:varchar(100)" validate:"required" json:"IP"`
 	CreatedAt string `gorm:"type:varchar(100)" json:"CreatedAt"`
 }
@@ -31,9 +31,16 @@ type Match struct{
 	UserId2 string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"UserId2"`
 }
 
+// type OTPVerification struct{
+// 	UserId string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"UserId"`
+// 	SessionId string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"SessionId"`
+// 	OTP string `gorm:"primary_key;varchar(100)" validate:"required"  json:"OTP"`
+// 	CreatedAt string `gorm:"type:varchar" json:"CreatedAt"`
+// }
 func init(){
 	db:=database.GetDB()
 	db.AutoMigrate(&Session{})
-	db.AutoMigrate(&UserVerificationSession{})
+	db.AutoMigrate(&TemporarySession{})
 	db.AutoMigrate(&Match{})
+	// db.AutoMigrate(&OTPVerification{})
 }

@@ -12,7 +12,6 @@ import(
 func Register(w http.ResponseWriter, r *http.Request){
 	//Get ip address of user
 	ipAddress:=util.GetIPAddress(r)
-	fmt.Println("Registeration request from "+ipAddress)
 
 	//GET HEADER 
 	header:=RegisterHeader{}
@@ -47,7 +46,7 @@ func Register(w http.ResponseWriter, r *http.Request){
 	userId,ok:=userDataHandle(w,userData)
 	if ok{
 		userData.UserId=userId
-		cookie:=util.InsertUserVerificationSession(userData.UserId,ipAddress)
+		cookie:=util.InsertTemporarySession(userData.UserId,ipAddress)
 		w.Header().Set("Miti-Cookie",cookie)
 		util.Message(w,200)
 	}
