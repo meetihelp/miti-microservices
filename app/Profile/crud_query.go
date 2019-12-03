@@ -3,7 +3,7 @@ import(
 	"fmt"
    database "app/Database"
    util "app/Util"
-   "reflect"
+   // "reflect"
 )
 
 func EnterProfileData(profileData Profile){
@@ -118,11 +118,10 @@ func InsertQuestionInDB(content string,TypeofQuestion int,factor int){
 
 func InsertQuestionResponse(userId string,response map[string]int){
 	db:=database.GetDB()
-
-    keys := reflect.ValueOf(response).MapKeys()
-	for _,key := range keys{
-		db.Table("question_responses").Where("user_id=?",userId).Update(key.Interface().(string),response[key.Interface().(string)])
-	}
+	questionResponse:=QuestionResponse{}
+	db.Where("user_id=?",userId).Find(&questionResponse)
+	questionResponse=getDataInQuestionResponseForm(questionResponse,response)
+	db.Model(&questionResponse).Where("user_id=?",userId).Update(questionResponse)
 }
 func UpdateJob(userId string,job string){
 	db:=database.GetDB()
@@ -178,4 +177,8 @@ func ProfileViewAuthorization(userId1 string,userId2 string) string{
 		return "Ok"
 	}
 	return "Error"
+}
+
+func UpdateIPIPScore(userId string){
+	
 }
