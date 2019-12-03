@@ -10,8 +10,8 @@ import(
    util "app/Util"
 )
 
-func GetQuestion(w http.ResponseWriter, r *http.Request){
-	header:=ProfileCreationHeader{}
+func InsertQuestion(w http.ResponseWriter, r *http.Request){
+	header:=InsertQuestionHeader{}
 	util.GetHeader(r,&header)
 
 
@@ -31,20 +31,20 @@ func GetQuestion(w http.ResponseWriter, r *http.Request){
 		return 
 	}
 
-	questionRequest:=QuestionRequest{}
-	errQuestionData:=json.Unmarshal(requestBody,&questionRequest)
+	question:=Question{}
+	errQuestionData:=json.Unmarshal(requestBody,&question)
 	if errQuestionData!=nil{
 		fmt.Println("Could not Unmarshall profile data")
 		util.Message(w,1001)
 		return
 	}
-	// sanatization_status:=Sanatize(questionRequest)
+	// sanatization_status:=Sanatize(question)
 	// if sanatization_status =="ERROR"{
 	// 	fmt.Println("profile creation data invalid")
 	// 	util.Message(w,1002)
 	// 	return
 	// }
-	question:=GetQuestionFromDB(questionRequest.Offset,questionRequest.NumOfQuestion)
 
-	SendQuestion(w,question)
+	InsertQuestionInDB(question.Content,question.Type,question.Factor)
+	util.Message(w,200)
 }

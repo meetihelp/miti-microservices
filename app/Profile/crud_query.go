@@ -49,58 +49,6 @@ func GetUserIdByName(Offset int,numOfProfile int,name string) ([]string){
 	return userId
 }
 
-func UpdateScore(userId string,score []int){
-	db:=database.GetDB()
-	profile:=Profile{}
-	db.Where("UserId=?",userId).Find(&profile)
-	score[0]=profile.Extraversion+score[0]
-	score[1]=profile.Agreeableness+score[1]
-	score[2]=profile.Conscientiousness+score[2]
-	score[3]=profile.EmotionalStability+score[3]
-	score[4]=profile.Intellect+score[4]
-	db.Table("profiles").Where("UserId=?",userId).Updates(Profile{Extraversion:score[0],
-		Agreeableness:score[1],Conscientiousness:score[2],EmotionalStability:score[3],Intellect:score[4]})
-}
-
-func UpdateExtraversionScore(userId string,score int){
-	db:=database.GetDB()
-	profile:=Profile{}
-	db.Where("UserId=?",userId).Find(&profile)
-	newScore:=profile.Extraversion+score
-	db.Table("profiles").Where("UserId=?",userId).Update("Extraversion",newScore)
-}
-
-func UpdateAgreeablenessScore(userId string,score int){
-	db:=database.GetDB()
-	profile:=Profile{}
-	db.Where("UserId=?",userId).Find(&profile)
-	newScore:=profile.Agreeableness+score
-	db.Table("profiles").Where("UserId=?",userId).Update("Agreeableness",newScore)
-}
-
-func UpdateConscientiousnessScore(userId string,score int){
-	db:=database.GetDB()
-	profile:=Profile{}
-	db.Where("UserId=?",userId).Find(&profile)
-	newScore:=profile.Conscientiousness+score
-	db.Table("profiles").Where("UserId=?",userId).Update("Conscientiousness",newScore)
-}
-
-func UpdateEmotionalStabilityScore(userId string,score int){
-	db:=database.GetDB()
-	profile:=Profile{}
-	db.Where("UserId=?",userId).Find(&profile)
-	newScore:=profile.EmotionalStability+score
-	db.Table("profiles").Where("UserId=?",userId).Update("EmotionalStability",newScore)
-}
-
-func UpdateIntellectScore(userId string,score int){
-	db:=database.GetDB()
-	profile:=Profile{}
-	db.Where("UserId=?",userId).Find(&profile)
-	newScore:=profile.EmotionalStability+score
-	db.Table("profiles").Where("UserId=?",userId).Update("Intellect",newScore)
-}
 
 func GetQuestionById(questionId int) string{
 	db:=database.GetDB()
@@ -180,5 +128,73 @@ func ProfileViewAuthorization(userId1 string,userId2 string) string{
 }
 
 func UpdateIPIPScore(userId string){
-	
+	db:=database.GetDB()
+	questionResponse:=QuestionResponse{}
+	db.Where("user_id=?",userId).Find(&questionResponse)
+	score:=CalculateIPIPScore(questionResponse)
+	UpdateScore(userId,score)
+}
+
+func CalculateIPIPScore(questionResponse QuestionResponse) ([] int){
+	db:=database.GetDB()
+	response:=ConvertQuestionResponseToArray(questionResponse)
+	score:=make([]int,5)
+	question:=[]Question{}
+	db.Find(&question)
+	for _,q:=range question{
+		score[q.Type]=score[q.Type]+q.Factor*response[q.Id]
+	}
+	return score
+}
+func UpdateScore(userId string,score []int){
+	db:=database.GetDB()
+	profile:=Profile{}
+	db.Where("user_id=?",userId).Find(&profile)
+	score[0]=profile.Extraversion+score[0]
+	score[1]=profile.Agreeableness+score[1]
+	score[2]=profile.Conscientiousness+score[2]
+	score[3]=profile.EmotionalStability+score[3]
+	score[4]=profile.Intellect+score[4]
+	db.Table("profiles").Where("UserId=?",userId).Updates(Profile{Extraversion:score[0],
+		Agreeableness:score[1],Conscientiousness:score[2],EmotionalStability:score[3],Intellect:score[4]})
+}
+
+func UpdateExtraversionScore(userId string,score int){
+	db:=database.GetDB()
+	profile:=Profile{}
+	db.Where("UserId=?",userId).Find(&profile)
+	newScore:=profile.Extraversion+score
+	db.Table("profiles").Where("UserId=?",userId).Update("Extraversion",newScore)
+}
+
+func UpdateAgreeablenessScore(userId string,score int){
+	db:=database.GetDB()
+	profile:=Profile{}
+	db.Where("UserId=?",userId).Find(&profile)
+	newScore:=profile.Agreeableness+score
+	db.Table("profiles").Where("UserId=?",userId).Update("Agreeableness",newScore)
+}
+
+func UpdateConscientiousnessScore(userId string,score int){
+	db:=database.GetDB()
+	profile:=Profile{}
+	db.Where("UserId=?",userId).Find(&profile)
+	newScore:=profile.Conscientiousness+score
+	db.Table("profiles").Where("UserId=?",userId).Update("Conscientiousness",newScore)
+}
+
+func UpdateEmotionalStabilityScore(userId string,score int){
+	db:=database.GetDB()
+	profile:=Profile{}
+	db.Where("UserId=?",userId).Find(&profile)
+	newScore:=profile.EmotionalStability+score
+	db.Table("profiles").Where("UserId=?",userId).Update("EmotionalStability",newScore)
+}
+
+func UpdateIntellectScore(userId string,score int){
+	db:=database.GetDB()
+	profile:=Profile{}
+	db.Where("UserId=?",userId).Find(&profile)
+	newScore:=profile.EmotionalStability+score
+	db.Table("profiles").Where("UserId=?",userId).Update("Intellect",newScore)
 }
