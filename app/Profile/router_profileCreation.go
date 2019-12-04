@@ -49,7 +49,6 @@ func ProfileCreation(w http.ResponseWriter, r *http.Request){
 	}
 	// profile_data_handle(w,profile_data)
 	EnterProfileData(profileData)
-
 	util.Message(w,200)
 
 }

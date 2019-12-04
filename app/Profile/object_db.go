@@ -28,8 +28,8 @@ type Profile struct{
 	Interest4 string `gorm:"type:varchar(100)" json:"Interest4"`
 	Interest5 string `gorm:"type:varchar(100)" json:"Interest5"`
 	MakingChoice string `gorm:"type:varchar(20)" json:"MakingChoice"`
-	Latitude string `gorm:"type:varchar(20)" json:"Latitude"`
-	Longitude string `gorm:"type:varchar(20)" json:"Longitude"`
+	// Latitude string `gorm:"type:varchar(20)" json:"Latitude"`
+	// Longitude string `gorm:"type:varchar(20)" json:"Longitude"`
 }
 
 

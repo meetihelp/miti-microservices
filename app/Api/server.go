@@ -9,9 +9,14 @@ import (
 	apnaauth "app/Authentication"
 	apnachat "app/Chat"
 	util "app/Util"
+	gps "app/GPS"
 )
 
 func test(w http.ResponseWriter,r *http.Request){
+	// l:=gps.Location{}
+	// l.Latitude=1
+	// l.Longitude=1
+	// gps.GetPersonList(l,1)
 	util.Message(w,200)
 }
 
@@ -46,13 +51,15 @@ func server(){
 
 	//Profile related APIs
 	r.HandleFunc("/profileCreation",profile.ProfileCreation).Methods("POST")
-	r.HandleFunc("/getQuestion",profile.GetQuestion).Methods("GET")
+	r.HandleFunc("/getQuestion",profile.GetQuestion).Methods("POST")
 	r.HandleFunc("/insertQuestion",profile.InsertQuestion).Methods("POST")
 	r.HandleFunc("/updateQuestionResponse",profile.UpdateQuestionResponse).Methods("POST")
 	r.HandleFunc("/getProfile",profile.GetProfile).Methods("POST")
 	http.Handle("/", r)
 	
-
+	//GPS related APIs
+	r.HandleFunc("/updateUserLocation",gps.UpdateUserLocation).Methods("POST")
+	r.HandleFunc("/getUserListByLocation",gps.GetUserListByLocation).Methods("POST")
 	if err := http.ListenAndServe("0.0.0.0:9000",nil); err != nil {
 		log.Fatal(err)
 	}
