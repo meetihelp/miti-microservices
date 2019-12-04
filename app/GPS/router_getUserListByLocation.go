@@ -40,5 +40,6 @@ func GetUserListByLocation(w http.ResponseWriter, r *http.Request){
 	location.Longitude=getUserListByLocationData.Longitude
 	distance,_:=strconv.ParseFloat(getUserListByLocationData.Distance,64)
 	userList:=GetUserListByLocationDB(location,distance)
-	fmt.Println(userList)
+	// fmt.Println(userList)
+	SendUserList(w,userList)
 }

@@ -9,4 +9,5 @@ go install $PATH1/Chat
 go install $PATH1/Authentication
 go install $PATH1/Profile
 go install $PATH1/GPS
+go install $PATH1/Event
 go install $PATH1/Api

@@ -14,6 +14,7 @@ type UserLocation struct{
 	Longitude string `gorm:"type:varchar" json:"Longitude"`
 	Latitude string `gorm:"type:varchar" json:"Latitude"`
 	City string `gorm:"type:varchar" json:"City"`
+	UpdatedAt string `gorm:"type:varchar" json:"UpdatedAt"`
 }
 
 type EventLocation struct{

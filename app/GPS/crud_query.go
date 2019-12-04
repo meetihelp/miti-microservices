@@ -1,7 +1,7 @@
 package GPS
 
 import(
-	// util "app/Util"
+	util "app/Util"
 	database "app/Database"
 	// "time"
 	// "fmt"
@@ -38,8 +38,9 @@ func UpdateUserLocationDB(userId string,location Location){
 		db.Create(&userLocation)
 		return
 	}
+	updatedAt:=util.GetTime()
 	db.Model(&userLocation).Where("user_id=?",userId).Updates(UserLocation{Latitude:location.Latitude,
-		Longitude:location.Longitude,City:city})
+		Longitude:location.Longitude,City:city,UpdatedAt:updatedAt})
 }
 
 func GetEventListByLocationDB(eventType string,location Location,distance float64) ([]string){
@@ -58,4 +59,18 @@ func GetEventListByLocationDB(eventType string,location Location,distance float6
 		}
 	}
 	return eventList
+}
+
+func InsertEventLocation(eventId string,eventType string,latitude string,longitude string){
+	db:=database.GetDB()
+	eventLocation:=EventLocation{}
+	eventLocation.EventId=eventId
+	eventLocation.EventType=eventType
+	eventLocation.Latitude=latitude
+	eventLocation.Longitude=longitude
+	location:=Location{}
+	location.Latitude=latitude
+	location.Longitude=longitude
+	eventLocation.City=GetCity(location)
+	db.Create(&eventLocation)
 }

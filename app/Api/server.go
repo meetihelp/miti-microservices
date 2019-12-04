@@ -10,6 +10,7 @@ import (
 	apnachat "app/Chat"
 	util "app/Util"
 	gps "app/GPS"
+	event "app/Event"
 )
 
 func test(w http.ResponseWriter,r *http.Request){
@@ -61,6 +62,9 @@ func server(){
 	r.HandleFunc("/updateUserLocation",gps.UpdateUserLocation).Methods("POST")
 	r.HandleFunc("/getUserListByLocation",gps.GetUserListByLocation).Methods("POST")
 	r.HandleFunc("/getEventListByLocation",gps.GetEventListByLocation).Methods("POST")
+
+	//Event related APIs
+	r.HandleFunc("/createEvent",event.CreateEvent).Methods("POST")
 
 	if err := http.ListenAndServe("0.0.0.0:9000",nil); err != nil {
 		log.Fatal(err)

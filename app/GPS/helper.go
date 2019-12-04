@@ -1,10 +1,11 @@
 package GPS
 
 import(
-	// util "app/Util"
-	// database "app/Database"
-	// "time"
-	// "fmt"
+	"net/http"
+	// "io"
+	"encoding/json"	
+	util "app/Util"
+	"log"
 	"strconv"
 	"math"
 )
@@ -25,6 +26,27 @@ func GetCity(location Location) string{
 	return "Patna"
 }	
 
+func SendUserList(w http.ResponseWriter,userList []string){
+	w.Header().Set("Content-Type", "application/json")
+	msg:=util.GetMessageDecode(200)
+	p:=&SendUserListContent{Code:200,Message:msg,UserList:userList}
+	enc := json.NewEncoder(w)
+	err:= enc.Encode(p)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func SendEventList(w http.ResponseWriter,eventList []string){
+	w.Header().Set("Content-Type", "application/json")
+	msg:=util.GetMessageDecode(200)
+	p:=&SendEventListContent{Code:200,Message:msg,EventList:eventList}
+	enc := json.NewEncoder(w)
+	err:= enc.Encode(p)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 
 // func GetEventList(location Location,eventType string,distance float64) ([]string){

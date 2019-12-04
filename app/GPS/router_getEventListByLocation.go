@@ -41,5 +41,6 @@ func GetEventListByLocation(w http.ResponseWriter, r *http.Request){
 	distance,_:=strconv.ParseFloat(getEventListByLocationData.Distance,64)
 	eventType:=getEventListByLocationData.EventType
 	eventList:=GetEventListByLocationDB(eventType,location,distance)
-	fmt.Println(eventList)
+	// fmt.Println(eventList)
+	SendEventList(w,eventList)
 }
