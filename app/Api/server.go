@@ -60,6 +60,8 @@ func server(){
 	//GPS related APIs
 	r.HandleFunc("/updateUserLocation",gps.UpdateUserLocation).Methods("POST")
 	r.HandleFunc("/getUserListByLocation",gps.GetUserListByLocation).Methods("POST")
+	r.HandleFunc("/getEventListByLocation",gps.GetEventListByLocation).Methods("POST")
+
 	if err := http.ListenAndServe("0.0.0.0:9000",nil); err != nil {
 		log.Fatal(err)
 	}

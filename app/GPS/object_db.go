@@ -16,7 +16,16 @@ type UserLocation struct{
 	City string `gorm:"type:varchar" json:"City"`
 }
 
+type EventLocation struct{
+	EventId string `gorm:"primary_key;type:varchar(100)"  json:"EventId"`
+	EventType string `gorm:"type:varchar" json:"EventType"`
+	Longitude string `gorm:"type:varchar" json:"Longitude"`
+	Latitude string `gorm:"type:varchar" json:"Latitude"`
+	City string `gorm:"type:varchar" json:"City"`
+}
+
 func init(){
 	db:=database.GetDB()
 	db.AutoMigrate(&UserLocation{})
+	db.AutoMigrate(&EventLocation{})
 }

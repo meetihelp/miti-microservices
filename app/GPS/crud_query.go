@@ -41,3 +41,21 @@ func UpdateUserLocationDB(userId string,location Location){
 	db.Model(&userLocation).Where("user_id=?",userId).Updates(UserLocation{Latitude:location.Latitude,
 		Longitude:location.Longitude,City:city})
 }
+
+func GetEventListByLocationDB(eventType string,location Location,distance float64) ([]string){
+	db:=database.GetDB()
+	event:=[]EventLocation{}
+	city:=GetCity(location)
+	db.Where("city=? AND event_type=?",city,eventType).Find(&event)
+	var eventList []string
+	eventLocation:=Location{}
+	for _,e:=range event{
+		eventLocation.Latitude=e.Latitude
+		eventLocation.Longitude=e.Longitude
+		d:=CalculateDistance(location,eventLocation)
+		if d<distance{
+			eventList=append(eventList,e.EventId)	
+		}
+	}
+	return eventList
+}
