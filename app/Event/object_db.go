@@ -11,6 +11,8 @@ type Event struct{
 	EventType string `gorm:"type:varchar" json:"EventType"`
 	Time string `gorm:"type:varchar" json:"Time"`
 	OrganiserId string `gorm:"type:varchar" json:"OrganiserId"`
+	Latitude string `gorm:"type:varchar" json:"Latitude"`
+	Longitude string `gorm:"type:varchar" json:"Longitude"`
 	CreatedAt string `gorm:"type:varchar" json:"CreatedAt'`
 }
 

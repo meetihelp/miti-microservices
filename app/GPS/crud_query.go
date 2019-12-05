@@ -61,7 +61,7 @@ func GetEventListByLocationDB(eventType string,location Location,distance float6
 	return eventList
 }
 
-func InsertEventLocation(eventId string,eventType string,latitude string,longitude string){
+func InsertEventLocation(eventId string,eventType string,latitude string,longitude string) string{
 	db:=database.GetDB()
 	eventLocation:=EventLocation{}
 	eventLocation.EventId=eventId
@@ -73,4 +73,5 @@ func InsertEventLocation(eventId string,eventType string,latitude string,longitu
 	location.Longitude=longitude
 	eventLocation.City=GetCity(location)
 	db.Create(&eventLocation)
+	return "Ok"
 }

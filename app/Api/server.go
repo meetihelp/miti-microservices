@@ -65,6 +65,7 @@ func server(){
 
 	//Event related APIs
 	r.HandleFunc("/createEvent",event.CreateEvent).Methods("POST")
+	r.HandleFunc("/getEventById",event.GetEventById).Methods("POST")
 
 	if err := http.ListenAndServe("0.0.0.0:9000",nil); err != nil {
 		log.Fatal(err)

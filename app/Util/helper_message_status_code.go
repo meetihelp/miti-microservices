@@ -12,6 +12,7 @@ func GetMessageDecode(status_code int) string{
 	message_decode[1003]="Session does not exist"
 	message_decode[1004]="User already verified"
 	message_decode[1005]="User is not verified"
+	message_decode[1006]="Database Problem"
 
 	//MESSAGE STATUS CODE FOR REGISTER
 	message_decode[1101]="User Already Exists"
@@ -39,6 +40,10 @@ func GetMessageDecode(status_code int) string{
 
 	//MESSAGE STATUS CODE FOR GETCHATDETAIL
 	message_decode[7000]="Error in retrieving database"
+
+	//MESSAGE STATUS CODE FOR GETEVENTBYID
+	message_decode[8000]="Error in retrieving database"
+	message_decode[8001]="Event Id does not exist"
 	
 	return message_decode[status_code]
 }

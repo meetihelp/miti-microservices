@@ -39,8 +39,13 @@ func CreateEvent(w http.ResponseWriter, r *http.Request){
 	event:=getEvent(createEventData)
 	event.OrganiserId=organiserId
 	eventId:=InsertEvent(event)
-	gps.InsertEventLocation(eventId,createEventData.EventType,createEventData.Latitude,createEventData.Longitude)
-	util.Message(w,200)
+	status:=gps.InsertEventLocation(eventId,createEventData.EventType,createEventData.Latitude,createEventData.Longitude)
+	if status=="Ok"{
+		util.Message(w,200)	
+	}else{
+		util.Message(w,1006)
+	}
+	
 
 }
 

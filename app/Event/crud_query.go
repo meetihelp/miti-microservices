@@ -12,3 +12,13 @@ func InsertEvent(event Event) string{
 	db.Create(&event)
 	return event.EventId
 }
+
+func GetEventByIdDB(eventId string) (Event,string){
+	db:=database.GetDB()
+	event:=Event{}
+	db.Where("event_id=?",eventId).Find(&event)
+	if event.EventId==""{
+		return event,"Error"
+	}
+	return event,"Ok"
+}
