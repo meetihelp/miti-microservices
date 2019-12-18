@@ -17,7 +17,7 @@ type User struct{
 type OTPVerification struct{
 	UserId string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"UserId"`
 	SessionId string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"SessionId"`
-	OTP string `gorm:"varchar(100)" validate:"required"  json:"OTP"`
+	OTP string `gorm:"varchar(6)" validate:"required"  json:"OTP"`
 	CreatedAt string `gorm:"type:varchar" json:"CreatedAt"`
 }
 

@@ -4,12 +4,13 @@ package Authentication
 // 	"fmt"	
 // 	"time"
 // 	util "miti-microservices/Util"
-// 	sms "miti-microservices/Notification/SMS")
+// 	sms "miti-microservices/Notification/SMS"
+// )
 
-const (
-	MAXCOUNT = 5
-	MAXHOUR = 1
-)
+// const (
+// 	MAXCOUNT = 5
+// 	MAXMINUTE = 10
+// )
 
 
 
@@ -56,7 +57,7 @@ const (
 // 	}
 
 // 	duration:=calculateDuration(lastModified)
-// 	if duration < MAXHOUR{
+// 	if duration < MAXMINUTE{
 // 		util.Message(w,1302)
 // 		return
 // 	}
@@ -78,7 +79,7 @@ const (
 // 	t,_:=time.Parse(layout,lastModified)
 // 	now:=time.Now()
 // 	duration:=now.Sub(t)
-// 	h:=duration.Hours()
+// 	h:=duration.Minutes()
 // 	h_int:=int(h)
 // 	print(h_int)
 // 	return h_int
