@@ -6,6 +6,22 @@ func GetMessageDecode(status_code int) string{
 
 	message_decode[200]="Successfull"
 
+	//MESSAGE STATUS CODE FOR LOADING PAGE
+	message_decode[300]="User already logded in"
+	message_decode[2000]="New or Logged out user"
+	message_decode[2001]="User not verified"
+	message_decode[2002]="Profile Not Created"
+	message_decode[2003]="Preference not completed"
+	
+
+
+
+
+
+
+
+
+
 	message_decode[1000]="Could not read  Body"
 	message_decode[1001]="Could not Unmarshal  Data"
 	message_decode[1002]="User Data Invalid"
@@ -13,6 +29,8 @@ func GetMessageDecode(status_code int) string{
 	message_decode[1004]="User already verified"
 	message_decode[1005]="User is not verified"
 	message_decode[1006]="Database Problem"
+	message_decode[1007]="InvalidURL"
+	message_decode[1008]="Profile not created"
 
 	//MESSAGE STATUS CODE FOR REGISTER
 	message_decode[1101]="User Already Exists"
@@ -32,7 +50,8 @@ func GetMessageDecode(status_code int) string{
 	message_decode[1401]="Wrong OTP"
 
 	//MESSAGE STATUS CODE FOR LOGIN
-	message_decode[1501]="Invalid user id or password"
+	message_decode[1502]="Invalid User Id or Password"
+	message_decode[1501]="No such User"
 
 	//MESSAGE STATUS CODE FOR PROFILE CREATION
 	message_decode[2001]="Cannot Access this Profile"

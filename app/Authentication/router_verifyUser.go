@@ -14,6 +14,7 @@ func VerifyUser(w http.ResponseWriter,r *http.Request){
     util.GetHeader(r,&verifyOtpHeader)
     sessionId:=verifyOtpHeader.Cookie
     userId,sessionErr:=util.GetUserIdFromTemporarySession(sessionId)
+    fmt.Println(sessionId)
     if sessionErr=="Error"{
         fmt.Println("Session Does not exist")
         util.Message(w,1003)

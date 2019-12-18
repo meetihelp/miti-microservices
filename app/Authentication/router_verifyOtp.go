@@ -9,7 +9,7 @@ import(
 )
 
 func VerifyOTP(w http.ResponseWriter,r *http.Request){
-    // ipAddress:=util.GetIPAddress(r)
+    ipAddress:=util.GetIPAddress(r)
     verifyOtpHeader:=VerifyOTPHeader{}
     util.GetHeader(r,&verifyOtpHeader)
     sessionId:=verifyOtpHeader.Cookie
@@ -50,8 +50,14 @@ func VerifyOTP(w http.ResponseWriter,r *http.Request){
         //CHANGE STATUS OF USER TO VERIFIED
         // ChangeVerificationStatus(userId)
         // util.InsertSessionValue(sessionId,userId,ipAddress)
+        util.InsertSessionValue(sessionId,userId,ipAddress)
         util.DeleteTemporarySession(sessionId)
-        util.Message(w,200)
+        profileCreationStatus:=IsProfileCreated(userId)
+        if(profileCreationStatus=="Ok"){
+            util.Message(w,200)
+        }else{
+            util.Message(w,1008)
+        }
     } else{
         util.Message(w,1401)
     }

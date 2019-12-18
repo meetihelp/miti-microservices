@@ -11,15 +11,13 @@ import (
 	util "app/Util"
 	gps "app/GPS"
 	event "app/Event"
+	image "app/Image"
 )
 
 func test(w http.ResponseWriter,r *http.Request){
-	// l:=gps.Location{}
-	// l.Latitude=1
-	// l.Longitude=1
-	// gps.GetPersonList(l,1)
 	util.Message(w,200)
 }
+
 
 func server(){
 	fmt.Println("Server running.....")
@@ -29,6 +27,7 @@ func server(){
 	r.HandleFunc("/createMatch",apnaauth.CreateMatch).Methods("GET")
 
 	//Authentication related APIs
+	r.HandleFunc("/loadingPage",apnaauth.LoadingPage).Methods("GET")
 	r.HandleFunc("/register",apnaauth.Register).Methods("POST")
 	r.HandleFunc("/verifyUser",apnaauth.VerifyUser).Methods("GET")
 	r.HandleFunc("/verifyOTPUserverification",apnaauth.VerifyOTPUserverification).Methods("POST")
@@ -67,6 +66,11 @@ func server(){
 	r.HandleFunc("/createEvent",event.CreateEvent).Methods("POST")
 	r.HandleFunc("/getEventById",event.GetEventById).Methods("POST")
 
+	//Image related APIs
+	r.HandleFunc("/getImageById",image.GetImageById).Methods("POST")
+	r.HandleFunc("/uploadProfilePic",image.UploadProfilePic).Methods("POST")
+	r.HandleFunc("/getEventImageList",image.GetEventImageList).Methods("POST")
+	r.HandleFunc("/getUserImageList",image.GetUserImageList).Methods("POST")
 	if err := http.ListenAndServe("0.0.0.0:9000",nil); err != nil {
 		log.Fatal(err)
 	}

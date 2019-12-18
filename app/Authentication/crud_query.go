@@ -9,6 +9,29 @@ import(
     util "app/Util"
 )
 
+func LoadingPageQuery(id string) (bool,bool,int){
+	db:=database.GetDB()
+	user:=User{}
+	db.Where("user_id=?",id).First(&user)
+	IsUserVerified:=false
+	IsProfileCreated:=false
+	if user.Status=="U"{
+		IsUserVerified=false
+	} else{
+		IsUserVerified=true
+	}
+
+	if user.ProfileCreationStatus=="Y"{
+		IsProfileCreated=true
+	} else{
+		IsProfileCreated=false
+	}
+
+	Preferece:=user.PreferenceCreationStatus
+	return IsUserVerified,IsProfileCreated,Preferece
+}
+
+
 func EnterMatchUser(userId1 string,userId2 string){	
 
 	chatID:=util.GenerateToken()
@@ -52,7 +75,7 @@ func EnterAnonymousUser(userId string,tempUserId string,chatId string,chatType s
 }
 
 func EnterUserData(userData User) (string,int){
-	userData.Password = util.GenerateEncryptedPassword(userData.Password)
+	// userData.Password = util.GenerateEncryptedPassword(userData.Password)
 	
 	db:=database.GetDB()
 	//CHECK IF USER EMAIL ID OR PHONE ALREADY EXISTS
@@ -92,15 +115,15 @@ func CheckUserCredentials(userData User)(string,string){
 	db:=database.GetDB()
 	email:=userData.Email
 	phone:=userData.Phone
-	password:=userData.Password
+	// password:=userData.Password
 
 	user:=User{}
 	if email!=""{
 		db.Where("email=?",email).First(&user)
-		status:=util.ComaparePassword(user.Password,password)
-		if !status{
-			return "","WrongPassword"
-		}
+		// status:=util.ComaparePassword(user.Password,password)
+		// if !status{
+		// 	return "","WrongPassword"
+		// }
 		if user.UserId==""{
 			return user.UserId,"NoUser"
 		} 
@@ -113,13 +136,14 @@ func CheckUserCredentials(userData User)(string,string){
 
 	if phone!=""{
 		db.Where("phone=?",phone).First(&user)
-		status:=util.ComaparePassword(user.Password,password)
-		if !status{
-			return "","WrongPassword"
-		}
+		// status:=util.ComaparePassword(user.Password,password)
 		if user.UserId==""{
 			return user.UserId,"NoUser"
-		} 
+		}
+		// if !status{
+		// 	return "","WrongPassword"
+		// }
+	 
 		if user.UserId !="" && user.Status=="U"{
 			return user.UserId,"Unverified"
 		}
@@ -134,10 +158,10 @@ func CheckUserById(id string,password string) string{
 	db:=database.GetDB()
 	user:=User{}
 	db.Where("user_id=?",id).First(&user)
-	status:=util.ComaparePassword(user.Password,password)
-	if !status{
-		return "WrongPassword"
-	}
+	// status:=util.ComaparePassword(user.Password,password)
+	// if !status{
+	// 	return "WrongPassword"
+	// }
 	if user.UserId==""{
 		return "NoUser"
 	} 
@@ -318,4 +342,14 @@ func CanUserUpdatePassword(sessionId string) string{
 func DeleteForgetPasswordSession(sessionId string){
 	db:=database.GetDB()
 	db.Where("session_id=?",sessionId).Delete(&ForgetPasswordStatus{})
+}
+
+func IsProfileCreated(userId string) string{
+	db:=database.GetDB()
+	user:=User{}
+	db.Where("user_id=?",userId).Find(&user)
+	if(user.ProfileCreationStatus=="Y"){
+		return "Ok"
+	}
+	return "Error"
 }

@@ -13,7 +13,7 @@ type Profile struct{
 	Name string `gorm:"type:varchar(40)" validate:"required" json:"Name"`
 	DateOfBirth string `gorm:"type:varchar(100)" validate:"required" json:"DateOfBirth"`
 	Job string `gorm:"type:varchar(30)" validate:"required" "json:"Job"`
-	PicUrl string `gorm:"type:varchar(100)"  json:"PicUrl"`
+	ProfilePicId string `gorm:"type:varchar(100)"  json:"ProfilePicId"`
 	Gender string `gorm:"type:varchar(10)" validate:"required" json:"Gender"`
 	Language string `gorm:"type:varchar(20)" validate:"required" json:"Language"`
 	Country string `gorm:"type:varchar(30)" json:"Country"`

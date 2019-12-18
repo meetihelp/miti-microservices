@@ -19,7 +19,7 @@ func Login(w http.ResponseWriter,r *http.Request){
 	userId,loginStatus:=util.GetUserIdFromSession(sessionId)
 	fmt.Println("session "+loginStatus)
 	if loginStatus=="Ok"{
-		util.Message(w,200)
+		util.Message(w,300)
 		return
 	}
 	//Check if User is verified or not
@@ -47,7 +47,7 @@ func Login(w http.ResponseWriter,r *http.Request){
 		util.Message(w,1001)
 		return 
 	}
-
+	fmt.Println(userData);
 	//Check if the user data is proper or not
 	sanatizationStatus :=Sanatize(userData)
 	if sanatizationStatus =="Error"{
@@ -58,10 +58,10 @@ func Login(w http.ResponseWriter,r *http.Request){
 
 	//Check if the credentials given by user is Proper or not
 	userId,loginStatus=CheckUserCredentials(userData)
-	if loginStatus=="WrongPassword"{
-		util.Message(w,1501)
-		return
-	}
+	// if loginStatus=="WrongPassword"{
+	// 	util.Message(w,1502)
+	// 	return
+	// }
 	if loginStatus=="NoUser"{
 		util.Message(w,1501)
 		return
@@ -73,7 +73,7 @@ func Login(w http.ResponseWriter,r *http.Request){
 		return
 	} 
 	if loginStatus=="Ok"{
-		cookie:=util.InsertSession(userId,ipAddress)
+		cookie:=util.InsertTemporarySession(userId,ipAddress)
 		w.Header().Set("Miti-Cookie",cookie)
 		util.Message(w,200)
 		return

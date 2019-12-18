@@ -30,7 +30,7 @@ func GetProfileDB(userId string) ProfileResponse{
 	profileResponse.Name=profile.Name
 	profileResponse.DateOfBirth=profile.DateOfBirth
 	profileResponse.Job=profile.Job
-	profileResponse.PicUrl=profile.PicUrl
+	profileResponse.ProfilePicId=profile.ProfilePicId
 	profileResponse.Gender=profile.Gender
 	profileResponse.Language=profile.Language
 	profileResponse.Country=profile.Country
@@ -197,4 +197,9 @@ func UpdateIntellectScore(userId string,score int){
 	db.Where("UserId=?",userId).Find(&profile)
 	newScore:=profile.EmotionalStability+score
 	db.Table("profiles").Where("UserId=?",userId).Update("Intellect",newScore)
+}
+
+func UpdateProfilePicDB(userId string,imageId string){
+	db:=database.GetDB()
+	db.Table("profiles").Where("user_id=?",userId).Update("profile_pic_id",imageId)
 }
