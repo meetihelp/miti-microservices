@@ -2,8 +2,8 @@ package Authentication
 import (
 	"net/http"
 	"fmt"
-	util "app/Util"
-	mail "app/Notification/Mail"
+	util "miti-microservices/Util"
+	mail "miti-microservices/Notification/Mail"
 )
 
 const(

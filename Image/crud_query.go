@@ -1,7 +1,7 @@
 package Image
 import(
 	"os"
-	database "app/Database"
+	database "miti-microservices/Database"
 )
 func DoesImageExist(path string) string{
 	if _, err := os.Stat(path); err != nil {

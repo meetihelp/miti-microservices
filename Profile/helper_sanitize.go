@@ -1,7 +1,7 @@
 package Profile
 import(
-	//"gopkg.in/go-playground/validator.v9"
-	"gopkg.in/go-playground/validator"
+	"gopkg.in/go-playground/validator.v9"
+	// "gopkg.in/go-playground/validator"
 	"fmt"
 )
 

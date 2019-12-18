@@ -2,8 +2,8 @@ package GPS
 import(
 	"net/http"
 	"fmt"
-	// CD "app/Model/CreateDatabase"
-	util "app/Util"
+	// CD "miti-microservices/Model/CreateDatabase"
+	util "miti-microservices/Util"
 	"io/ioutil"
 	"encoding/json"
 )

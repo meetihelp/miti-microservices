@@ -1,8 +1,8 @@
 package Event
 
 import(
-	database "app/Database"
-	util "app/Util"
+	database "miti-microservices/Database"
+	util "miti-microservices/Util"
 )
 
 func InsertEvent(event Event) string{

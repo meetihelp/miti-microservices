@@ -1,7 +1,7 @@
 
 package Util
 import(
-	database "app/Database"
+	database "miti-microservices/Database"
 	"github.com/nu7hatch/gouuid"
 	"time"
 	"net/http"

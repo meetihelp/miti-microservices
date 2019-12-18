@@ -6,7 +6,7 @@ import(
 	// "log"
 	"io/ioutil"
 	"encoding/json"
-   	util "app/Util"
+   	util "miti-microservices/Util"
 )
 
 func UpdateForgetPassword(w http.ResponseWriter, r *http.Request){

@@ -3,8 +3,8 @@ package Cassandra
 import(
 	"fmt"
 	"log"
-	CD "app/Model/CreateDatabase"
-	// util "app/Utility"
+	CD "miti-microservices/Model/CreateDatabase"
+	// util "miti-microservices/Utility"
 )
 
 func EnterChat(chat CD.Chat){

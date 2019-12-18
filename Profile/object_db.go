@@ -3,7 +3,7 @@ package Profile
 import (
 	// "log"
 	// "fmt"
-	database "app/Database"
+	database "miti-microservices/Database"
 // 	"github.com/jinzhu/gorm"
 //  _ 	"github.com/jinzhu/gorm/dialects/postgres"
 )

@@ -7,7 +7,7 @@ import(
 	"io/ioutil"
 	// "strings"
 	"encoding/json"
-   util "app/Util"
+   util "miti-microservices/Util"
 )
 
 func GetProfile(w http.ResponseWriter, r *http.Request){

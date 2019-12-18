@@ -5,7 +5,7 @@ import(
 	"io/ioutil"
 	"fmt"
 	"encoding/json"
-    util "app/Util"
+    util "miti-microservices/Util"
 )
 
 

@@ -3,10 +3,10 @@ import(
 	"fmt"
 	"github.com/jinzhu/gorm"
  _ 	"github.com/jinzhu/gorm/dialects/postgres"
-   	database "app/Database"
-   	sms "app/Notification/SMS"
-   	chat "app/Chat"
-    util "app/Util"
+   	database "miti-microservices/Database"
+   	sms "miti-microservices/Notification/SMS"
+   	chat "miti-microservices/Chat"
+    util "miti-microservices/Util"
 )
 
 func LoadingPageQuery(id string) (bool,bool,int){

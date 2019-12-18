@@ -1,7 +1,7 @@
 package GPS
 
 import(
-	database "app/Database"
+	database "miti-microservices/Database"
 )
 
 type Location struct{

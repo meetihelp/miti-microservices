@@ -1,6 +1,7 @@
 package main
 
 import (
+	Api "miti-microservices/Api"
 )
 
 const(
@@ -8,6 +9,6 @@ const(
 )
 
 func main(){
-	server()
+	Api.Server()
 	
 }

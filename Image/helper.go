@@ -4,7 +4,7 @@ import(
 	"os"
 	"log"
 	"net/http"
-	util "app/Util"
+	util "miti-microservices/Util"
 	"encoding/json"
 	"io"
 	// "fmt"

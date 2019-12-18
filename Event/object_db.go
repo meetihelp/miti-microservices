@@ -1,7 +1,7 @@
 package Event
 
 import(
-	database "app/Database"
+	database "miti-microservices/Database"
 )
 
 type Event struct{

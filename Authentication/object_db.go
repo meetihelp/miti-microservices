@@ -1,6 +1,6 @@
 package Authentication
 import (
-	database "app/Database"
+	database "miti-microservices/Database"
 )
 
 

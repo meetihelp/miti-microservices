@@ -3,7 +3,7 @@ package Authentication
 import(
 	"net/http"
 	"fmt"
-	util "app/Util"
+	util "miti-microservices/Util"
     // "encoding/json"
     // "io/ioutil"
 )

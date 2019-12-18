@@ -1,17 +1,17 @@
-package main
+package API
 
 import (
 	"fmt"
 	"log"
 	"github.com/gorilla/mux"
 	"net/http"
-	profile "app/Profile"
-	apnaauth "app/Authentication"
-	apnachat "app/Chat"
-	util "app/Util"
-	gps "app/GPS"
-	event "app/Event"
-	image "app/Image"
+	profile "miti-microservices/Profile"
+	apnaauth "miti-microservices/Authentication"
+	apnachat "miti-microservices/Chat"
+	util "miti-microservices/Util"
+	gps "miti-microservices/GPS"
+	event "miti-microservices/Event"
+	image "miti-microservices/Image"
 )
 
 func test(w http.ResponseWriter,r *http.Request){
@@ -19,7 +19,7 @@ func test(w http.ResponseWriter,r *http.Request){
 }
 
 
-func server(){
+func Server(){
 	fmt.Println("Server running.....")
 	r := mux.NewRouter()
 	r.HandleFunc("/", test).Methods("GET")

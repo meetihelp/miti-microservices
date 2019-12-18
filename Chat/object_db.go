@@ -3,7 +3,7 @@
 import (
 	// "log"
 	// "fmt"
-	database "app/Database"
+	database "miti-microservices/Database"
 	// "time"
 	// "github.com/jinzhu/gorm"
  // _ 	"github.com/jinzhu/gorm/dialects/postgres"

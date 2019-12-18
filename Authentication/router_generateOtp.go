@@ -3,8 +3,8 @@ package Authentication
 // 	"net/http"
 // 	"fmt"	
 // 	"time"
-// 	util "app/Util"
-// 	sms "app/Notification/SMS")
+// 	util "miti-microservices/Util"
+// 	sms "miti-microservices/Notification/SMS")
 
 const (
 	MAXCOUNT = 5

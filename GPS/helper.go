@@ -4,7 +4,7 @@ import(
 	"net/http"
 	// "io"
 	"encoding/json"	
-	util "app/Util"
+	util "miti-microservices/Util"
 	"log"
 	"strconv"
 	"math"

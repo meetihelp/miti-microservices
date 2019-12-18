@@ -3,12 +3,12 @@ package Image
 import(
 	"net/http"
 	"fmt"
-	// CD "app/Model/CreateDatabase"
-	util "app/Util"
+	// CD "miti-microservices/Model/CreateDatabase"
+	util "miti-microservices/Util"
 	// "io/ioutil"
 	"io"
 	// "encoding/json"
-	profile "app/Profile"
+	profile "miti-microservices/Profile"
 )
 
 func UploadProfilePic(w http.ResponseWriter,r *http.Request){

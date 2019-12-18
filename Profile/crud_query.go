@@ -1,8 +1,8 @@
 package Profile
 import(
 	"fmt"
-   database "app/Database"
-   util "app/Util"
+   database "miti-microservices/Database"
+   util "miti-microservices/Util"
    // "reflect"
 )
 

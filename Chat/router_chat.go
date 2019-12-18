@@ -3,9 +3,9 @@ package Chat
 import (
 	"net/http"
 	"fmt"
-	// redis "app/Model/Redis"
-	// database "app/Database"
-	util "app/Util"
+	// redis "miti-microservices/Model/Redis"
+	// database "miti-microservices/Database"
+	util "miti-microservices/Util"
 	"io/ioutil"
 	"encoding/json"
 	// "time"

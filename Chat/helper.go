@@ -3,7 +3,7 @@ import(
 	"net/http"
 	// "io"
 	"encoding/json"	
-	util "app/Util"
+	util "miti-microservices/Util"
 	"log"
 )
 func SendChat(w http.ResponseWriter,chat []Chat){

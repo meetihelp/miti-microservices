@@ -1,8 +1,8 @@
 package Chat
 
 import(
-	util "app/Util"
-	database "app/Database"
+	util "miti-microservices/Util"
+	database "miti-microservices/Database"
 	// "time"
 	"fmt"
 )
