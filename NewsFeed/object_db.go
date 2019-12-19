@@ -29,6 +29,7 @@ type NewsFeedArticle struct{
 type NewsFeedReaction struct{
 	NewsFeedId string `gorm:primary_key;unique;varchar(100)" json:"NewsFeedId"`
 	UserId string `gorm:primary_key;unique;varchar(100)" json:"UserId"`
+	Reaction string `gorm:"type:varchar" json:"Reaction"`
 }
 
 func init(){

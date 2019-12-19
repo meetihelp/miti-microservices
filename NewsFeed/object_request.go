@@ -15,3 +15,12 @@ type GetNewsFeedArticleHeader struct{
 type GetNewsFeedArticleDS struct{
 	NewsFeedId string `json:"NewsFeedId"`
 }
+
+type NewsFeedReactionHeader struct{
+	Cookie string `header:"Miti-Cookie"`
+}
+
+type NewsFeedReactionDS struct{
+	NewsFeedId string `json:"NewsFeedId"`
+	Reaction string `json:"Reaction"`
+}
