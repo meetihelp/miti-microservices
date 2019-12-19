@@ -17,6 +17,7 @@ const (
 	MAXMINUTE = 10
 	MAXFAILCOUNT=5
 	MAXRESENDCOUNT=5
+	ONEDAY=1440
 )
 
 func SendPreference(w http.ResponseWriter,preferenceCreationStatus int,code int){
@@ -38,6 +39,10 @@ func OTPHelper(sessionId string) (string,int){
 	userId,loginStatus:=util.GetUserIdFromTemporarySession(sessionId)
 	if loginStatus=="Ok"{
 		otp:=GetOTPDetails(userId)
+		duration:=CalculateDuration(otp.CreatedAt)
+		if(duration>ONEDAY){
+			return userId,3005
+		}
 		if(otp.FailCount>=MAXFAILCOUNT){
 			// util.Message(w,3000)
 			return userId,3000
@@ -46,7 +51,7 @@ func OTPHelper(sessionId string) (string,int){
 			// util.Message(w,3001)
 			return userId,3001
 		}
-		duration:=CalculateDuration(otp.CreatedAt)
+		
 		deliveryCount:=otp.DeliverCount
 		if(duration<MAXMINUTE && deliveryCount!=0){
 			// util.Message(w,3002)
@@ -73,12 +78,12 @@ func OTPHelper(sessionId string) (string,int){
 }
 
 func CalculateDuration(lastModified string) int{
-	layout:="2009-11-10 23:00:00 +0000 UTC"
+	layout:="2006-01-02 15:04:05"
 	t,_:=time.Parse(layout,lastModified)
 	now:=time.Now()
+	now,_=time.Parse(layout,now.Format("2006-01-02 15:04:05"))
 	duration:=now.Sub(t)
 	h:=duration.Minutes()
 	h_int:=int(h)
-	print(h_int)
 	return h_int
 }

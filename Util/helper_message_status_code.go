@@ -24,6 +24,7 @@ func GetMessageDecode(status_code int) string{
 	message_decode[3002]="Check Message, OTP already delivered"
 	message_decode[3003]="Check Message for OTP"
 	message_decode[3004]="New OTP Delivery"
+	message_decode[3005]="Last Modified More than One Day"
 	
 
 
