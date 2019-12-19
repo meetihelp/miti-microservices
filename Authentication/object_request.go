@@ -20,3 +20,11 @@ type RegisterHeader struct{
 	Method string `header:"Method"`
 	Agent string `header:"UserAgent"`
 }
+
+type SMSHeader struct{
+	Cookie string `header:"Miti-Cookie"`
+}
+
+type OTPStatusHeader struct{
+	Cookie string `header:"Miti-Cookie"`
+}

@@ -12,6 +12,7 @@ import (
 	gps "miti-microservices/GPS"
 	event "miti-microservices/Event"
 	image "miti-microservices/Image"
+	// sms "miti-microservices/Notification/SMS"
 )
 
 func test(w http.ResponseWriter,r *http.Request){
@@ -37,6 +38,8 @@ func Server(){
 	r.HandleFunc("/verifyOTPForgetPassword",apnaauth.VerifyOTPForgetPassword).Methods("POST")
 	r.HandleFunc("/updateForgetPassword",apnaauth.UpdateForgetPassword).Methods("POST")
 	r.HandleFunc("/updatePassword",apnaauth.UpdatePassword).Methods("POST")
+	r.HandleFunc("/resendOTP",apnaauth.ReSendOTP).Methods("GET")
+	r.HandleFunc("/otpStatus",apnaauth.OTPStatus).Methods("GET")
 	
 	
 	
@@ -53,7 +56,7 @@ func Server(){
 	r.HandleFunc("/profileCreation",profile.ProfileCreation).Methods("POST")
 	r.HandleFunc("/getQuestion",profile.GetQuestion).Methods("POST")
 	r.HandleFunc("/insertQuestion",profile.InsertQuestion).Methods("POST")
-	r.HandleFunc("/updateQuestionResponse",profile.UpdateQuestionResponse).Methods("POST")
+	r.HandleFunc("/updateIPIPResponse",profile.UpdateIPIPResponse).Methods("POST")
 	r.HandleFunc("/getProfile",profile.GetProfile).Methods("POST")
 	http.Handle("/", r)
 	
@@ -71,6 +74,8 @@ func Server(){
 	r.HandleFunc("/uploadProfilePic",image.UploadProfilePic).Methods("POST")
 	r.HandleFunc("/getEventImageList",image.GetEventImageList).Methods("POST")
 	r.HandleFunc("/getUserImageList",image.GetUserImageList).Methods("POST")
+
+	
 	if err := http.ListenAndServe("0.0.0.0:9000",nil); err != nil {
 		log.Fatal(err)
 	}

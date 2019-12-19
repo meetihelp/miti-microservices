@@ -64,12 +64,13 @@ func InsertQuestionInDB(content string,TypeofQuestion int,factor int){
 }
 
 
-func InsertQuestionResponse(userId string,response map[string]int){
+func UpdateIPIPResponseDB(userId string,response map[string]int) int{
 	db:=database.GetDB()
 	questionResponse:=QuestionResponse{}
 	db.Where("user_id=?",userId).Find(&questionResponse)
-	questionResponse=getDataInQuestionResponseForm(questionResponse,response)
+	ipipStatus,questionResponse:=getDataInQuestionResponseForm(questionResponse,response)
 	db.Model(&questionResponse).Where("user_id=?",userId).Update(questionResponse)
+	return ipipStatus
 }
 func UpdateJob(userId string,job string){
 	db:=database.GetDB()

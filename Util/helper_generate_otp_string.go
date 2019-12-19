@@ -1,9 +1,11 @@
 package Util
 
 import (
-	"io/ioutil"
-	"log"
-	"net/http"
+	// "io/ioutil"
+	// "log"
+	// "net/http"
+    "io"
+    "crypto/rand"
 )
 func EncodeToString(max int) string {
 	var table = [...]byte{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'}

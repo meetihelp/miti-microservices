@@ -12,6 +12,7 @@ type User struct{
 	Status string `gorm:"type:varchar(3)" json:"Status"`  //Verified/Unverified/Deleted
 	ProfileCreationStatus string `gorm:"type:varchar(3)" json:"ProfileCreationStatus"`
 	PreferenceCreationStatus int `gorm:"type:int" json:"PreferenceCreationStatus"`
+	IPIPStatus int `gorm:"type:int" json:"IPIPStatus"`
 	CreatedAt string `gorm:"type:Varchar(100)" json:"CreatedAt"`
 }
 type OTPVerification struct{
@@ -19,6 +20,9 @@ type OTPVerification struct{
 	SessionId string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"SessionId"`
 	OTP string `gorm:"varchar(6)" validate:"required"  json:"OTP"`
 	CreatedAt string `gorm:"type:varchar" json:"CreatedAt"`
+	ResendCount int `gorm:"type:int" json:"ResendCount"`
+	FailCount int `gorm:"type:int" json:"FailCount"`
+	DeliverCount int `gorm:"type:int" json:"DeliverCount"`
 }
 
 type EmailVerification struct{

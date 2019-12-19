@@ -9,6 +9,7 @@ import(
    	util "miti-microservices/Util"
 )
 
+
 func Register(w http.ResponseWriter, r *http.Request){
 	//Get ip address of user
 	ipAddress:=util.GetIPAddress(r)
@@ -53,6 +54,8 @@ func Register(w http.ResponseWriter, r *http.Request){
 }
 
 func userDataHandle(w http.ResponseWriter, userData User) (string,bool){
+	userData.ProfileCreationStatus="N"
+	userData.PreferenceCreationStatus=-1
 	userId,dbStatus:=EnterUserData(userData)
 	if dbStatus ==1{
 		log.Println("User Already exist")

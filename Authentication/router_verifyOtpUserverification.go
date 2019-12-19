@@ -45,7 +45,7 @@ func VerifyOTPUserverification(w http.ResponseWriter,r *http.Request){
         return
     }
 
-    otpVerify:=VerifyOTPDB(otpVerification.UserId,otpVerification.OTP)
+    otpVerify,otpVerificationDB:=VerifyOTPDB(otpVerification.UserId,otpVerification.OTP)
     if otpVerify{
         //CHANGE STATUS OF USER TO VERIFIED
         ChangeVerificationStatus(userId)
@@ -53,6 +53,8 @@ func VerifyOTPUserverification(w http.ResponseWriter,r *http.Request){
         util.DeleteTemporarySession(sessionId)
         util.Message(w,200)
     } else{
+        fmt.Println(otpVerificationDB.FailCount)
+        UpdateFailCount(userId,otpVerificationDB.FailCount)
         util.Message(w,1401)
     }
 }

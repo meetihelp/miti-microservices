@@ -4,7 +4,7 @@ import(
 	"github.com/jinzhu/gorm"
  _ 	"github.com/jinzhu/gorm/dialects/postgres"
    	database "miti-microservices/Database"
-   	sms "miti-microservices/Notification/SMS"
+   	// sms "miti-microservices/Notification/SMS"
    	chat "miti-microservices/Chat"
     util "miti-microservices/Util"
 )
@@ -31,6 +31,11 @@ func LoadingPageQuery(id string) (bool,bool,int){
 	return IsUserVerified,IsProfileCreated,Preferece
 }
 
+func UpdateProfileCreationStatus(userId string){
+	db:=database.GetDB()
+	user:=User{}
+	db.Model(&user).Where("user_id = ?", userId).Update("profile_creation_status", "Y")
+}
 
 func EnterMatchUser(userId1 string,userId2 string){	
 
@@ -86,6 +91,10 @@ func EnterUserData(userData User) (string,int){
 	//GENERATE USER ID
 	userData.UserId =util.GenerateToken()
 	userData.Status="U"
+	userData.ProfileCreationStatus="N"
+	userData.IPIPStatus=0
+	userData.PreferenceCreationStatus=0
+	
 	// userData.CreatedAt =time.Now()
 	userData.CreatedAt =util.GetTime()
 	//INSERT IN DATABASE
@@ -209,14 +218,14 @@ func GetAllUser() ([]string){
 	return UserList
 }
 
-func VerifyOTPDB(userId string,otp string) (bool){
+func VerifyOTPDB(userId string,otp string) (bool,OTPVerification){
 	db:=database.GetDB()
 	otpVerification:=OTPVerification{}
-	db.Where("user_id=? AND otp=?",userId,otp).First(&otpVerification)
-	if otpVerification.UserId==""{
-		return false
+	db.Where("user_id=?",userId).First(&otpVerification)
+	if(otpVerification.UserId!="" && otpVerification.OTP==otp){
+		return true,otpVerification
 	}
-	return true
+	return false,otpVerification
 }
 
 func EnterVerificationOtp(id string,otp string){
@@ -226,6 +235,13 @@ func EnterVerificationOtp(id string,otp string){
 	otpVerification.OTP=otp
 	otpVerification.CreatedAt=util.GetTime()
 	db.Create(&otpVerification)
+}
+
+func GetOTPDetails(userId string) OTPVerification{
+	db:=database.GetDB()
+	otp:=OTPVerification{}
+	db.Where("user_id=?",userId).Find(&otp)
+	return otp
 }
 
 func GetOtpVerificationCount(id string)(int,string){
@@ -301,20 +317,37 @@ func GetPhoneFromUserId(userId string) (string,string){
 	return "","Error"
 }
 
-func SendOTP(phone string,otp string){
-	sms.SendSMS(phone,otp)
-}
 
 func InsertOTP(userId string,sessionId string) string{
 	db:=database.GetDB()
 	otp:=util.GenerateOTP()
 	otpVerification:=OTPVerification{}
+	db.Where("user_id=?",userId).Find(&otpVerification)
+	if(otpVerification.UserId!=""){
+		resendCount:=otpVerification.ResendCount+1
+		db.Model(&otpVerification).Where("user_id = ?", userId).Update("resend_count", resendCount)
+		return otp
+	}
 	otpVerification.UserId=userId
 	otpVerification.SessionId=sessionId
 	otpVerification.OTP=otp
+	otpVerification.ResendCount=0
+	otpVerification.DeliverCount=0
+	otpVerification.FailCount=0
 	otpVerification.CreatedAt=util.GetTime()
 	db.Create(&otpVerification)
 	return otp
+}
+
+func UpdateFailCount(userId string,failCount int){
+	db:=database.GetDB()
+	otp:=OTPVerification{}
+	db.Model(&otp).Where("user_id=?",userId).Update("fail_count",failCount+1)
+}
+func UpdateDeliverCount(userId string,deliverCount int){
+	db:=database.GetDB()
+	otp:=OTPVerification{}
+	db.Model(&otp).Where("user_id=?",userId).Update("deliver_count",deliverCount+1)
 }
 func InsertForgetPasswordStatus(sessionId string){
 	db:=database.GetDB()
@@ -352,4 +385,10 @@ func IsProfileCreated(userId string) string{
 		return "Ok"
 	}
 	return "Error"
+}
+
+func UpdateIPIPStatus(userId string,ipipStatus int){
+	db:=database.GetDB()
+	user:=User{}
+	db.Model(&user).Where("user_id=?",userId).Update("ipip_status",ipipStatus)
 }

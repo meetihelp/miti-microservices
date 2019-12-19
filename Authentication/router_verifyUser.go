@@ -48,8 +48,12 @@ func VerifyUser(w http.ResponseWriter,r *http.Request){
 
     phone,status:=GetPhoneFromUserId(userId)
     if status=="Ok"{
-        otp:=InsertOTP(userId,sessionId)
-        SendOTP(phone,otp)
-        util.Message(w,200)
+        otpCode:=InsertOTP(userId,sessionId)
+        resp,err:=SendOTP(phone,otpCode)
+        if(err==nil && resp.StatusCode==http.StatusOK){
+            util.Message(w,200)
+        } else{
+            fmt.Println(err)
+        }
     }
 }

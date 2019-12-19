@@ -7,10 +7,6 @@ package Authentication
 // 	sms "miti-microservices/Notification/SMS"
 // )
 
-// const (
-// 	MAXCOUNT = 5
-// 	MAXMINUTE = 10
-// )
 
 
 

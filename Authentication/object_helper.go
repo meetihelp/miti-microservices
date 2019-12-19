@@ -12,3 +12,8 @@ type ForgetPasswordDS struct{
 type UpdateForgetPasswordDS struct{
 	Password string `validate:"required" json:"Password"`
 }
+
+type SMSResponseCode struct{
+	RequestID string `json:"request_id"`
+	Type string `json:"type"`
+}

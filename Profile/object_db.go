@@ -22,11 +22,18 @@ type Profile struct{
 	Conscientiousness int `gorm:"type:int" json:"Conscientiousness"`
 	EmotionalStability int `gorm:"type:int" json:"EmotionalStability"`
 	Intellect int `gorm:"type:int" json:"Intellect"`
-	Interest1 string `gorm:"type:varchar(100)" json:"Interest1"`
-	Interest2 string `gorm:"type:varchar(100)" json:"Interest2"`
-	Interest3 string `gorm:"type:varchar(100)" json:"Interest3"`
-	Interest4 string `gorm:"type:varchar(100)" json:"Interest4"`
-	Interest5 string `gorm:"type:varchar(100)" json:"Interest5"`
+	InterestIndoorPassive1 string `gorm:"type:varchar(100)" json:"InterestIndoorPassive1"`
+	InterestIndoorPassive2 string `gorm:"type:varchar(100)" json:"InterestIndoorPassive2"`
+	InterestIndoorActive1 string `gorm:"type:varchar(100)" json:"InterestIndoorActive1"`
+	InterestIndoorActive2 string `gorm:"type:varchar(100)" json:"InterestIndoorActive2"`
+	InterestOutdoorActive1 string `gorm:"type:varchar(100)" json:"InterestOutdoorActive1"`
+	InterestOutdoorActive2 string `gorm:"type:varchar(100)" json:"InterestOutdoorActive2"`
+	InterestOutdoorPassive1 string `gorm:"type:varchar(100)" json:"InterestOutdoorPassive1"`
+	InterestOutdoorPassive2 string `gorm:"type:varchar(100)" json:"InterestOutdoorPassive2"`
+	InterestOthers1 string `gorm:"type:varchar(100)" json:"InterestOthers1"`
+	InterestOthers2 string `gorm:"type:varchar(100)" json:"InterestOthers2"`
+	InterestIdeology1 string `gorm:"type:varchar(100)" json:"InterestIdeology1"`
+	InterestIdeology2 string `gorm:"type:varchar(100)" json:"InterestIdeology2"`
 	MakingChoice string `gorm:"type:varchar(20)" json:"MakingChoice"`
 	// Latitude string `gorm:"type:varchar(20)" json:"Latitude"`
 	// Longitude string `gorm:"type:varchar(20)" json:"Longitude"`

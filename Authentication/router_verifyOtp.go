@@ -45,7 +45,7 @@ func VerifyOTP(w http.ResponseWriter,r *http.Request){
         return
     }
 
-    otpVerify:=VerifyOTPDB(otpVerification.UserId,otpVerification.OTP)
+    otpVerify,_:=VerifyOTPDB(otpVerification.UserId,otpVerification.OTP)
     if otpVerify{
         //CHANGE STATUS OF USER TO VERIFIED
         // ChangeVerificationStatus(userId)

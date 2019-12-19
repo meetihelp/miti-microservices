@@ -63,7 +63,12 @@ func Login(w http.ResponseWriter,r *http.Request){
 	// 	return
 	// }
 	if loginStatus=="NoUser"{
-		util.Message(w,1501)
+		userId,dbStatus:=EnterUserData(userData)
+		if(dbStatus==1){
+			cookie:=util.InsertTemporarySession(userId,ipAddress)
+			w.Header().Set("Miti-Cookie",cookie)
+			util.Message(w,1501)
+		}
 		return
 	}
 	if loginStatus=="Unverified"{

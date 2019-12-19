@@ -4,34 +4,40 @@ import(
 	"net/http"
 	"net/url"
 	"log"
+	"fmt"
 	"os"
+	util "miti-microservices/Util"
+	
 )
 
-func GetAuth string(){
+func GetAuth() string{
 	return os.Getenv("msg91_authkey")
 }
-func SendSMS(phone string,otp string){
-	base, err := url.Parse("https://api.msg91.com/api/v5/otp")
+func SendSMS(phone string,otp string) (*http.Response,error){
+	base, err := url.Parse("http://api.msg91.com/api/v5/otp")
 	if err != nil {
-		return
+		return nil,err
 	}
 	q := url.Values{}
-	q.Add("invisible", 1)
+	q.Add("invisible", "1")
 	q.Add("otp",otp)
 	q.Add("mobile",phone)
 
 	q.Add("authkey","308893A1u1gEJGa9U5df9fb61")
 	q.Add("template_id","5dfa1cdbd6fc054db941c67a")
-	q.Add("otp_expiry",10)
+	q.Add("otp_expiry","10")
 	base.RawQuery = q.Encode()
-	resp, err1:=http.POST(base.String())
+	client:=util.GetClient(2)
+	resp, err1:=client.Post(base.String(),"",nil)
+	fmt.Println(resp)
 	if err1!=nil {
 		log.Print(err)
 	}
+	return resp,err1
 }
 
-func ReSendSMS(phone string){
-	base, err := url.Parse("https://api.msg91.com/api/v5/otp/retry")
+func ReSendSMSHelper(phone string){
+	base, err := url.Parse("http://api.msg91.com/api/v5/otp/retry")
 	if err != nil {
 		return
 	}
@@ -44,8 +50,10 @@ func ReSendSMS(phone string){
 	q.Add("authkey", authk)
 	q.Add("mobile",phone)
 	base.RawQuery = q.Encode()
-	resp, err1:=http.Get(base.String())
+	resp, err1:=http.Post(base.String(),"",nil)
+	fmt.Println(resp)
 	if err1!=nil {
 		log.Print(err)
 	}
 }
+

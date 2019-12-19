@@ -4,7 +4,12 @@ package Util
 func GetMessageDecode(status_code int) string{
 	message_decode:=make(map[int]string)
 
+	//GENERAL
 	message_decode[200]="Successfull"
+	message_decode[1000]="Could not read  Body"
+	message_decode[1001]="Could not Unmarshal  Data"
+	message_decode[1002]="User Data Invalid"
+	message_decode[1003]="Session does not exist"
 
 	//MESSAGE STATUS CODE FOR LOADING PAGE
 	message_decode[300]="User already logded in"
@@ -12,6 +17,13 @@ func GetMessageDecode(status_code int) string{
 	message_decode[2001]="User not verified"
 	message_decode[2002]="Profile Not Created"
 	message_decode[2003]="Preference not completed"
+
+	//MESSAGE STATUS CODE FOR OTP PAGE
+	message_decode[3000]="You are blocked"
+	message_decode[3001]="Resent more than 5 times"
+	message_decode[3002]="Check Message, OTP already delivered"
+	message_decode[3003]="Check Message for OTP"
+	message_decode[3004]="New OTP Delivery"
 	
 
 
@@ -22,10 +34,7 @@ func GetMessageDecode(status_code int) string{
 
 
 
-	message_decode[1000]="Could not read  Body"
-	message_decode[1001]="Could not Unmarshal  Data"
-	message_decode[1002]="User Data Invalid"
-	message_decode[1003]="Session does not exist"
+	
 	message_decode[1004]="User already verified"
 	message_decode[1005]="User is not verified"
 	message_decode[1006]="Database Problem"
@@ -54,7 +63,7 @@ func GetMessageDecode(status_code int) string{
 	message_decode[1501]="No such User"
 
 	//MESSAGE STATUS CODE FOR PROFILE CREATION
-	message_decode[2001]="Cannot Access this Profile"
+	// message_decode[2001]="Cannot Access this Profile"
 	//MESSAGE STATUS CODE FOR LOGOUT	
 
 	//MESSAGE STATUS CODE FOR GETCHATDETAIL

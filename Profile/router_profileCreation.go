@@ -8,6 +8,7 @@ import(
 	// "strings"
 	"encoding/json"
    util "miti-microservices/Util"
+   auth "miti-microservices/Authentication"
 )
 
 
@@ -48,6 +49,7 @@ func ProfileCreation(w http.ResponseWriter, r *http.Request){
 		return
 	}
 	// profile_data_handle(w,profile_data)
+	auth.UpdateProfileCreationStatus(userId)
 	EnterProfileData(profileData)
 	util.Message(w,200)
 
