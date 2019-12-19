@@ -30,7 +30,7 @@ func GetProfileDB(userId string) ProfileResponse{
 	profileResponse.Name=profile.Name
 	profileResponse.DateOfBirth=profile.DateOfBirth
 	profileResponse.Job=profile.Job
-	profileResponse.ProfilePicId=profile.ProfilePicId
+	profileResponse.ProfilePicURL=profile.ProfilePicURL
 	profileResponse.Gender=profile.Gender
 	profileResponse.Language=profile.Language
 	profileResponse.Country=profile.Country

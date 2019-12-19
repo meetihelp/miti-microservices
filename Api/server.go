@@ -11,7 +11,8 @@ import (
 	util "miti-microservices/Util"
 	gps "miti-microservices/GPS"
 	event "miti-microservices/Event"
-	image "miti-microservices/Image"
+	newsfeed "miti-microservices/NewsFeed"
+	// image "miti-microservices/Image"
 	// sms "miti-microservices/Notification/SMS"
 )
 
@@ -70,12 +71,15 @@ func Server(){
 	r.HandleFunc("/createEvent",event.CreateEvent).Methods("POST")
 	r.HandleFunc("/getEventById",event.GetEventById).Methods("POST")
 
-	//Image related APIs
-	r.HandleFunc("/getImageById",image.GetImageById).Methods("POST")
-	r.HandleFunc("/uploadProfilePic",image.UploadProfilePic).Methods("POST")
-	r.HandleFunc("/getEventImageList",image.GetEventImageList).Methods("POST")
-	r.HandleFunc("/getUserImageList",image.GetUserImageList).Methods("POST")
+	// //Image related APIs
+	// r.HandleFunc("/getImageById",image.GetImageById).Methods("POST")
+	// r.HandleFunc("/uploadProfilePic",image.UploadProfilePic).Methods("POST")
+	// r.HandleFunc("/getEventImageList",image.GetEventImageList).Methods("POST")
+	// r.HandleFunc("/getUserImageList",image.GetUserImageList).Methods("POST")
 
+
+	//NewsFeed related APIs
+	r.HandleFunc("/getNewsFeedSummary",newsfeed.GetNewsFeedSummary).Methods("POST")
 	
 	if err := http.ListenAndServe("0.0.0.0:9000",nil); err != nil {
 		log.Fatal(err)
