@@ -72,6 +72,14 @@ func UpdateIPIPResponseDB(userId string,response map[string]int) int{
 	db.Model(&questionResponse).Where("user_id=?",userId).Update(questionResponse)
 	return ipipStatus
 }
+func UpdatePreferecePResponseDB(userId string,response map[string]string) int{
+	db:=database.GetDB()
+	interest:=Interest{}
+	db.Where("user_id=?",userId).Find(&interest)
+	preferenceStatus,interest:=getDataInInterestForm(interest,response)
+	db.Model(&interest).Where("user_id=?",userId).Update(interest)
+	return preferenceStatus
+}
 func UpdateJob(userId string,job string){
 	db:=database.GetDB()
 	db.Table("profiles").Where("UserId=?",userId).Update("Job",job)

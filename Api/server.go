@@ -58,6 +58,7 @@ func Server(){
 	r.HandleFunc("/insertQuestion",profile.InsertQuestion).Methods("POST")
 	r.HandleFunc("/updateIPIPResponse",profile.UpdateIPIPResponse).Methods("POST")
 	r.HandleFunc("/getProfile",profile.GetProfile).Methods("POST")
+	r.HandleFunc("/updatePreference",profile.UpdatePreference).Methods("Post")
 	http.Handle("/", r)
 	
 	//GPS related APIs

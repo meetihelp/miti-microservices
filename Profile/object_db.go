@@ -22,6 +22,13 @@ type Profile struct{
 	Conscientiousness int `gorm:"type:int" json:"Conscientiousness"`
 	EmotionalStability int `gorm:"type:int" json:"EmotionalStability"`
 	Intellect int `gorm:"type:int" json:"Intellect"`
+	MakingChoice string `gorm:"type:varchar(20)" json:"MakingChoice"`
+	// Latitude string `gorm:"type:varchar(20)" json:"Latitude"`
+	// Longitude string `gorm:"type:varchar(20)" json:"Longitude"`
+}
+
+type Interest struct{
+	UserId string `gorm:"primary_key;type:varchar(100)"  json:"UserId"`
 	InterestIndoorPassive1 string `gorm:"type:varchar(100)" json:"InterestIndoorPassive1"`
 	InterestIndoorPassive2 string `gorm:"type:varchar(100)" json:"InterestIndoorPassive2"`
 	InterestIndoorActive1 string `gorm:"type:varchar(100)" json:"InterestIndoorActive1"`
@@ -34,9 +41,6 @@ type Profile struct{
 	InterestOthers2 string `gorm:"type:varchar(100)" json:"InterestOthers2"`
 	InterestIdeology1 string `gorm:"type:varchar(100)" json:"InterestIdeology1"`
 	InterestIdeology2 string `gorm:"type:varchar(100)" json:"InterestIdeology2"`
-	MakingChoice string `gorm:"type:varchar(20)" json:"MakingChoice"`
-	// Latitude string `gorm:"type:varchar(20)" json:"Latitude"`
-	// Longitude string `gorm:"type:varchar(20)" json:"Longitude"`
 }
 
 

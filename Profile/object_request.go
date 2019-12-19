@@ -17,6 +17,11 @@ type UpdateQuestionResponseHeader struct{
 	Agent1 string `header:"agent"`
 	Cookie string `header:"Miti-Cookie"`	
 }
+type UpdatePreferenceResponseHeader struct{
+	Method1 string `header:"method"`
+	Agent1 string `header:"agent"`
+	Cookie string `header:"Miti-Cookie"`	
+}
 type QuestionRequest struct{
 	Offset int `json:"Offset"`
 	NumOfQuestion int `json:"NumOfQuestion"`

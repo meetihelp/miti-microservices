@@ -37,6 +37,12 @@ func UpdateProfileCreationStatus(userId string){
 	db.Model(&user).Where("user_id = ?", userId).Update("profile_creation_status", "Y")
 }
 
+func UpdatePreferencetatus(userId string,preferenceStatus int){
+	db:=database.GetDB()
+	user:=User{}
+	db.Model(&user).Where("user_id=?",userId).Update("preference_creation_status",preferenceStatus)
+}
+
 func EnterMatchUser(userId1 string,userId2 string){	
 
 	chatID:=util.GenerateToken()
