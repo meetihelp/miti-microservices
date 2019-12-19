@@ -17,3 +17,14 @@ func SendSummary(w http.ResponseWriter,summaryData NewsFeedSummary){
 		log.Fatal(err)
 	}
 }
+
+func SendArticle(w http.ResponseWriter,articleData NewsFeedArticle){
+	w.Header().Set("Content-Type", "application/json")
+	enc := json.NewEncoder(w)
+	msg:=util.GetMessageDecode(200)
+	p:=&ArticleResponse{Code:200,Message:msg,NewsFeedId:articleData.NewsFeedId,Article:articleData.Article}
+	err:= enc.Encode(p)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
