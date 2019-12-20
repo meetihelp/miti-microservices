@@ -10,5 +10,9 @@ func OTPStatus(w http.ResponseWriter,r *http.Request){
 	util.GetHeader(r,&otpStatusHeader)
 	sessionId:=otpStatusHeader.Cookie
 	_,code:=OTPHelper(sessionId)
-	util.Message(w,code)
+	if(code==3005 || code==3003 || code==3004){
+		util.Message(w,200)
+	}else{
+		util.Message(w,code)
+	}
 }

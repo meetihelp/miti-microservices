@@ -3,10 +3,10 @@ package Authentication
 import(
 	"net/http"
 	// "io/ioutil"
-	"encoding/json"	
+	// "encoding/json"	
 	util "miti-microservices/Util"
 	sms "miti-microservices/Notification/SMS"
-	"log"
+	// "log"
 	"time"
 	// "reflect"
 	// "fmt"
@@ -20,16 +20,16 @@ const (
 	ONEDAY=1440
 )
 
-func SendPreference(w http.ResponseWriter,preferenceCreationStatus int,code int){
-	w.Header().Set("Content-Type", "application/json")
-	msg:=util.GetMessageDecode(code)
-	p:=&PreferenceContent{Code:code,Message:msg,Preference:preferenceCreationStatus}
-	enc := json.NewEncoder(w)
-	err:= enc.Encode(p)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
+// func SendPreference(w http.ResponseWriter,preferenceCreationStatus int,code int){
+// 	w.Header().Set("Content-Type", "application/json")
+// 	msg:=util.GetMessageDecode(code)
+// 	p:=&PreferenceContent{Code:code,Message:msg,Preference:preferenceCreationStatus}
+// 	enc := json.NewEncoder(w)
+// 	err:= enc.Encode(p)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// }
 
 func SendOTP(phone string,otp string)(*http.Response,error){
 	return sms.SendSMS(phone,otp)
@@ -53,10 +53,10 @@ func OTPHelper(sessionId string) (string,int){
 		}
 		
 		deliveryCount:=otp.DeliverCount
-		if(duration<MAXMINUTE && deliveryCount!=0){
-			// util.Message(w,3002)
-			return userId,3002
-		}
+		// if(duration<MAXMINUTE && deliveryCount!=0){
+		// 	// util.Message(w,3002)
+		// 	return userId,3002
+		// }
 		if(duration<MAXMINUTE || deliveryCount==0){
 			// phone,_:=GetPhoneFromUserId(userId)
 			// sms.ReSendSMSHelper(phone)
@@ -87,3 +87,5 @@ func CalculateDuration(lastModified string) int{
 	h_int:=int(h)
 	return h_int
 }
+
+

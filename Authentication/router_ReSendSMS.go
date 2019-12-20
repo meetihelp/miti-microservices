@@ -4,7 +4,7 @@ import(
 	"net/http"
 	util "miti-microservices/Util"
 	sms "miti-microservices/Notification/SMS"
-	"log"
+	// "log"
 )
 func ReSendOTP(w http.ResponseWriter,r *http.Request){
 	smsHeader:=SMSHeader{}
@@ -16,6 +16,12 @@ func ReSendOTP(w http.ResponseWriter,r *http.Request){
 		sms.ReSendSMSHelper(phone)
 		util.Message(w,200)
 		return
+	}else if(code==3005){
+		DeleteOtp(userId)
+		phone,_:=GetPhoneFromUserId(userId)
+		sms.ReSendSMSHelper(phone)
+		util.Message(w,200)
+		return
 	}else if(code==3004){
 		phone,_:=GetPhoneFromUserId(userId)
 		otpCode:=InsertOTP(userId,sessionId)
@@ -23,7 +29,8 @@ func ReSendOTP(w http.ResponseWriter,r *http.Request){
         if(err==nil && resp.StatusCode==http.StatusOK){
             util.Message(w,200)
         } else{
-            log.Println(err)
+            // log.Println(err)
+            util.Message(w,200)
         }
 	} else {
 		util.Message(w,code)

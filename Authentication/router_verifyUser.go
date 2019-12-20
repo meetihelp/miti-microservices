@@ -47,13 +47,28 @@ func VerifyUser(w http.ResponseWriter,r *http.Request){
     // }
 
     phone,status:=GetPhoneFromUserId(userId)
+    _,code:=OTPHelper(sessionId)
     if status=="Ok"{
-        otpCode:=InsertOTP(userId,sessionId)
-        resp,err:=SendOTP(phone,otpCode)
-        if(err==nil && resp.StatusCode==http.StatusOK){
-            util.Message(w,200)
-        } else{
-            fmt.Println(err)
-        }
+        if(code==3003 || code ==3004 || code ==3005){
+            otpCode:=InsertOTP(userId,sessionId)
+            resp,err:=SendOTP(phone,otpCode)
+            if(err==nil && resp.StatusCode==http.StatusOK){
+                util.Message(w,200)
+            } else{
+                util.Message(w,200)
+                // fmt.Println(err)
+            }
+        } else {
+            util.Message(w,code)
+        } 
+        // otpCode:=InsertOTP(userId,sessionId)
+        // resp,err:=SendOTP(phone,otpCode)
+        // if(err==nil && resp.StatusCode==http.StatusOK){
+        //     util.Message(w,200)
+        // } else{
+        //     util.Message(w,200)
+        //     // fmt.Println(err)
+        // }
     }
+    
 }

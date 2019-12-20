@@ -14,7 +14,8 @@ func GetAuth() string{
 	return os.Getenv("msg91_authkey")
 }
 func SendSMS(phone string,otp string) (*http.Response,error){
-	base, err := url.Parse("http://api.msg91.com/api/v5/otp")
+	// base, err := url.Parse("http://api.msg91.com/api/v5/otp")
+	base, err := url.Parse("")
 	if err != nil {
 		return nil,err
 	}
@@ -22,8 +23,12 @@ func SendSMS(phone string,otp string) (*http.Response,error){
 	q.Add("invisible", "1")
 	q.Add("otp",otp)
 	q.Add("mobile",phone)
-
-	q.Add("authkey","308893A1u1gEJGa9U5df9fb61")
+	authk:=GetAuth()
+	if(authk==""){
+		log.Println("Please set authkey for message")
+		return nil,err
+	}
+	q.Add("authkey", authk)
 	q.Add("template_id","5dfa1cdbd6fc054db941c67a")
 	q.Add("otp_expiry","10")
 	base.RawQuery = q.Encode()
@@ -37,7 +42,8 @@ func SendSMS(phone string,otp string) (*http.Response,error){
 }
 
 func ReSendSMSHelper(phone string){
-	base, err := url.Parse("http://api.msg91.com/api/v5/otp/retry")
+	// base, err := url.Parse("http://api.msg91.com/api/v5/otp/retry")
+	base, err := url.Parse("")
 	if err != nil {
 		return
 	}

@@ -1,10 +1,12 @@
 package Authentication
 import (
 	"net/http"
-	"fmt"
+	// "fmt"
 	util "miti-microservices/Util"
 	// "io/ioutil"
-	// "encoding/json"
+	"encoding/json"
+	"bytes"
+	"log"
 )
 
 
@@ -16,37 +18,159 @@ func LoadingPage(w http.ResponseWriter,r *http.Request){
 	util.GetHeader(r,&loginHeader)
 	sessionId:=loginHeader.Cookie
 	//Check if the user is already logged in? Using session value
+	statusCode:=0
+	moveTo:=0
+	var data map[string]string
+	content:=LoadingResponse{}
+
 	userId,loginStatus:=util.GetUserIdFromSession(sessionId)
-	fmt.Println("session "+loginStatus)
+
+	log.Println("session "+loginStatus)
 	if loginStatus=="Ok"{
-		util.Message(w,300)
-		return
-	}
-	userId,loginStatus=util.GetUserIdFromTemporarySession(sessionId)
-	if loginStatus=="Error"{
-		util.Message(w,2000)
-		return
+		statusCode=200
+		moveTo:=6
+		content.Code=statusCode
+		content.MoveTo=moveTo
+		content.Message=util.GetMessageDecode(statusCode)
+		responseHeader:=LoadingToFeedHeader{}
+		responseHeader.ContentType="application/json"
+		headerBytes:=new(bytes.Buffer)
+		json.NewEncoder(headerBytes).Encode(responseHeader)
+		responseHeaderBytes:=headerBytes.Bytes()
+		if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+        	panic(err)
+    	}
+		w=util.GetResponseFormatHeader(w,data)
+		// util.Message(w,200)
+		// return
 	}else{
-		 temporarySessionCase(w,userId)
+		userId,loginStatus=util.GetUserIdFromTemporarySession(sessionId)
+		if loginStatus=="Error"{
+			// util.Message(w,1003)
+			// return
+			statusCode=1003
+			moveTo=2
+			content.Code=statusCode
+			content.MoveTo=moveTo
+			content.Message=util.GetMessageDecode(statusCode)
+			responseHeader:=LoadingToLoginHeader{}
+			responseHeader.ContentType="application/json"
+			headerBytes:=new(bytes.Buffer)
+			json.NewEncoder(headerBytes).Encode(responseHeader)
+			responseHeaderBytes:=headerBytes.Bytes()
+			if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+	        	panic(err)
+	    	}
+			w=util.GetResponseFormatHeader(w,data)
+		}else{
+			// w=temporarySessionCase(w,userId)
+			IsUserVerified,IsProfileCreated,Preference:=LoadingPageQuery(userId)
+			if !IsUserVerified{
+				// util.Message(w,1004)
+				statusCode=1004
+				moveTo=3
+				content.Code=statusCode
+				content.MoveTo=moveTo
+				content.Message=util.GetMessageDecode(statusCode)
+				responseHeader:=LoadingToOTPHeader{}
+				responseHeader.ContentType="application/json"
+				headerBytes:=new(bytes.Buffer)
+				json.NewEncoder(headerBytes).Encode(responseHeader)
+				responseHeaderBytes:=headerBytes.Bytes()
+				if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+		        	panic(err)
+		    	}
+				w=util.GetResponseFormatHeader(w,data)
+			}else if !IsProfileCreated{
+				// util.Message(w,2002)
+				statusCode=1005
+				moveTo=4
+				content.Code=statusCode
+				content.MoveTo=moveTo
+				content.Message=util.GetMessageDecode(statusCode)
+				responseHeader:=LoadingToProfileHeader{}
+				responseHeader.ContentType="application/json"
+				headerBytes:=new(bytes.Buffer)
+				json.NewEncoder(headerBytes).Encode(responseHeader)
+				responseHeaderBytes:=headerBytes.Bytes()
+				if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+		        	panic(err)
+		    	}
+				w=util.GetResponseFormatHeader(w,data)
+			} else if Preference<6{
+				// SendPreference(w,Preferece,1006)
+				statusCode=1003
+				moveTo=2
+				content.Code=statusCode
+				content.MoveTo=moveTo
+				content.Preference=Preference
+				content.Message=util.GetMessageDecode(statusCode)
+				responseHeader:=LoadingToPreferenceHeader{}
+				responseHeader.ContentType="application/json"
+				headerBytes:=new(bytes.Buffer)
+				json.NewEncoder(headerBytes).Encode(responseHeader)
+				responseHeaderBytes:=headerBytes.Bytes()
+				if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+		        	panic(err)
+		    	}
+				w=util.GetResponseFormatHeader(w,data)
+				
+			}
+		}
+	}
+	//Send Response
+	p:=&content
+	enc := json.NewEncoder(w)
+	err:= enc.Encode(p)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
 
 func temporarySessionCase(w http.ResponseWriter,userId string){
-	IsUserVerified,IsProfileCreated,Preferece:=LoadingPageQuery(userId)
-	if !IsUserVerified{
-		util.Message(w,2001)
-		return
-	}
+	// IsUserVerified,IsProfileCreated,Preferece:=LoadingPageQuery(userId)
+	// if !IsUserVerified{
+	// 	// util.Message(w,1004)
+	// 	statusCode=1004
+	// 	moveTo=3
+	// 	content:=LoadingToOTP{}
+	// 	content.Code=statusCode
+	// 	content.moveTo=moveTo
+	// 	content.Message=util.GetMessageDecode(statusCode)
+	// 	responseHeader:=LoginToOTPHeader{}
+	// 	responseHeader.ContentType="application/json"
+	// 	w=GetResponseFormatHeader(responseHeader)
+	// 	return w,content
+	// }
 
-	if !IsProfileCreated{
-		util.Message(w,2002)
-		return
-	}
+	// if !IsProfileCreated{
+	// 	// util.Message(w,2002)
+	// 	statusCode=1005
+	// 	moveTo=4
+	// 	content:=LoadingToProfile{}
+	// 	content.Code=statusCode
+	// 	content.moveTo=moveTo
+	// 	content.Message=util.GetMessageDecode(statusCode)
+	// 	responseHeader:=LoginToProfileHeader{}
+	// 	responseHeader.ContentType="application/json"
+	// 	w=GetResponseFormatHeader(responseHeader)
+	// 	return w,content
+	// }
 
-	if Preferece<6{
-		SendPreference(w,Preferece,2003)
-		return
-	}
+	// if Preferece<6{
+	// 	// SendPreference(w,Preferece,1006)
+	// 	statusCode=1003
+	// 	moveTo=2
+	// 	content:=LoadingToPreference{}
+	// 	content.Code=statusCode
+	// 	content.moveTo=moveTo
+	// 	content.Preferece=Preferece
+	// 	content.Message=util.GetMessageDecode(statusCode)
+	// 	responseHeader:=LoginToPreferenceHeader{}
+	// 	responseHeader.ContentType="application/json"
+	// 	w=GetResponseFormatHeader(responseHeader)
+	// 	return w,content
+	// }
 
-	util.Message(w,200)
+	// util.Message(w,1003)
 }
