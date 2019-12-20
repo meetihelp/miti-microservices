@@ -298,7 +298,7 @@ func VerifyEmailFunc(token string) (string,bool){
 	return emailVerification.UserId,true
 }
 
-func DeleteOtp(id string){
+func DeleteOTP(id string){
 	db:=database.GetDB()
 	db.Where("user_id=?",id).Delete(&OTPVerification{})
 }

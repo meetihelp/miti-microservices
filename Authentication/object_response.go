@@ -33,6 +33,16 @@ type LoginResponse struct{
 type LoginToOTPHeader struct{
 	MitiCookie string `json:"Miti-Cookie"`
 }
+
+type OTPResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	MoveTo int `json:"MoveTo"`
+}
+
+type OTPResponseHeader struct{
+	MitiCookie string `json:"Miti-Cookie"`
+}
 // type PreferenceContent struct{
 // 	Code int `json:"Code"`
 // 	Message string `json:"Message"`

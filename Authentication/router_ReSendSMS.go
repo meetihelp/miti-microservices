@@ -17,7 +17,7 @@ func ReSendOTP(w http.ResponseWriter,r *http.Request){
 		util.Message(w,200)
 		return
 	}else if(code==3005){
-		DeleteOtp(userId)
+		// DeleteOtp(userId)
 		phone,_:=GetPhoneFromUserId(userId)
 		sms.ReSendSMSHelper(phone)
 		util.Message(w,200)

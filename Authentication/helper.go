@@ -41,7 +41,9 @@ func OTPHelper(sessionId string) (string,int){
 		otp:=GetOTPDetails(userId)
 		duration:=CalculateDuration(otp.CreatedAt)
 		if(duration>ONEDAY){
-			return userId,3005
+			DeleteOTP(userId)
+			return userId,200
+			// return userId,3005
 		}
 		if(otp.FailCount>=MAXFAILCOUNT){
 			// util.Message(w,3000)
@@ -61,7 +63,8 @@ func OTPHelper(sessionId string) (string,int){
 			// phone,_:=GetPhoneFromUserId(userId)
 			// sms.ReSendSMSHelper(phone)
 			// util.Message(w,200)
-			return userId,3003
+			return userId,200
+			// return userId,3003
 		}
 		if(duration>MAXMINUTE){
 			// otpCode:=InsertOTP(userId,sessionId)
@@ -71,7 +74,8 @@ func OTPHelper(sessionId string) (string,int){
 	  //       } else{
 	  //           log.Println(err)
 	  //       }
-	  		return userId,3004
+	  		return userId,200
+	  		// return userId,3004
 		}
 	}
 	return userId,1003
