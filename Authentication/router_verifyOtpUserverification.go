@@ -156,7 +156,7 @@ func VerifyOTPUserverification(w http.ResponseWriter,r *http.Request){
             if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
                 panic(err)
             }
-        }else if(Preference<6){
+        }else if(Preference<NUM_OF_PREFERENCE){
             statusCode=1006
             moveTo=5
             content.Code=statusCode

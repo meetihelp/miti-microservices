@@ -18,6 +18,7 @@ const (
 	MAXFAILCOUNT=5
 	MAXRESENDCOUNT=5
 	ONEDAY=1440
+	NUM_OF_PREFERENCE=6
 )
 
 // func SendPreference(w http.ResponseWriter,preferenceCreationStatus int,code int){

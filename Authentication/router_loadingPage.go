@@ -97,7 +97,7 @@ func LoadingPage(w http.ResponseWriter,r *http.Request){
 		        	panic(err)
 		    	}
 				w=util.GetResponseFormatHeader(w,data)
-			} else if Preference<6{
+			} else if Preference<NUM_OF_PREFERENCE{
 				// SendPreference(w,Preferece,1006)
 				statusCode=1003
 				moveTo=2
