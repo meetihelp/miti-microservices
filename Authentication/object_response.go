@@ -43,6 +43,17 @@ type OTPResponse struct{
 type OTPResponseHeader struct{
 	MitiCookie string `json:"Miti-Cookie"`
 }
+
+type VerifyOTPResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	MoveTo int `json:"MoveTo"`
+	Preference int `json:"Preference"`
+}
+
+type VerifyOTPResponseHeader struct{
+	MitiCookie string `json:"Miti-Cookie"`
+}
 // type PreferenceContent struct{
 // 	Code int `json:"Code"`
 // 	Message string `json:"Message"`
