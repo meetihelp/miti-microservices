@@ -34,6 +34,16 @@ type LoginToOTPHeader struct{
 	MitiCookie string `json:"Miti-Cookie"`
 }
 
+type OTPStatusResponseContent struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	MoveTo int `json:"MoveTo"`
+}
+
+type OTPStatusResponseHeader struct{
+	ContentType string `json:"Content-Type"`
+}
+
 type OTPResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`

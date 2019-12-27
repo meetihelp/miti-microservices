@@ -46,22 +46,30 @@ func LoadingPage(w http.ResponseWriter,r *http.Request){
 	}else{
 		userId,loginStatus=util.GetUserIdFromTemporarySession(sessionId)
 		if loginStatus=="Error"{
+			content,w:=util.GetSessionErrorContent(w)
+			p:=&content
+			enc := json.NewEncoder(w)
+			err:= enc.Encode(p)
+			if err != nil {
+				log.Fatal(err)
+			}
+			return
 			// util.Message(w,1003)
 			// return
-			statusCode=1003
-			moveTo=2
-			content.Code=statusCode
-			content.MoveTo=moveTo
-			content.Message=util.GetMessageDecode(statusCode)
-			responseHeader:=LoadingToLoginHeader{}
-			responseHeader.ContentType="application/json"
-			headerBytes:=new(bytes.Buffer)
-			json.NewEncoder(headerBytes).Encode(responseHeader)
-			responseHeaderBytes:=headerBytes.Bytes()
-			if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
-	        	panic(err)
-	    	}
-			w=util.GetResponseFormatHeader(w,data)
+			// statusCode=1003
+			// moveTo=2
+			// content.Code=statusCode
+			// content.MoveTo=moveTo
+			// content.Message=util.GetMessageDecode(statusCode)
+			// responseHeader:=LoadingToLoginHeader{}
+			// responseHeader.ContentType="application/json"
+			// headerBytes:=new(bytes.Buffer)
+			// json.NewEncoder(headerBytes).Encode(responseHeader)
+			// responseHeaderBytes:=headerBytes.Bytes()
+			// if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+	  //       	panic(err)
+	  //   	}
+			// w=util.GetResponseFormatHeader(w,data)
 		}else{
 			// w=temporarySessionCase(w,userId)
 			IsUserVerified,IsProfileCreated,Preference:=LoadingPageQuery(userId)

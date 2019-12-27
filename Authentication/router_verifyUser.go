@@ -24,27 +24,33 @@ func VerifyUser(w http.ResponseWriter,r *http.Request){
     content:=OTPResponse{}
     responseHeader:=OTPResponseHeader{}
     if sessionErr=="Error"{
-        statusCode=1003
-        moveTo=0
-        content.Code=statusCode
-        content.MoveTo=moveTo
-        content.Message=util.GetMessageDecode(statusCode)
-        headerBytes:=new(bytes.Buffer)
-        json.NewEncoder(headerBytes).Encode(responseHeader)
-        responseHeaderBytes:=headerBytes.Bytes()
-        if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
-            panic(err)
-        }
-        w=util.GetResponseFormatHeader(w,data)
+        // statusCode=1003
+        // moveTo=0
+        // content.Code=statusCode
+        // content.MoveTo=moveTo
+        // content.Message=util.GetMessageDecode(statusCode)
+        // headerBytes:=new(bytes.Buffer)
+        // json.NewEncoder(headerBytes).Encode(responseHeader)
+        // responseHeaderBytes:=headerBytes.Bytes()
+        // if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+        //     panic(err)
+        // }
+        // w=util.GetResponseFormatHeader(w,data)
+        // p:=&content
+        // enc := json.NewEncoder(w)
+        // err:= enc.Encode(p)
+        // if err != nil {
+        //     log.Fatal(err)
+        // }
+        // fmt.Println("Session Does not exist")
+        // util.Message(w,1003)
+        content,w:=util.GetSessionErrorContent(w)
         p:=&content
         enc := json.NewEncoder(w)
         err:= enc.Encode(p)
         if err != nil {
             log.Fatal(err)
         }
-        // fmt.Println("Session Does not exist")
-        // util.Message(w,1003)
-
         return
     }
     //Read body data

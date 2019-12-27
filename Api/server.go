@@ -31,8 +31,10 @@ func Server(){
 	//Authentication related APIs
 	r.HandleFunc("/loadingPage",apnaauth.LoadingPage).Methods("GET")
 	r.HandleFunc("/register",apnaauth.Register).Methods("POST")
-	r.HandleFunc("/verifyUser",apnaauth.VerifyUser).Methods("GET")
-	r.HandleFunc("/verifyOTPUserverification",apnaauth.VerifyOTPUserverification).Methods("POST")
+	r.HandleFunc("/generateOTP",apnaauth.VerifyUser).Methods("GET")
+	r.HandleFunc("/verifyOTP",apnaauth.VerifyOTPUserverification).Methods("POST")
+	// r.HandleFunc("/verifyUser",apnaauth.VerifyUser).Methods("GET")
+	// r.HandleFunc("/verifyOTPUserverification",apnaauth.VerifyOTPUserverification).Methods("POST")
 	r.HandleFunc("/login",apnaauth.Login).Methods("POST")
 	r.HandleFunc("/logout",apnaauth.Logout).Methods("GET")
 	r.HandleFunc("/forgetPassword",apnaauth.ForgetPassword).Methods("POST")

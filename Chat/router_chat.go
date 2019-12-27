@@ -8,6 +8,7 @@ import (
 	util "miti-microservices/Util"
 	"io/ioutil"
 	"encoding/json"
+	"log"
 	// "time"
 )
 
@@ -19,15 +20,31 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 	_,loginStatus:=util.GetUserIdFromSession(sessionId)
 
 	if loginStatus=="Error"{
-		util.Message(w,1003)
+		// util.Message(w,1003)
+		// return
+		content,w:=util.GetSessionErrorContent(w)
+		p:=&content
+		enc := json.NewEncoder(w)
+		err:= enc.Encode(p)
+		if err != nil {
+			log.Fatal(err)
+		}
 		return
 	}
 
 	requestBody,err:=ioutil.ReadAll(r.Body)
 	if err!=nil{
-		fmt.Println("Could not read body")
-		util.Message(w,1000)
-		return 
+		// fmt.Println("Could not read body")
+		// util.Message(w,1000)
+		// return 
+		content,w:=util.GetBodyReadErrorContent(w)
+		p:=&content
+		enc := json.NewEncoder(w)
+		err:= enc.Encode(p)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return
 	}
 
 	chatData :=Chat{}
