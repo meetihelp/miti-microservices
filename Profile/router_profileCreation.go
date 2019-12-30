@@ -20,10 +20,18 @@ func ProfileCreation(w http.ResponseWriter, r *http.Request){
 	sessionId:=header.Cookie
 
 	userId,dErr:=util.GetUserIdFromSession(sessionId)
+	// if dErr=="Error"{
+	// 	fmt.Println("Session Does not exist")
+	// 	util.Message(w,1003)
+	// 	return
+	// }
+
 	if dErr=="Error"{
-		fmt.Println("Session Does not exist")
-		util.Message(w,1003)
-		return
+		userId,dErr=util.GetUserIdFromTemporarySession(sessionId)
+		if dErr=="Error"{
+			util.Message(w,1003)
+			return
+		}
 	}
 
 

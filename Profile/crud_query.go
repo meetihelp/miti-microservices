@@ -76,6 +76,11 @@ func UpdatePreferecePResponseDB(userId string,response map[string]string) int{
 	db:=database.GetDB()
 	interest:=Interest{}
 	db.Where("user_id=?",userId).Find(&interest)
+	if(interest.UserId==""){
+		interest.UserId=userId
+		db.Create(&interest)
+
+	}
 	preferenceStatus,interest:=getDataInInterestForm(interest,response)
 	db.Model(&interest).Where("user_id=?",userId).Update(interest)
 	return preferenceStatus

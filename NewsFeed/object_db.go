@@ -1,8 +1,27 @@
 package NewsFeed
 
 import(
-	database "miti-microservices/Database"
+	// database "miti-microservices/Database"
 )
+
+type News struct{
+	Id int64 `gorm:"primary_key;unique;varchar(100)" json:"Id"`
+	ReferenceText string `gorm:"type:varchar" json:"ReferenceText"`
+	Summary string `gorm:"type:varchar" json:"Summary"`
+	Spinned string `gorm:"type:varchar" json:"Spinned"`
+	Sentiment string `gorm:"type:varchar" json:"Sentiment"`
+	Location string `gorm:"type:varchar" json:"Location"`
+	Event string `gorm:"type:varchar" json:"Event"`
+	Label string `gorm:"type:varchar" json:"Label"`
+	Title string `gorm:"type:varchar" json:"Title"`
+	ArticleSize string `gorm:"type:varchar" json:"ArticleSize"`
+	Author string `gorm:"type:varchar" json:"Author"`
+	ImageURL string `gorm:"type:varchar" json:"ImageURL"`
+	ReferenceArticleURL string `gorm:"type:varchar" json:"ReferenceArticleURL"`
+	Mitidatetime string `gorm:"type:varchar" json:"Mitidatatime"`
+
+}
+
 
 type NewsFeed struct{
 	NewsFeedId string `gorm:"primary_key;unique;varchar(100)" json:"NewsFeedId"`
@@ -33,9 +52,10 @@ type NewsFeedReaction struct{
 }
 
 func init(){
-	db:=database.GetDB()
-	db.AutoMigrate(&NewsFeed{})
-	db.AutoMigrate(&NewsFeedSummary{})
-	db.AutoMigrate(&NewsFeedArticle{})
-	db.AutoMigrate(&NewsFeedReaction{})
+	// db:=database.GetDB()
+	// db.AutoMigrate(&News{})
+	// db.AutoMigrate(&NewsFeed{})
+	// db.AutoMigrate(&NewsFeedSummary{})
+	// db.AutoMigrate(&NewsFeedArticle{})
+	// db.AutoMigrate(&NewsFeedReaction{})
 }

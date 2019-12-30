@@ -9,7 +9,7 @@ import(
 	"encoding/json"
 )
 
-func GetNewsFeedArticle(w http.ResponseWriter,r *http.Request){
+func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 	getNewsFeedArticleHeader:=GetNewsFeedArticleHeader{}
 	util.GetHeader(r,&getNewsFeedArticleHeader)
 	sessionId:=getNewsFeedArticleHeader.Cookie
@@ -36,12 +36,11 @@ func GetNewsFeedArticle(w http.ResponseWriter,r *http.Request){
 		return 
 	}
 
-	articleData:=GetArticle(getNewsFeedArticleData.Id)
-	if(articleData==""){
-		util.Message(w,4000)
-		return
-	}
-	data:=NewsFeedArticleResponse{Id:getNewsFeedArticleData.Id,Article:articleData}
-	SendArticle(w,data)
+	articleData:=GetArticleAfterId(getNewsFeedArticleData.Id)
+	// if(articleData.NewsFeedId==""){
+	// 	util.Message(w,4000)
+	// 	return
+	// }
+	SendNewsArticle(w,articleData)
 
 }

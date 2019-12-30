@@ -10,13 +10,26 @@ func GetSummary(newsFeedId string) NewsFeedSummary{
 	return summaryData
 }
 
-func GetArticle(newsFeedId string) NewsFeedArticle{
+// func GetArticle(newsFeedId string) NewsFeedArticle{
+// 	db:=database.GetDB()
+// 	articleData:=NewsFeedArticle{}
+// 	db.Where("news_feed_id=?",newsFeedId).Find(&articleData)
+// 	return articleData
+// }
+
+func GetArticle(id int64) string{
 	db:=database.GetDB()
-	articleData:=NewsFeedArticle{}
-	db.Where("news_feed_id=?",newsFeedId).Find(&articleData)
-	return articleData
+	articleData:=News{}
+	db.Where("id=?",id).Find(&articleData)
+	return articleData.Spinned
 }
 
+func GetArticleAfterId(id int64) ([]News){
+	db:=database.GetDB()
+	news:=[]News{}
+	db.Where("id>?",id).Limit(NUMBEROFARTICLE).Find(&news)
+	return news
+}
 func UpdateNewsFeedReactionDB(userId string,newsFeedReactionData NewsFeedReactionDS){
 	db:=database.GetDB()
 	newsFeedReaction:=NewsFeedReaction{}

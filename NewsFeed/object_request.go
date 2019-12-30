@@ -24,3 +24,7 @@ type NewsFeedReactionDS struct{
 	NewsFeedId string `json:"NewsFeedId"`
 	Reaction string `json:"Reaction"`
 }
+
+type GetNewsArticleDS struct{
+	Id int64 `json:"Id"`
+}

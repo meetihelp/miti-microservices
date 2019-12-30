@@ -32,11 +32,11 @@ type Interest struct{
 	InterestIndoorPassive1 string `gorm:"type:varchar(100)" json:"InterestIndoorPassive1"`
 	InterestIndoorPassive2 string `gorm:"type:varchar(100)" json:"InterestIndoorPassive2"`
 	InterestIndoorActive1 string `gorm:"type:varchar(100)" json:"InterestIndoorActive1"`
-	InterestIndoorActive2 string `gorm:"type:varchar(100)" json:"InterestIndoorActive2"`
-	InterestOutdoorActive1 string `gorm:"type:varchar(100)" json:"InterestOutdoorActive1"`
-	InterestOutdoorActive2 string `gorm:"type:varchar(100)" json:"InterestOutdoorActive2"`
+	InterestIndoorActive2 string `gorm:"type:varchar(100)" json:"InterestIndoorActive2"`	
 	InterestOutdoorPassive1 string `gorm:"type:varchar(100)" json:"InterestOutdoorPassive1"`
 	InterestOutdoorPassive2 string `gorm:"type:varchar(100)" json:"InterestOutdoorPassive2"`
+	InterestOutdoorActive1 string `gorm:"type:varchar(100)" json:"InterestOutdoorActive1"`
+	InterestOutdoorActive2 string `gorm:"type:varchar(100)" json:"InterestOutdoorActive2"`
 	InterestOthers1 string `gorm:"type:varchar(100)" json:"InterestOthers1"`
 	InterestOthers2 string `gorm:"type:varchar(100)" json:"InterestOthers2"`
 	InterestIdeology1 string `gorm:"type:varchar(100)" json:"InterestIdeology1"`
@@ -112,4 +112,5 @@ func init(){
 	db.AutoMigrate(&Profile{})
 	db.AutoMigrate(&QuestionResponse{})	
 	db.AutoMigrate(&Question{})
+	db.AutoMigrate(&Interest{})
 }

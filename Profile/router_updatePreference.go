@@ -12,6 +12,7 @@ import(
 )
 
 func UpdatePreference(w http.ResponseWriter, r *http.Request){
+	ipAddress:=util.GetIPAddress(r)
 	header:=UpdatePreferenceResponseHeader{}
 	util.GetHeader(r,&header)
 
@@ -19,10 +20,17 @@ func UpdatePreference(w http.ResponseWriter, r *http.Request){
 	sessionId:=header.Cookie
 
 	userId,dErr:=util.GetUserIdFromSession(sessionId)
+	// if dErr=="Error"{
+	// 	fmt.Println("Session Does not exist")
+	// 	util.Message(w,1003)
+	// 	return
+	// }
 	if dErr=="Error"{
-		fmt.Println("Session Does not exist")
-		util.Message(w,1003)
-		return
+		userId,dErr=util.GetUserIdFromTemporarySession(sessionId)
+		if dErr=="Error"{
+			util.Message(w,1003)
+			return
+		}
 	}
 
 	requestBody,err:=ioutil.ReadAll(r.Body)
@@ -41,6 +49,10 @@ func UpdatePreference(w http.ResponseWriter, r *http.Request){
 	preferenceStatus:=UpdatePreferecePResponseDB(userId,data)
 	auth.UpdatePreferencetatus(userId,preferenceStatus)
 	// UpdateIPIPScore(userId)
+	if(preferenceStatus>=6){
+		util.InsertSessionValue(sessionId,userId,ipAddress)
+        util.DeleteTemporarySession(sessionId)
+	}
 	util.Message(w,200)
 }
 
@@ -60,18 +72,18 @@ func getDataInInterestForm(interest Interest,data map[string]string) (int,Intere
 		case "InterestIndoorActive2":
 			preferenceStatus=2
 			interest.InterestIndoorActive2=value
-		case "InterestOutdoorActive1":
-			preferenceStatus=3
-			interest.InterestOutdoorActive1=value
-		case "InterestOutdoorActive2":
-			preferenceStatus=3
-			interest.InterestOutdoorActive2=value
 		case "InterestOutdoorPassive1":
-			preferenceStatus=4
+			preferenceStatus=3
 			interest.InterestOutdoorPassive1=value
 		case "InterestOutdoorPassive2":
-			preferenceStatus=4
+			preferenceStatus=3
 			interest.InterestOutdoorPassive2=value
+		case "InterestOutdoorActive1":
+			preferenceStatus=4
+			interest.InterestOutdoorActive1=value
+		case "InterestOutdoorActive2":
+			preferenceStatus=4
+			interest.InterestOutdoorActive2=value
 		case "InterestOthers1":
 			preferenceStatus=5
 			interest.InterestOthers1=value
