@@ -39,3 +39,9 @@ type ResponseWrapper struct{
 type ProfileRequest struct{
 	UserId string `gorm:"primary_key;type:varchar(100)"  json:"UserId"`
 }
+
+type PreferenceRequest struct{
+	Page int `json:"Page"`
+	I1 string `json:"I1"`
+	I2 string `json:"I2"`
+}

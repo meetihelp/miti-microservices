@@ -9,10 +9,33 @@ import(
 func EnterProfileData(profileData Profile){
 	fmt.Println("Enter_profile_data")
 	db:=database.GetDB()
-	db.Create(&profileData)
-	questionResponse:=QuestionResponse{}
-	questionResponse.UserId=profileData.UserId
-	db.Create(&questionResponse)
+	tempProfile:=Profile{}
+	db.Where("user_id=?",profileData.UserId).Find(&tempProfile)
+	if(tempProfile.UserId==""){
+		db.Create(&profileData)
+		questionResponse:=QuestionResponse{}
+		questionResponse.UserId=profileData.UserId
+		db.Create(&questionResponse)
+	}else{
+		if(profileData.Name!=""){
+			tempProfile.Name=profileData.Name
+		}
+		if(profileData.DateOfBirth!=""){
+			tempProfile.DateOfBirth=profileData.DateOfBirth
+		}
+		if(profileData.Job!=""){
+			tempProfile.Job=profileData.Job
+		}
+		if(profileData.Gender!=""){
+			tempProfile.Gender=profileData.Gender
+		}
+		if(profileData.Language!=""){
+			tempProfile.Language=profileData.Language
+		}
+		if(profileData.Country!=""){
+			tempProfile.Country=profileData.Country
+		}
+	}
 }
 
 // func GetProfile(userId string) Profile{
@@ -72,7 +95,8 @@ func UpdateIPIPResponseDB(userId string,response map[string]int) int{
 	db.Model(&questionResponse).Where("user_id=?",userId).Update(questionResponse)
 	return ipipStatus
 }
-func UpdatePreferecePResponseDB(userId string,response map[string]string) int{
+
+func UpdatePreferecePResponseDB(userId string,response PreferenceRequest) int{
 	db:=database.GetDB()
 	interest:=Interest{}
 	db.Where("user_id=?",userId).Find(&interest)
@@ -85,6 +109,20 @@ func UpdatePreferecePResponseDB(userId string,response map[string]string) int{
 	db.Model(&interest).Where("user_id=?",userId).Update(interest)
 	return preferenceStatus
 }
+
+// func UpdatePreferecePResponseDB(userId string,response map[string]string) int{
+// 	db:=database.GetDB()
+// 	interest:=Interest{}
+// 	db.Where("user_id=?",userId).Find(&interest)
+// 	if(interest.UserId==""){
+// 		interest.UserId=userId
+// 		db.Create(&interest)
+
+// 	}
+// 	preferenceStatus,interest:=getDataInInterestForm(interest,response)
+// 	db.Model(&interest).Where("user_id=?",userId).Update(interest)
+// 	return preferenceStatus
+// }
 func UpdateJob(userId string,job string){
 	db:=database.GetDB()
 	db.Table("profiles").Where("UserId=?",userId).Update("Job",job)

@@ -85,8 +85,10 @@ func VerifyUser(w http.ResponseWriter,r *http.Request){
         // if(code==3003 || code ==3004 || code ==3005){
         if(code==200){
             otpCode:=InsertOTP(userId,sessionId)
-            resp,err:=SendOTP(phone,otpCode)
-            if(err==nil && resp.StatusCode==http.StatusOK){
+            err:=SendOTP(phone,otpCode)
+            if err=="Ok"{
+            // resp,err:=SendOTP(phone,otpCode)
+            // if(err==nil && resp.StatusCode==http.StatusOK){
                 // util.Message(w,200)
                 statusCode=200
                 moveTo=0
@@ -97,7 +99,8 @@ func VerifyUser(w http.ResponseWriter,r *http.Request){
                 json.NewEncoder(headerBytes).Encode(responseHeader)
                 responseHeaderBytes:=headerBytes.Bytes()
                 if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
-                    panic(err)
+                    // panic(err)
+                    log.Println(err)
                 }
             } else{
                 // util.Message(w,200)
@@ -111,7 +114,8 @@ func VerifyUser(w http.ResponseWriter,r *http.Request){
                 json.NewEncoder(headerBytes).Encode(responseHeader)
                 responseHeaderBytes:=headerBytes.Bytes()
                 if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
-                    panic(err)
+                    // panic(err)
+                    log.Println(err)
                 }
             }
         } else {
@@ -125,7 +129,8 @@ func VerifyUser(w http.ResponseWriter,r *http.Request){
             json.NewEncoder(headerBytes).Encode(responseHeader)
             responseHeaderBytes:=headerBytes.Bytes()
             if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
-                panic(err)
+                // panic(err)
+                log.Println(err)
             }
         } 
         w=util.GetResponseFormatHeader(w,data)

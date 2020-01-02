@@ -25,8 +25,10 @@ func ReSendOTP(w http.ResponseWriter,r *http.Request){
 	}else if(code==3004){
 		phone,_:=GetPhoneFromUserId(userId)
 		otpCode:=InsertOTP(userId,sessionId)
-        resp,err:=SendOTP(phone,otpCode)
-        if(err==nil && resp.StatusCode==http.StatusOK){
+		err:=SendOTP(phone,otpCode)
+		if(err=="Ok"){
+        // resp,err:=SendOTP(phone,otpCode)
+        // if(err==nil && resp.StatusCode==http.StatusOK){
             util.Message(w,200)
         } else{
             // log.Println(err)

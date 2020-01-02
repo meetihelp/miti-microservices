@@ -1,11 +1,11 @@
 package Authentication
 
 import(
-	"net/http"
+	// "net/http"
 	// "io/ioutil"
 	// "encoding/json"	
 	util "miti-microservices/Util"
-	sms "miti-microservices/Notification/SMS"
+	// sms "miti-microservices/Notification/SMS"
 	// "log"
 	"time"
 	// "reflect"
@@ -32,9 +32,12 @@ const (
 // 	}
 // }
 
-func SendOTP(phone string,otp string)(*http.Response,error){
-	return sms.SendSMS(phone,otp)
+func SendOTP(phone string,otp string)(string){
+	return "Ok"
 }
+// func SendOTP(phone string,otp string)(*http.Response,error){
+// 	return sms.SendSMS(phone,otp)
+// }
 
 func OTPHelper(sessionId string) (string,int){
 	userId,loginStatus:=util.GetUserIdFromTemporarySession(sessionId)

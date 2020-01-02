@@ -124,6 +124,6 @@ func GetLastChatIndex(chatId string) int{
 func GetChatAfterIndexMessages(chatId string, offset int, numOfChat int, index int)([]Chat){
 	db:=database.GetDB()
 	chat:=[]Chat{}
-	db.Order("created_at").Where("chat_id=? AND index>?",chatId,index).Find(&chat)
+	db.Order("created_at").Limit(numOfChat).Where("chat_id=? AND index>?",chatId,index).Find(&chat)
 	return chat
 }
