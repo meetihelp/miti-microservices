@@ -75,11 +75,11 @@ func getDataInInterestForm(interest Interest,data PreferenceRequest) (int,Intere
 		interest.InterestOutdoorActive1=data.I1
 		interest.InterestOutdoorActive2=data.I2
 	} else if(preferenceStatus==5){
-		interest.InterestIdeology1=data.I1
-		interest.InterestIdeology2=data.I2
-	} else if(preferenceStatus==6){
 		interest.InterestOthers1=data.I1
 		interest.InterestOthers2=data.I2
+	} else if(preferenceStatus==6){
+		interest.InterestIdeology1=data.I1
+		interest.InterestIdeology2=data.I2
 	}
 	return preferenceStatus,interest
 }
