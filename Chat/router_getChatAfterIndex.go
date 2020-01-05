@@ -26,7 +26,7 @@ func GetChatAfterIndex(w http.ResponseWriter,r *http.Request){
 		return 
 	}
 
-	chatData:=ChatAfterIndex{}
+	chatData:=ChatAfterTime{}
 	errUserData:=json.Unmarshal(requestBody,&chatData)
 	if errUserData!=nil{
 		fmt.Println("Could not Unmarshall user data")
@@ -46,7 +46,7 @@ func GetChatAfterIndex(w http.ResponseWriter,r *http.Request){
 		return
 	}
 
-	chat:=GetChatAfterIndexMessages(chatData.ChatId,chatData.Offset,chatData.NumOfChat,chatData.Index)
+	chat:=GetChatAfterTimeMessages(chatData.ChatId,chatData.NumOfChat,chatData.CreatedAt)
 
 	SendChat(w,chat)
 }

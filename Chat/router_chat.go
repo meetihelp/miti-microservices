@@ -16,8 +16,7 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 	chatHeader:=ChatHeader{}
 	util.GetHeader(r,&chatHeader)
 	sessionId:=chatHeader.Cookie
-
-	_,loginStatus:=util.GetUserIdFromSession(sessionId)
+	userId,loginStatus:=util.GetUserIdFromSession(sessionId)
 
 	if loginStatus=="Error"{
 		// util.Message(w,1003)
@@ -61,6 +60,7 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 		util.Message(w,1002)
 		return
 	}
+	chatData.UserId=userId
 	chatData.MessageId=util.GenerateToken()
 	chatData.CreatedAt=util.GetTime()
 	// tempTime:=time.Now()
@@ -71,14 +71,19 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 	// chatData.Index=index
 	// fmt.Println(chatData.CreatedAt)
 	// db:=database.GetDB()
-	ChatInsertDB(chatData)
+	if(chatData.MessageContent!=""){
+		chatResponse:=ChatInsertDB(chatData)
 	// db.Create(&chatData)
-	e:=UpdateChatTime(chatData.ChatId,chatData.CreatedAt)
-	if e!=nil{
-		return
+		e:=UpdateChatTime(chatData.ChatId,chatData.CreatedAt)
+		if e!=nil{
+			return
+		}
+		
+		userList:=GetUserListFromChatId(chatData.ChatId)
+		EnterReadBy(userList,chatData.MessageId)
+		// util.Message(w,200)
+		SendMessageResponse(w,chatResponse.MessageId,chatResponse.CreatedAt)
+	}else{
+		util.Message(w,1002)
 	}
-	
-	userList:=GetUserListFromChatId(chatData.ChatId)
-	EnterReadBy(userList,chatData.MessageId)
-	util.Message(w,200)
 }

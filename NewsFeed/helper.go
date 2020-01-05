@@ -59,6 +59,8 @@ func SendNewsArticle(w http.ResponseWriter,data []News){
 		n.Event=d.Event
 		n.Label=d.Label
 		n.Title=d.Title
+		n.ImageURL=d.ImageURL
+		n.Flag=d.Flag
 		news=append(news,n)
 	}
 	p:=&NewsArticleResponse{Code:200,Message:msg,NewsData:news}

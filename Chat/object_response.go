@@ -18,3 +18,10 @@ type ChatDetailResponse struct{
 	CreatedAt string `gorm:"varchar(100)" json:"CreatedAt"`
 	LastUpdate string `gorm:"varchar(100)" json:"LastUpdate"`
 }
+
+type ChatResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	MessageId string `json:"MessageId"`
+	CreatedAt string `json:"CreatedAt"`
+}

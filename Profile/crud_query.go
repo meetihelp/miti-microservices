@@ -35,6 +35,15 @@ func EnterProfileData(profileData Profile){
 		if(profileData.Country!=""){
 			tempProfile.Country=profileData.Country
 		}
+		if(profileData.Sex!=""){
+			tempProfile.Sex=profileData.Sex
+		}
+		if(profileData.RelationshipStatus!=""){
+			tempProfile.RelationshipStatus=profileData.RelationshipStatus
+		}
+		if(profileData.ParentsAddress!=""){
+			tempProfile.ParentsAddress=profileData.ParentsAddress
+		}
 	}
 }
 
@@ -57,6 +66,9 @@ func GetProfileDB(userId string) ProfileResponse{
 	profileResponse.Gender=profile.Gender
 	profileResponse.Language=profile.Language
 	profileResponse.Country=profile.Country
+	profileResponse.Sex=profile.Sex
+	profileResponse.RelationshipStatus=profile.RelationshipStatus
+	profileResponse.ParentsAddress=profile.ParentsAddress
 	// _=reflect.Copy(profileResponse,profile)
 	return profileResponse
 }

@@ -39,6 +39,7 @@ func GetMessageDecode(status_code int) string{
 
 	// //MESSAGE STATUS CODE FOR VERIFY OTP
 	message_decode[1401]="Wrong OTP"
+	//message_decode[2001]="No Message Sent"
 
 	// //MESSAGE STATUS CODE FOR LOGIN
 	// message_decode[1502]="Invalid User Id or Password"

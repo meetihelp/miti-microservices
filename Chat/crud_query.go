@@ -4,7 +4,7 @@ import(
 	util "miti-microservices/Util"
 	database "miti-microservices/Database"
 	// "time"
-	"fmt"
+	// "fmt"
 )
 
 func GetChatMessages(chatId string,offset int,numOfRows int)([]Chat){
@@ -14,12 +14,20 @@ func GetChatMessages(chatId string,offset int,numOfRows int)([]Chat){
 	return chat
 }
 
-func ChatInsertDB(chatData Chat) {
-	index:=GetLastChatIndex(chatData.ChatId)
-	index=index+1
-	chatData.Index=index
+func ChatInsertDB(chatData Chat) Chat {
+	// index:=GetLastChatIndex(chatData.ChatId)
+	// index=index+1
+	// chatData.Index=index
+	chat:=Chat{}
 	db:=database.GetDB()
-	db.Create(&chatData)
+	db.Where("user_id=? AND request_id=?",chatData.UserId,chatData.RequestId).Find(&chat)
+	if(chat.UserId==""){
+		db.Create(&chatData)
+		return chatData
+	}else{
+		return chat
+	}
+	
 }
 func CheckCorrectChat(userId string,chatId string) string{
 	db:=database.GetDB()
@@ -110,20 +118,20 @@ func UpdateChatTime(chatId string, lastUpdate string) error{
 	return nil
 }
 
-func GetLastChatIndex(chatId string) int{
-	db:=database.GetDB()
-	chat:=Chat{}
-	db.Order("index desc").Where("chat_id=?",chatId).First(&chat)
-	fmt.Println(chat)
-	if chat.ChatId==""{
-		return 0
-	}
-	return chat.Index
-}
+// func GetLastChatIndex(chatId string) int{
+// 	db:=database.GetDB()
+// 	chat:=Chat{}
+// 	db.Order("index desc").Where("chat_id=?",chatId).First(&chat)
+// 	fmt.Println(chat)
+// 	if chat.ChatId==""{
+// 		return 0
+// 	}
+// 	return chat.Index
+// }
 
-func GetChatAfterIndexMessages(chatId string, offset int, numOfChat int, index int)([]Chat){
+func GetChatAfterTimeMessages(chatId string, numOfChat int, createdAt string)([]Chat){
 	db:=database.GetDB()
 	chat:=[]Chat{}
-	db.Order("created_at").Limit(numOfChat).Where("chat_id=? AND index>?",chatId,index).Find(&chat)
+	db.Order("created_at").Limit(numOfChat).Where("chat_id=? AND created_at>?",chatId,createdAt).Find(&chat)
 	return chat
 }

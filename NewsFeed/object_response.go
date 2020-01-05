@@ -33,6 +33,8 @@ type NewsResponse struct{
 	Event string `json:"Event"`
 	Label string `json:"Label"`
 	Title string `json:"Title"`
+	ImageURL string `json:"ImageURL"`
+	Flag string `json:"Flag"`
 }
 
 type NewsFeedArticleResponse struct{

@@ -37,3 +37,15 @@ func SendChatDetail(w http.ResponseWriter, chatDetail []ChatDetail,statusCode in
 		log.Fatal(err)
 	}
 }
+
+func SendMessageResponse(w http.ResponseWriter, messageId string, createdAt string){
+	w.Header().Set("Content-Type", "application/json")
+	msg:=util.GetMessageDecode(200)
+	p:=&ChatResponse{Code:200,Message:msg,MessageId:messageId,CreatedAt:createdAt}
+	enc := json.NewEncoder(w)
+	err:= enc.Encode(p)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}

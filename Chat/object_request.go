@@ -24,9 +24,10 @@ type ChatRequest struct{
 type GetChatAfterIndexHeader struct{
 	Cookie string `header:"Miti-Cookie"`
 }
-type ChatAfterIndex struct{
+type ChatAfterTime struct{
 	ChatId string `json:"ChatId"`
-	Offset int `json:"Offset"`
+	// Offset int `json:"Offset"`
 	NumOfChat int `json:"NumOfChat"`
-	Index int `json:"Index"`
+	// Index int `json:"Index"`
+	CreatedAt string `json:"CreatedAt"`
 }

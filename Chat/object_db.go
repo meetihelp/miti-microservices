@@ -20,12 +20,12 @@ type ChatDetail struct{
 }
 type Chat struct{
 	UserId string `gorm:"varchar(100)"  json:"UserId"`
-	ChatId string `gorm:"varchar(100)"  json:"ChatId"`
+	ChatId string `gorm:"primary_key;varchar(100)"  json:"ChatId"`
 	MessageId string `gorm:"primary_key;unique;varchar(100)"  json:"MessageId"`
 	MessageType string `gorm:"varchar(100)"  json:"MessageType"`
 	MessageContent string `gorm:"varchar(100)"  json:"MessageContent"`
 	CreatedAt string `gorm:"type:varchar" json:"CreatedAt"`
-	Index int `gorm:"type:int" json:"Index"`
+	RequestId string `gorm:"type:varchar" json:"RequestId"`
 }
 type ReadBy struct{
 	UserId string `gorm:"primary_key;varchar(100)"  json:"UserId"`

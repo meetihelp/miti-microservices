@@ -19,6 +19,7 @@ type News struct{
 	ImageURL string `gorm:"type:varchar" json:"ImageURL"`
 	ReferenceArticleURL string `gorm:"type:varchar" json:"ReferenceArticleURL"`
 	Mitidatetime string `gorm:"type:varchar" json:"Mitidatatime"`
+	Flag string `gorm:"type:varchar" json:"Flag"`
 
 }
 

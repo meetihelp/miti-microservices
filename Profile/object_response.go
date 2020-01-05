@@ -15,6 +15,9 @@ type ProfileResponse struct{
 	Gender string `gorm:"type:varchar(10)" validate:"required" json:"Gender"`
 	Language string `gorm:"type:varchar(20)" validate:"required" json:"Language"`
 	Country string `gorm:"type:varchar(30)" json:"Country"`
+	Sex string `gorm:"type:varchar(10)"  json:"Sex"`
+	RelationshipStatus string `gorm:"type:varchar(10)"  json:"RelationshipStatus"`
+	ParentsAddress string `gorm:"type:varchar(10)"  json:"ParentsAddress"`
 }
 
 type ProfileResponseContent struct{

@@ -33,9 +33,9 @@ func(chatRequestData ChatRequest) doSanitization() string {
 	return "Ok"
 }
 
-func(chatAfterIndexData ChatAfterIndex) doSanitization() string {
+func(chatAfterTimeData ChatAfterTime) doSanitization() string {
 	validate :=validator.New()
-	err:= validate.Struct(chatAfterIndexData)
+	err:= validate.Struct(chatAfterTimeData)
 	if err!=nil{
 		fmt.Println(err.Error())
 		return "Error"
