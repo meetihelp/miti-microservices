@@ -20,7 +20,17 @@ func SendChat(w http.ResponseWriter,chat []Chat){
 func SendChatDetail(w http.ResponseWriter, chatDetail []ChatDetail,statusCode int){
 	w.Header().Set("Content-Type", "application/json")
 	msg:=util.GetMessageDecode(statusCode)
-	p:=&ChatDetailContent{ChatDetail:chatDetail,Code:statusCode,Message:msg}
+	chatDetailResponse:=[]ChatDetailResponse{}
+	for _,c:=range chatDetail{
+		temp:=ChatDetailResponse{}
+		temp.UserId=c.TempUserId
+		temp.ChatId=c.ChatId
+		temp.ChatType=c.ChatType
+		temp.CreatedAt=c.CreatedAt
+		temp.LastUpdate=c.LastUpdate
+		chatDetailResponse=append(chatDetailResponse,temp)
+	}
+	p:=&ChatDetailContent{ChatDetailResponse:chatDetailResponse,Code:statusCode,Message:msg}
 	enc := json.NewEncoder(w)
 	err:= enc.Encode(p)
 	if err != nil {

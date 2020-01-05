@@ -6,7 +6,15 @@ type SendChatContent struct{
 }
 
 type ChatDetailContent struct{
-	ChatDetail []ChatDetail `json:"ChatDetail"`
+	ChatDetailResponse []ChatDetailResponse `json:"ChatDetail"`
 	Code int `json:"Code"`
 	Message string `json:"Message"`
+}
+
+type ChatDetailResponse struct{
+	UserId string `gorm:"varchar(100)"  json:"UserId"`
+	ChatId string `gorm:"primary_key;varchar(100)"  json:"ChatId"`
+	ChatType string `gorm:"varchar(100)"  json:"ChatType"`
+	CreatedAt string `gorm:"varchar(100)" json:"CreatedAt"`
+	LastUpdate string `gorm:"varchar(100)" json:"LastUpdate"`
 }
