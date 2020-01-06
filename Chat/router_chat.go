@@ -82,7 +82,7 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 		userList:=GetUserListFromChatId(chatData.ChatId)
 		EnterReadBy(userList,chatData.MessageId)
 		// util.Message(w,200)
-		SendMessageResponse(w,chatResponse.MessageId,chatResponse.CreatedAt)
+		SendMessageResponse(w,chatResponse.RequestId,chatResponse.MessageId,chatResponse.CreatedAt)
 	}else{
 		util.Message(w,1002)
 	}

@@ -23,5 +23,6 @@ type ChatResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
 	MessageId string `json:"MessageId"`
+	RequestId string `json:"RequestId"`
 	CreatedAt string `json:"CreatedAt"`
 }
