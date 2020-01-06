@@ -135,3 +135,10 @@ func GetChatAfterTimeMessages(chatId string, numOfChat int, createdAt string)([]
 	db.Order("created_at").Limit(numOfChat).Where("chat_id=? AND created_at>?",chatId,createdAt).Find(&chat)
 	return chat
 }
+
+func GetTempUserIdFromChatId(userId string,chatId string) string{
+	db:=database.GetDB()
+	anonymousUser:=AnonymousUserHelper{}
+	db.Table("anonymous_users").Where("user_id=? AND chat_id=?",userId,chatId).Find(&anonymousUser)
+	return anonymousUser.AnonymousId
+}
