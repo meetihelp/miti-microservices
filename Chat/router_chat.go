@@ -6,6 +6,7 @@ import (
 	// redis "miti-microservices/Model/Redis"
 	// database "miti-microservices/Database"
 	util "miti-microservices/Util"
+	// auth "miti-microservices/Authentication"
 	"io/ioutil"
 	"encoding/json"
 	"log"
@@ -60,6 +61,8 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 		util.Message(w,1002)
 		return
 	}
+	// tempUserId:=auth.GetTempUserIdFromChatId(userId,chatData.ChatId)
+	// chatData.UserId=tempUserId
 	chatData.UserId=userId
 	chatData.MessageId=util.GenerateToken()
 	chatData.CreatedAt=util.GetTime()

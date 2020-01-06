@@ -96,4 +96,8 @@ func CalculateDuration(lastModified string) int{
 	return h_int
 }
 
+// func SendTemporaryIdList(temporaryIdList TempUserList){
+	
+// }
+
 

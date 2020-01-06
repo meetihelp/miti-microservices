@@ -28,3 +28,7 @@ type SMSHeader struct{
 type OTPStatusHeader struct{
 	Cookie string `header:"Miti-Cookie"`
 }
+
+type GetTempUserIdHeader struct{
+	Cookie string `header:"Miti-Cookie"`
+}

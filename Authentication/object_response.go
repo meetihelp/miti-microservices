@@ -64,6 +64,22 @@ type VerifyOTPResponse struct{
 type VerifyOTPResponseHeader struct{
 	MitiCookie string `json:"Miti-Cookie"`
 }
+
+type TempUserResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	List TempUserList `json:"List"`
+}
+
+type TempUserList struct{
+	UserId string `json:"UserId"`
+	ChatList []ChatListElement `json:"ChatList"`
+}
+
+type ChatListElement struct{
+	ChatId string `json:"ChatId"`
+	TempId string `json:"TemporaryUserId"`
+}
 // type PreferenceContent struct{
 // 	Code int `json:"Code"`
 // 	Message string `json:"Message"`

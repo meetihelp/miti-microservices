@@ -398,3 +398,28 @@ func UpdateIPIPStatus(userId string,ipipStatus int){
 	user:=User{}
 	db.Model(&user).Where("user_id=?",userId).Update("ipip_status",ipipStatus)
 }
+
+func GetTemporaryIdList(userId string) TempUserList{
+	db:=database.GetDB()
+	anonymousUser:=[]AnonymousUser{}
+	db.Where("user_id=?",userId).Find(&anonymousUser)
+	tempUser:=TempUserList{}
+	tempUser.UserId=userId
+	chatList:=[]ChatListElement{}
+	for _,u :=range anonymousUser{
+		c:=ChatListElement{}
+		c.ChatId=u.ChatId
+		c.TempId=u.AnonymousId
+		chatList=append(chatList,c)
+
+	}
+	tempUser.ChatList=chatList
+	return tempUser
+}
+
+func GetTempUserIdFromChatId(userId string,chatId string) string{
+	db:=database.GetDB()
+	anonymousUser:=AnonymousUser{}
+	db.Where("user_id=? AND chat_id=?",userId,chatId).Find(&anonymousUser)
+	return anonymousUser.AnonymousId
+}

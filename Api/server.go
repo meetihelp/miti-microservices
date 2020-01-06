@@ -43,6 +43,7 @@ func Server(){
 	r.HandleFunc("/updatePassword",apnaauth.UpdatePassword).Methods("POST")
 	r.HandleFunc("/resendOTP",apnaauth.ReSendOTP).Methods("GET")
 	r.HandleFunc("/otpStatus",apnaauth.OTPStatus).Methods("GET")
+	r.HandleFunc("/getTemporaryUserId",apnaauth.GetTemporaryUserId).Methods("GET")
 	
 	
 	
