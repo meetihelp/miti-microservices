@@ -132,7 +132,7 @@ func UpdateChatTime(chatId string, lastUpdate string) error{
 func GetChatAfterTimeMessages(chatId string, numOfChat int, createdAt string)([]Chat){
 	db:=database.GetDB()
 	chat:=[]Chat{}
-	db.Order("created_at").Limit(numOfChat).Where("chat_id=? AND created_at>?",chatId,createdAt).Find(&chat)
+	db.Order("created_at desc").Limit(numOfChat).Where("chat_id=? AND created_at>?",chatId,createdAt).Find(&chat)
 	return chat
 }
 
