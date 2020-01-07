@@ -23,7 +23,8 @@ func SendChatDetail(w http.ResponseWriter, chatDetail []ChatDetail,statusCode in
 	chatDetailResponse:=[]ChatDetailResponse{}
 	for _,c:=range chatDetail{
 		temp:=ChatDetailResponse{}
-		temp.UserId=c.TempUserId
+		// temp.UserId=c.TempUserId
+		temp.UserId=c.ActualUserId
 		temp.ChatId=c.ChatId
 		temp.ChatType=c.ChatType
 		temp.CreatedAt=c.CreatedAt

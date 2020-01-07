@@ -68,8 +68,13 @@ type VerifyOTPResponseHeader struct{
 type TempUserResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
-	List TempUserList `json:"List"`
+	UserId string `json:"UserId"`
 }
+// type TempUserResponse struct{
+// 	Code int `json:"Code"`
+// 	Message string `json:"Message"`
+// 	List TempUserList `json:"List"`
+// }
 
 type TempUserList struct{
 	UserId string `json:"UserId"`

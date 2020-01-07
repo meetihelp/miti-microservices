@@ -24,11 +24,12 @@ func GetTemporaryUserId(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	temporaryIdList:=GetTemporaryIdList(userId)
+	// temporaryIdList:=GetTemporaryIdList(userId)
 	// SendTemporaryIdList(temporaryIdList)
 	w.Header().Set("Content-Type", "application/json")
 	msg:=util.GetMessageDecode(200)
-	p:=&TempUserResponse{Code:200,Message:msg,List:temporaryIdList}
+	// p:=&TempUserResponse{Code:200,Message:msg,List:temporaryIdList}
+	p:=&TempUserResponse{Code:200,Message:msg,UserId:userId}
 	enc := json.NewEncoder(w)
 	err:= enc.Encode(p)
 	if err != nil {

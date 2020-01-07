@@ -61,9 +61,9 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 		util.Message(w,1002)
 		return
 	}
-	tempUserId:=GetTempUserIdFromChatId(userId,chatData.ChatId)
-	chatData.UserId=tempUserId
-	// chatData.UserId=userId
+	// tempUserId:=GetTempUserIdFromChatId(userId,chatData.ChatId)
+	// chatData.UserId=tempUserId
+	chatData.UserId=userId
 	chatData.MessageId=util.GenerateToken()
 	chatData.CreatedAt=util.GetTime()
 	// tempTime:=time.Now()
