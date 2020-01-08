@@ -14,6 +14,7 @@ import (
 	newsfeed "miti-microservices/NewsFeed"
 	image "miti-microservices/Media/Image"
 	// sms "miti-microservices/Notification/SMS"
+	"os"
 )
 
 func test(w http.ResponseWriter,r *http.Request){
@@ -21,7 +22,7 @@ func test(w http.ResponseWriter,r *http.Request){
 }
 
 
-func Server(){
+func Server(runMethod string){
 	fmt.Println("Server running.....")
 	r := mux.NewRouter()
 	r.HandleFunc("/", test).Methods("GET")
@@ -90,7 +91,21 @@ func Server(){
 	// r.HandleFunc("/getNewsFeedArticle",newsfeed.GetNewsFeedArticle).Methods("POST")
 	// r.HandleFunc("/newsFeedReaction",newsfeed.UpdateNewsFeedReaction).Methods("POST")
 	
-	if err := http.ListenAndServe("0.0.0.0:8000",nil); err != nil {
-		log.Fatal(err)
+	if(runMethod=="Devlopment"){
+		port:=os.Getenv("DevlopmentPort")
+		url:="0.0.0.0:"+port
+		if err := http.ListenAndServe(url,nil); err != nil {
+			log.Fatal(err)
+		}
+	}else if(runMethod=="production"){
+		port:=os.Getenv("ProductionPort")
+		url:="0.0.0.0:"+port
+		if err := http.ListenAndServe(url,nil); err != nil {
+			log.Fatal(err)
+		}
+	}else{
+		log.Println("Run Method not correct")
+		return
 	}
+	
 }
