@@ -26,3 +26,21 @@ type GetEventImageListDS struct{
 type UploadProfilePicHeader struct{
 	Cookie string `header:"Miti-Cookie"`
 }
+
+type UploadImageHeader struct{
+	Cookie string `header:"Miti-Cookie"`
+	AccessType string `header:"AccessType"`
+	ActualFileName string `header:"ActualFileName"`
+	Format string `header:"Format"`
+	Latitude string `header:"Latitutde"`
+	Longitude string `header:"Longitude"`
+	Dimension string `header:"Dimension"`
+	RequestId string `header:"RequestId"`
+}
+
+type UploadImageResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	ImageId string `json:"ImageId"`
+	URL string `json:"URL"`
+}

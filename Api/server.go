@@ -12,7 +12,7 @@ import (
 	gps "miti-microservices/GPS"
 	event "miti-microservices/Event"
 	newsfeed "miti-microservices/NewsFeed"
-	// image "miti-microservices/Image"
+	image "miti-microservices/Media/Image"
 	// sms "miti-microservices/Notification/SMS"
 )
 
@@ -75,6 +75,7 @@ func Server(){
 	r.HandleFunc("/getEventById",event.GetEventById).Methods("POST")
 
 	// //Image related APIs
+	r.HandleFunc("/uploadImage",image.UploadImage).Methods("POST")
 	// r.HandleFunc("/getImageById",image.GetImageById).Methods("POST")
 	// r.HandleFunc("/uploadProfilePic",image.UploadProfilePic).Methods("POST")
 	// r.HandleFunc("/getEventImageList",image.GetEventImageList).Methods("POST")
@@ -89,7 +90,7 @@ func Server(){
 	// r.HandleFunc("/getNewsFeedArticle",newsfeed.GetNewsFeedArticle).Methods("POST")
 	// r.HandleFunc("/newsFeedReaction",newsfeed.UpdateNewsFeedReaction).Methods("POST")
 	
-	if err := http.ListenAndServe("0.0.0.0:9000",nil); err != nil {
+	if err := http.ListenAndServe("0.0.0.0:8000",nil); err != nil {
 		log.Fatal(err)
 	}
 }

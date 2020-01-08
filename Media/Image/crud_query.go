@@ -41,3 +41,8 @@ func InsertUserImage(userId string,imageId string){
 	userImage.ImageId=imageId
 	db.Create(&userImage)
 }
+
+func EnterUserImage(userImageData UserImage){
+	db:=database.GetDB()
+	db.Create(&userImageData)
+}
