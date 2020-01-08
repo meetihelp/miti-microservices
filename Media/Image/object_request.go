@@ -29,8 +29,8 @@ type UploadProfilePicHeader struct{
 
 type UploadImageHeader struct{
 	Cookie string `header:"Miti-Cookie"`
-	AccessType string `header:"AccessType"`
-	ActualFileName string `header:"ActualFileName"`
+	AccessType string `header:"Access-Type"`
+	ActualFileName string `header:"Actual-Filename"`
 	Format string `header:"Format"`
 	Latitude string `header:"Latitutde"`
 	Longitude string `header:"Longitude"`

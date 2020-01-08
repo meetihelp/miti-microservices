@@ -17,7 +17,9 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 	uploadImageHeader:=UploadImageHeader{}
 	util.GetHeader(r,&uploadImageHeader)
 	sessionId:=uploadImageHeader.Cookie
+	log.Println("upload Image Cookie:"+sessionId)
 	accessType:=uploadImageHeader.AccessType
+	log.Println("upload Image AccessType:"+accessType)
 	actualFileName:=uploadImageHeader.ActualFileName
 	format:=uploadImageHeader.Format
 	latitude:=uploadImageHeader.Latitude
