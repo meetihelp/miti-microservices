@@ -1,31 +1,32 @@
-package Image
-
+package Chat
 
 import(
 	"net/http"
 	util "miti-microservices/Util"
+	image "miti-microservices/Media/Image"
 	"io/ioutil"
 	"fmt"
 	"encoding/json"
-	"os"
+	// "os"
 	"log"
 
 )
 
-func UploadImage(w http.ResponseWriter, r *http.Request){
+func SendChatImage(w http.ResponseWriter, r *http.Request){
 	//get buffer of image from user
-	uploadImageHeader:=UploadImageHeader{}
-	util.GetHeader(r,&uploadImageHeader)
-	sessionId:=uploadImageHeader.Cookie
+	sendChatImageHeader:=SendChatImageHeader{}
+	util.GetHeader(r,&sendChatImageHeader)
+	sessionId:=sendChatImageHeader.Cookie
 	log.Println("upload Image Cookie:"+sessionId)
-	accessType:=uploadImageHeader.AccessType
+	accessType:=sendChatImageHeader.AccessType
 	log.Println("upload Image AccessType:"+accessType)
-	actualFileName:=uploadImageHeader.ActualFileName
-	format:=uploadImageHeader.Format
-	latitude:=uploadImageHeader.Latitude
-	longitude:=uploadImageHeader.Longitude
-	dimension:=uploadImageHeader.Dimension
-	requestId:=uploadImageHeader.RequestId
+	actualFileName:=sendChatImageHeader.ActualFileName
+	format:=sendChatImageHeader.Format
+	latitude:=sendChatImageHeader.Latitude
+	longitude:=sendChatImageHeader.Longitude
+	dimension:=sendChatImageHeader.Dimension
+	requestId:=sendChatImageHeader.RequestId
+	chatId:=sendChatImageHeader.ChatId
 	userId,getChatStatus:=util.GetUserIdFromSession(sessionId)
 	// fmt.Println(userId)
 	if getChatStatus=="Error"{
@@ -33,8 +34,7 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	url:=""
-	userImageData,status:=GetUserImageByRequestId(userId,requestId)
+	userImageData,status:=image.GetUserImageByRequestId(userId,requestId)
 	if(status=="Error"){
 		file, _, err := r.FormFile("myFile")
 	    if err != nil {
@@ -55,18 +55,19 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 		bucket:=""
 		fmt.Println("AccessType:"+accessType)
 		if(accessType=="Private"){
-			bucket=GetPrivateImageBucket()
+			bucket=image.GetPrivateImageBucket()
 			fmt.Println("Bucket:"+bucket)
 		}else{
-			bucket=GetPublicImageBucket()
+			bucket=image.GetPublicImageBucket()
 		}
-		size,err:=UploadToS3(buffer,filename,bucket,format)
+		size,err:=image.UploadToS3(buffer,filename,bucket,format)
 		if(err!=nil){
 			//Could Not Upload Image
 			fmt.Println(err)
 			util.Message(w,3001)
 		}else{
 			//Uploaded image Successfully
+			userImageData:=image.UserImage{}
 			userImageData.UserId=userId
 			userImageData.ImageId=imageId
 			userImageData.AccessType=accessType
@@ -80,22 +81,43 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 			userImageData.GeneratedName=generatedName
 			userImageData.RequestId=requestId
 			userImageData.CreatedAt=util.GetTime()
-			EnterUserImage(userImageData)
-
-			// signedURL:=""
-			// url:=""
-			if(accessType=="Public"){
-				PublicCloudFront:=os.Getenv("publicImageCloudFront")
-				url=PublicCloudFront+"/"+filename
-			}
-	
+			image.EnterUserImage(userImageData)
 	}
-
 	
+
+		// signedURL:=""
+		// url:=""
+		// if(accessType=="Public"){
+		// 	PublicCloudFront:=os.Getenv("publicImageCloudFront")
+		// 	url=PublicCloudFront+"/"+filename
+		// }
+
+		chat:=Chat{}
+		chat.UserId=userId
+		chat.ChatId=chatId
+		chat.MessageType="image"
+		chat.MessageContent=userImageData.ImageId
+		chat.RequestId=userImageData.RequestId
+		messageId:=util.GenerateToken()
+		chat.MessageId=messageId
+		createdAt:=util.GetTime()
+		chat.CreatedAt=createdAt
+		chatResponse:=ChatInsertDB(chat)
+		// db.Create(&chatData)
+		if(chat.CreatedAt==chatResponse.CreatedAt){
+			e:=UpdateChatTime(chat.ChatId,chat.CreatedAt)
+			if e!=nil{
+				return
+			}
+		}
+
 		code:=200
 		msg:=util.GetMessageDecode(code)
 		w.Header().Set("Content-Type", "application/json")
-		p:=&UploadImageResponse{Code:code,Message:msg,ImageId:userImageData.ImageId,URL:url,RequestId:userImageData.RequestId}
+		// p:=&UploadImageResponse{Code:code,Message:msg,ImageId:imageId,URL:url}
+		p:=&SendChatImageResponse{Code:code,Message:msg,ImageId:userImageData.ImageId,
+					RequestId:chatResponse.RequestId,MessageId:chatResponse.MessageId,
+					CreatedAt:chatResponse.CreatedAt,MessageType:chat.MessageType}
 		enc := json.NewEncoder(w)
 		err= enc.Encode(p)
 		if err != nil {

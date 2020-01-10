@@ -5,7 +5,7 @@ import(
  _ 	"github.com/jinzhu/gorm/dialects/postgres"
    	database "miti-microservices/Database"
    	// sms "miti-microservices/Notification/SMS"
-   	chat "miti-microservices/Chat"
+   	// chat "miti-microservices/Chat"
     util "miti-microservices/Util"
 )
 
@@ -43,47 +43,47 @@ func UpdatePreferencetatus(userId string,preferenceStatus int){
 	db.Model(&user).Where("user_id=?",userId).Update("preference_creation_status",preferenceStatus)
 }
 
-func EnterMatchUser(userId1 string,userId2 string){	
+// func EnterMatchUser(userId1 string,userId2 string){	
 
-	chatID:=util.GenerateToken()
-	tempUser1:=util.GenerateToken()
-	tempUser2:=util.GenerateToken()
+// 	chatID:=util.GenerateToken()
+// 	tempUser1:=util.GenerateToken()
+// 	tempUser2:=util.GenerateToken()
 
-	EnterAnonymousUser(userId1,tempUser2,chatID,"OneToOne",1)
-	EnterAnonymousUser(userId2,tempUser1,chatID,"OneToOne",2)
+// 	EnterAnonymousUser(userId1,tempUser2,chatID,"OneToOne",1)
+// 	EnterAnonymousUser(userId2,tempUser1,chatID,"OneToOne",2)
 
-	EnterMatchData(userId1,userId2)
-}
+// 	EnterMatchData(userId1,userId2)
+// }
 
-func EnterMatchData(userId1 string,userId2 string){
-	db:=database.GetDB()
-	match:=util.Match{}
-	match.UserId1=userId1
-	match.UserId2=userId2
-	db.Create(&match)
-}
-func EnterAnonymousUser(userId string,tempUserId string,chatId string,chatType string,userIndex int){
-	db:=database.GetDB()
-	anonymousUser:=AnonymousUser{}
-	anonymousUser.UserId=userId
-	anonymousUser.AnonymousId=tempUserId
-	anonymousUser.ChatId=chatId
-	anonymousUser.CreatedAt=util.GetTime()
-	anonymousUser.Status="None"
+// func EnterMatchData(userId1 string,userId2 string){
+// 	db:=database.GetDB()
+// 	match:=util.Match{}
+// 	match.UserId1=userId1
+// 	match.UserId2=userId2
+// 	db.Create(&match)
+// }
+// func EnterAnonymousUser(userId string,tempUserId string,chatId string,chatType string,userIndex int){
+// 	db:=database.GetDB()
+// 	anonymousUser:=AnonymousUser{}
+// 	anonymousUser.UserId=userId
+// 	anonymousUser.AnonymousId=tempUserId
+// 	anonymousUser.ChatId=chatId
+// 	anonymousUser.CreatedAt=util.GetTime()
+// 	anonymousUser.Status="None"
 
-	chatDetail:=chat.ChatDetail{}
-	chatDetail.TempUserId=tempUserId
-	chatDetail.ActualUserId=userId
-	chatDetail.ChatId=chatId
-	chatDetail.ChatType=chatType
-	chatDetail.CreatedAt=anonymousUser.CreatedAt
-	chatDetail.UserIndex=userIndex
+// 	chatDetail:=chat.ChatDetail{}
+// 	chatDetail.TempUserId=tempUserId
+// 	chatDetail.ActualUserId=userId
+// 	chatDetail.ChatId=chatId
+// 	chatDetail.ChatType=chatType
+// 	chatDetail.CreatedAt=anonymousUser.CreatedAt
+// 	chatDetail.UserIndex=userIndex
 
-	db.Create(&anonymousUser)
-	db.Create(&chatDetail)
+// 	db.Create(&anonymousUser)
+// 	db.Create(&chatDetail)
 
 
-}
+// }
 
 func EnterUserData(userData User) (string,int){
 	// userData.Password = util.GenerateEncryptedPassword(userData.Password)
@@ -399,27 +399,43 @@ func UpdateIPIPStatus(userId string,ipipStatus int){
 	db.Model(&user).Where("user_id=?",userId).Update("ipip_status",ipipStatus)
 }
 
-func GetTemporaryIdList(userId string) TempUserList{
-	db:=database.GetDB()
-	anonymousUser:=[]AnonymousUser{}
-	db.Where("user_id=?",userId).Find(&anonymousUser)
-	tempUser:=TempUserList{}
-	tempUser.UserId=userId
-	chatList:=[]ChatListElement{}
-	for _,u :=range anonymousUser{
-		c:=ChatListElement{}
-		c.ChatId=u.ChatId
-		c.TempId=u.AnonymousId
-		chatList=append(chatList,c)
+// func GetTemporaryIdList(userId string) TempUserList{
+// 	db:=database.GetDB()
+// 	anonymousUser:=[]AnonymousUser{}
+// 	db.Where("user_id=?",userId).Find(&anonymousUser)
+// 	tempUser:=TempUserList{}
+// 	tempUser.UserId=userId
+// 	chatList:=[]ChatListElement{}
+// 	for _,u :=range anonymousUser{
+// 		c:=ChatListElement{}
+// 		c.ChatId=u.ChatId
+// 		c.TempId=u.AnonymousId
+// 		chatList=append(chatList,c)
 
+// 	}
+// 	tempUser.ChatList=chatList
+// 	return tempUser
+// }
+
+// func GetTempUserIdFromChatId(userId string,chatId string) string{
+// 	db:=database.GetDB()
+// 	anonymousUser:=AnonymousUser{}
+// 	db.Where("user_id=? AND chat_id=?",userId,chatId).Find(&anonymousUser)
+// 	return anonymousUser.AnonymousId
+// }
+
+func CheckPhoneNumberStatusDB(getPhoneStatusRequest GetPhoneStatusRequest) ([]int){
+	db:=database.GetDB()
+	phone:=getPhoneStatusRequest.PhoneList
+	phoneStatusList:=make([]int,0)
+	for _,p:=range phone{
+		user:=User{}
+		db.Table("users").Where("phone=?",p).Find(&user)
+		if(user.UserId==""){
+			phoneStatusList=append(phoneStatusList,0)
+		}else{
+			phoneStatusList=append(phoneStatusList,1)
+		}
 	}
-	tempUser.ChatList=chatList
-	return tempUser
-}
-
-func GetTempUserIdFromChatId(userId string,chatId string) string{
-	db:=database.GetDB()
-	anonymousUser:=AnonymousUser{}
-	db.Where("user_id=? AND chat_id=?",userId,chatId).Find(&anonymousUser)
-	return anonymousUser.AnonymousId
+	return phoneStatusList
 }

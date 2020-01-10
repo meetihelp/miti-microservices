@@ -31,3 +31,15 @@ type ChatAfterTime struct{
 	// Index int `json:"Index"`
 	CreatedAt string `json:"CreatedAt"`
 }
+
+type SendChatImageHeader struct{
+	Cookie string `header:"Miti-Cookie"`
+	AccessType string `header:"Access-Type"`
+	ActualFileName string `header:"Actual-Filename"`
+	Format string `header:"Format"`
+	Latitude string `header:"Latitutde"`
+	Longitude string `header:"Longitude"`
+	Dimension string `header:"Dimension"`
+	RequestId string `header:"RequestId"`
+	ChatId string `header:"ChatId"`
+}

@@ -32,13 +32,13 @@ type EmailVerification struct{
 }
 
 
-type AnonymousUser struct{
-	UserId string `gorm:"primary_key;varchar(100)"  json:"UserId"`
-	AnonymousId string `gorm:"primary_key;unique;varchar(100)"  json:"AnonymousId"`
-	ChatId string `gorm:"primary_key;varchar(100)"  json:"ChatId"`
-	Status string `gorm:"type:varchar(6)" json:"Status"`  // status for Liked/not liked/ none
-	CreatedAt string `gorm:"type:varchar(100)" json:"CreatedAt"`
-}
+// type AnonymousUser struct{
+// 	UserId string `gorm:"primary_key;varchar(100)"  json:"UserId"`
+// 	AnonymousId string `gorm:"primary_key;unique;varchar(100)"  json:"AnonymousId"`
+// 	ChatId string `gorm:"primary_key;varchar(100)"  json:"ChatId"`
+// 	Status string `gorm:"type:varchar(6)" json:"Status"`  // status for Liked/not liked/ none
+// 	CreatedAt string `gorm:"type:varchar(100)" json:"CreatedAt"`
+// }
 
 type ForgetPasswordStatus struct{
 	SessionId string `gorm:"primary_key;type:varchar(100)"  validate:"required" json:"SessionId"`
@@ -49,6 +49,6 @@ func init(){
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&OTPVerification{})
 	db.AutoMigrate(&EmailVerification{})
-	db.AutoMigrate(&AnonymousUser{})
+	// db.AutoMigrate(&AnonymousUser{})
 	db.AutoMigrate(&ForgetPasswordStatus{})
 }

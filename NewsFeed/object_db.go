@@ -1,7 +1,7 @@
 package NewsFeed
 
 import(
-	// database "miti-microservices/Database"
+	database "miti-microservices/Database"
 )
 
 type News struct{
@@ -47,16 +47,16 @@ type NewsFeedArticle struct{
 }
 
 type NewsFeedReaction struct{
-	NewsFeedId string `gorm:primary_key;unique;varchar(100)" json:"NewsFeedId"`
-	UserId string `gorm:primary_key;unique;varchar(100)" json:"UserId"`
+	Id int64 `gorm:"primary_key;varchar(100)" json:"Id"`
+	UserId string `gorm:primary_key;varchar(100)" json:"UserId"`
 	Reaction string `gorm:"type:varchar" json:"Reaction"`
 }
 
 func init(){
-	// db:=database.GetDB()
-	// db.AutoMigrate(&News{})
+	db:=database.GetDB()
+	db.AutoMigrate(&News{})
 	// db.AutoMigrate(&NewsFeed{})
 	// db.AutoMigrate(&NewsFeedSummary{})
 	// db.AutoMigrate(&NewsFeedArticle{})
-	// db.AutoMigrate(&NewsFeedReaction{})
+	db.AutoMigrate(&NewsFeedReaction{})
 }

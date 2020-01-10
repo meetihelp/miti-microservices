@@ -2,8 +2,9 @@ package Profile
 import(
 	"fmt"
    database "miti-microservices/Database"
-   util "miti-microservices/Util"
+   // util "miti-microservices/Util"
    // "reflect"
+   
 )
 
 func EnterProfileData(profileData Profile){
@@ -53,7 +54,7 @@ func EnterProfileData(profileData Profile){
 // 	db.Where("UserId=?",userId).First(&profile)
 // 	return profile
 // }
-func GetProfileDB(userId string) ProfileResponse{
+func GetAuthorizedProfileDB(userId string) ProfileResponse{
 	db:=database.GetDB()
 	profile:=Profile{}
 	db.Where("user_id=?",userId).First(&profile)
@@ -68,7 +69,50 @@ func GetProfileDB(userId string) ProfileResponse{
 	profileResponse.Country=profile.Country
 	profileResponse.Sex=profile.Sex
 	profileResponse.RelationshipStatus=profile.RelationshipStatus
-	profileResponse.ParentsAddress=profile.ParentsAddress
+
+
+	interest:=Interest{}
+	db.Where("user_id=?",userId).Find(&interest)
+	profileResponse.InterestIndoorPassive1=interest.InterestIndoorPassive1
+	profileResponse.InterestIndoorPassive2=interest.InterestIndoorPassive2
+	profileResponse.InterestOutdoorPassive1=interest.InterestOutdoorPassive1
+	profileResponse.InterestOutdoorPassive2=interest.InterestOutdoorPassive2
+	profileResponse.InterestIndoorActive1=interest.InterestIndoorActive1
+	profileResponse.InterestIndoorActive2=interest.InterestIndoorActive2
+	profileResponse.InterestOutdoorActive1=interest.InterestOutdoorActive1
+	profileResponse.InterestOutdoorActive2=interest.InterestOutdoorActive2
+	profileResponse.InterestOthers1=interest.InterestOthers1
+	profileResponse.InterestOthers2=interest.InterestOthers2
+	profileResponse.InterestIdeology1=interest.InterestIdeology1
+	profileResponse.InterestIdeology2=interest.InterestIdeology2
+
+
+	// profileResponse.ParentsAddress=profile.ParentsAddress
+	// _=reflect.Copy(profileResponse,profile)
+	return profileResponse
+}
+
+func GetUnAuthorizedProfileDB(userId string) ProfileResponse{
+	db:=database.GetDB()
+	
+	profileResponse:=ProfileResponse{}
+	interest:=Interest{}
+	db.Where("user_id=?",userId).Find(&interest)
+	profileResponse.InterestIndoorPassive1=interest.InterestIndoorPassive1
+	profileResponse.InterestIndoorPassive2=interest.InterestIndoorPassive2
+	profileResponse.InterestOutdoorPassive1=interest.InterestOutdoorPassive1
+	profileResponse.InterestOutdoorPassive2=interest.InterestOutdoorPassive2
+	profileResponse.InterestIndoorActive1=interest.InterestIndoorActive1
+	profileResponse.InterestIndoorActive2=interest.InterestIndoorActive2
+	profileResponse.InterestOutdoorActive1=interest.InterestOutdoorActive1
+	profileResponse.InterestOutdoorActive2=interest.InterestOutdoorActive2
+	profileResponse.InterestOthers1=interest.InterestOthers1
+	profileResponse.InterestOthers2=interest.InterestOthers2
+	profileResponse.InterestIdeology1=interest.InterestIdeology1
+	profileResponse.InterestIdeology2=interest.InterestIdeology2
+
+
+	// profileResponse.ParentsAddress=profile.ParentsAddress
 	// _=reflect.Copy(profileResponse,profile)
 	return profileResponse
 }
@@ -103,8 +147,17 @@ func UpdateIPIPResponseDB(userId string,response map[string]int) int{
 	db:=database.GetDB()
 	questionResponse:=QuestionResponse{}
 	db.Where("user_id=?",userId).Find(&questionResponse)
+	flag:=1
+	if(questionResponse.UserId==""){
+		flag=0
+	}
 	ipipStatus,questionResponse:=getDataInQuestionResponseForm(questionResponse,response)
-	db.Model(&questionResponse).Where("user_id=?",userId).Update(questionResponse)
+	if(flag==0){
+		db.Create(&questionResponse)
+	}else{
+		db.Model(&questionResponse).Where("user_id=?",userId).Update(questionResponse)	
+	}
+	
 	return ipipStatus
 }
 
@@ -179,13 +232,13 @@ func GetScore(response []Response) ([]int){
 
 func ProfileViewAuthorization(userId1 string,userId2 string) string{
 	db:=database.GetDB()
-	match:=util.Match{}
+	match:=Match{}
 	db.Where("user_id1=? AND user_id2=?",userId1,userId2).First(&match)
-	if match.UserId1!=""{
+	if (match.UserId1!="" && match.Like1=="Like" && match.Like2=="Like"){
 		return "Ok"
 	}
 	db.Where("user_id1=? AND user_id2=?",userId2,userId1).First(&match)
-	if match.UserId1!=""{
+	if (match.UserId1!="" && match.Like1=="Like" && match.Like2=="Like"){
 		return "Ok"
 	}
 	return "Error"
@@ -267,3 +320,51 @@ func UpdateProfilePicDB(userId string,imageId string){
 	db:=database.GetDB()
 	db.Table("profiles").Where("user_id=?",userId).Update("profile_pic_id",imageId)
 }
+
+func UpdateMatchDB(userId1 string,profileReactionData ProfileReactionRequest){
+	userId2:=profileReactionData.UserId
+	reaction:=profileReactionData.Reaction
+	db:=database.GetDB()
+	_=db.Table("matches").Where("user_id1=? AND user_id2=?",userId1,userId2).Update("like1",reaction).Error
+	_=db.Table("matches").Where("user_id1=? AND user_id2=?",userId2,userId1).Update("like2",reaction).Error
+
+}
+
+func EnterStatusDB(createStatusData Status) Status{
+	db:=database.GetDB()
+	statusResponse:=Status{}
+	userId:=createStatusData.UserId
+	requestId:=createStatusData.RequestId
+	db.Table("status").Where("actual_user_id=? AND request_id=?",userId,requestId).Find(&statusResponse)
+	if(statusResponse.UserId==""){
+		db.Create(&createStatusData)
+		return createStatusData
+	}else{
+		return statusResponse
+	}
+}
+
+func IsChatIdOfUser(userId string,chatId string) string{
+	db:=database.GetDB()
+	chatDetail:=ChatDetail{}
+	db.Table("chat_details").Where("user_id=? AND chat_id=?",userId,chatId).Find(&chatDetail)
+	if(chatDetail.ActualUserId==""){
+		return "Error"
+	}else{
+		return "Ok"
+	}
+}
+
+// func GetStatusDB(chatId string) []Status{
+// 	db:=database.GetDB()
+// 	secondaryTrustChain:=[]SecondaryTrustChain{}
+// 	db.Where("chat_id=?",chatId).Find(&secondaryTrustChain)
+// 	statusList:=make([]Status,0)
+// 	for _,chain:=range secondaryTrustChain{
+// 		status:=Status{}
+
+// 		db.Where("user_id=? AND active_status=?",userId,"active").Find(&status)
+// 		statusList=append(statusList,status)
+// 	}
+// 	return statusList
+// }

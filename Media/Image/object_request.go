@@ -38,9 +38,3 @@ type UploadImageHeader struct{
 	RequestId string `header:"RequestId"`
 }
 
-type UploadImageResponse struct{
-	Code int `json:"Code"`
-	Message string `json:"Message"`
-	ImageId string `json:"ImageId"`
-	URL string `json:"URL"`
-}

@@ -7,21 +7,47 @@ type SendQuestionContent struct{
 }
 
 type ProfileResponse struct{
-	UserId string `gorm:"primary_key;type:varchar(100)"  json:"UserId"`
-	Name string `gorm:"type:varchar(40)" validate:"required" json:"Name"`
-	DateOfBirth string `gorm:"type:varchar(100)" validate:"required" json:"DateOfBirth"`
-	Job string `gorm:"type:varchar(30)" validate:"required" "json:"Job"`
-	ProfilePicURL string `gorm:"type:varchar(100)"  json:"ProfilePicURL"`
-	Gender string `gorm:"type:varchar(10)" validate:"required" json:"Gender"`
-	Language string `gorm:"type:varchar(20)" validate:"required" json:"Language"`
-	Country string `gorm:"type:varchar(30)" json:"Country"`
-	Sex string `gorm:"type:varchar(10)"  json:"Sex"`
-	RelationshipStatus string `gorm:"type:varchar(10)"  json:"RelationshipStatus"`
-	ParentsAddress string `gorm:"type:varchar(10)"  json:"ParentsAddress"`
+	UserId string `son:"UserId"`
+	Name string `json:"Name"`
+	DateOfBirth string `json:"DateOfBirth"`
+	Job string `json:"Job"`
+	ProfilePicURL string `json:"ProfilePicURL"`
+	Gender string `json:"Gender"`
+	Language string `json:"Language"`
+	Country string `json:"Country"`
+	Sex string `json:"Sex"`
+	RelationshipStatus string `json:"RelationshipStatus"`
+	InterestIndoorPassive1 string `json:"InterestIndoorPassive1"`
+	InterestIndoorPassive2 string `json:"InterestIndoorPassive2"`
+	InterestIndoorActive1 string `json:"InterestIndoorActive1"`
+	InterestIndoorActive2 string `json:"InterestIndoorActive2"`	
+	InterestOutdoorPassive1 string `json:"InterestOutdoorPassive1"`
+	InterestOutdoorPassive2 string `json:"InterestOutdoorPassive2"`
+	InterestOutdoorActive1 string `json:"InterestOutdoorActive1"`
+	InterestOutdoorActive2 string `json:"InterestOutdoorActive2"`
+	InterestOthers1 string `json:"InterestOthers1"`
+	InterestOthers2 string `json:"InterestOthers2"`
+	InterestIdeology1 string `json:"InterestIdeology1"`
+	InterestIdeology2 string `json:"InterestIdeology2"`
+	// ParentsAddress string `gorm:"type:varchar(10)"  json:"ParentsAddress"`
 }
 
 type ProfileResponseContent struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
 	ProfileResponse ProfileResponse `json:"ProfileResponse"` 
+}
+
+type CreateStatusResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	RequestId string `json:"RequestId"`
+	CreatedAt string `json:"CreatedAt"`
+}
+
+type GetStatusResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	ChatId string `json:"ChatId"`
+	StatusList []Status `json:"StatusList"`
 }

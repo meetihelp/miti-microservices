@@ -12,7 +12,7 @@ import(
 
 func GetProfile(w http.ResponseWriter, r *http.Request){
 	//CHECK IF USER IS AUTHORIZED TO SEE THE PROFILE
-	header:=InsertQuestionHeader{}
+	header:=GetProfileHeader{}
 	util.GetHeader(r,&header)
 
 
@@ -40,12 +40,15 @@ func GetProfile(w http.ResponseWriter, r *http.Request){
 	}
 	profileViewAuthorization:=ProfileViewAuthorization(userId,profileRequest.UserId)
 	if profileViewAuthorization=="Error"{
-		util.Message(w,2001)
-		return
+		profileResponse:=GetUnAuthorizedProfileDB(profileRequest.UserId)
+		SendProfile(w,2001,profileResponse)
+	}else{
+		profileResponse:=GetAuthorizedProfileDB(profileRequest.UserId)
+		SendProfile(w,200,profileResponse)
 	}
 
 	//RETURN PROFILE
-	profileResponse:=GetProfileDB(profileRequest.UserId)
-	SendProfile(w,profileResponse)
+	
+	
 
 }

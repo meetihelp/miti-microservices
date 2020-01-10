@@ -33,15 +33,15 @@ func GetArticleAfterId(id int64) ([]News){
 func UpdateNewsFeedReactionDB(userId string,newsFeedReactionData NewsFeedReactionDS){
 	db:=database.GetDB()
 	newsFeedReaction:=NewsFeedReaction{}
-	db.Where("user_id=? and news_feed_id=?",userId,newsFeedReactionData.NewsFeedId).Find(&newsFeedReaction)
+	db.Where("user_id=? and id=?",userId,newsFeedReactionData.Id).Find(&newsFeedReaction)
 	if(newsFeedReaction.Reaction==""){
 		newsFeedReaction.UserId=userId
-		newsFeedReaction.NewsFeedId=newsFeedReactionData.NewsFeedId
+		newsFeedReaction.Id=newsFeedReactionData.Id
 		newsFeedReaction.Reaction=newsFeedReactionData.Reaction
 		db.Create(&newsFeedReaction)
 		return
 	}else{
-		db.Model(&newsFeedReaction).Where("user_id=? and news_feed_id=?",userId,newsFeedReactionData.NewsFeedId).Update("reaction",newsFeedReactionData.Reaction)
+		db.Model(&newsFeedReaction).Where("user_id=? and id=?",userId,newsFeedReactionData.Id).Update("reaction",newsFeedReactionData.Reaction)
 		return
 	}
 

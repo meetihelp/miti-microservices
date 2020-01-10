@@ -77,15 +77,17 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 	if(chatData.MessageContent!=""){
 		chatResponse:=ChatInsertDB(chatData)
 	// db.Create(&chatData)
-		e:=UpdateChatTime(chatData.ChatId,chatData.CreatedAt)
-		if e!=nil{
-			return
+		if(chatData.CreatedAt==chatResponse.CreatedAt){
+			e:=UpdateChatTime(chatData.ChatId,chatData.CreatedAt)
+			if e!=nil{
+				return
+			}
 		}
 		
-		userList:=GetUserListFromChatId(chatData.ChatId)
-		EnterReadBy(userList,chatData.MessageId)
+		// userList:=GetUserListFromChatId(chatData.ChatId)
+		// EnterReadBy(userList,chatData.MessageId)
 		// util.Message(w,200)
-		SendMessageResponse(w,chatResponse.RequestId,chatResponse.MessageId,chatResponse.CreatedAt)
+		SendMessageResponse(w,chatResponse.RequestId,chatResponse.MessageId,chatResponse.CreatedAt,chatResponse.MessageType)
 	}else{
 		util.Message(w,1002)
 	}

@@ -37,5 +37,6 @@ func UpdateNewsFeedReaction(w http.ResponseWriter,r *http.Request){
 	}
 
 	UpdateNewsFeedReactionDB(userId,newsFeedReactionData)
+	util.Message(w,200)
 }
 

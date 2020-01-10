@@ -27,7 +27,7 @@ func Server(runMethod string){
 	r := mux.NewRouter()
 	r.HandleFunc("/", test).Methods("GET")
 
-	r.HandleFunc("/createMatch",apnaauth.CreateMatch).Methods("GET")
+	// r.HandleFunc("/createMatch",apnaauth.CreateMatch).Methods("GET")
 
 	//Authentication related APIs
 	r.HandleFunc("/loadingPage",apnaauth.LoadingPage).Methods("GET")
@@ -45,6 +45,7 @@ func Server(runMethod string){
 	r.HandleFunc("/resendOTP",apnaauth.ReSendOTP).Methods("GET")
 	r.HandleFunc("/otpStatus",apnaauth.OTPStatus).Methods("GET")
 	r.HandleFunc("/getTemporaryUserId",apnaauth.GetTemporaryUserId).Methods("GET")
+	r.HandleFunc("/getPhoneStatus",apnaauth.GetPhoneStatus).Methods("POST")
 	
 	
 	
@@ -55,6 +56,7 @@ func Server(runMethod string){
 	r.HandleFunc("/getChat",apnachat.GetChat).Methods("POST")
 	r.HandleFunc("/chat",apnachat.ChatInsert).Methods("POST")
 	r.HandleFunc("/getChatAfterIndex",apnachat.GetChatAfterIndex).Methods("POST")
+	r.HandleFunc("/sendChatImage",apnachat.SendChatImage).Methods("POST")
 
 
 	//Profile related APIs
@@ -64,6 +66,8 @@ func Server(runMethod string){
 	r.HandleFunc("/updateIPIPResponse",profile.UpdateIPIPResponse).Methods("POST")
 	r.HandleFunc("/getProfile",profile.GetProfile).Methods("POST")
 	r.HandleFunc("/updatePreference",profile.UpdatePreference).Methods("Post")
+	r.HandleFunc("/profileReaction",profile.ProfileReaction).Methods("POST")
+	r.HandleFunc("/createStatus",profile.CreateStatus).Methods("POST")
 	http.Handle("/", r)
 	
 	//GPS related APIs
@@ -86,6 +90,7 @@ func Server(runMethod string){
 	//NewsFeed related APIs
 	r.HandleFunc("/getNewsArticleList",newsfeed.GetNewsArticle).Methods("POST")
 	r.HandleFunc("/getNewsArticle",newsfeed.GetNewsFeedArticle).Methods("POST")
+	r.HandleFunc("/newsFeedReaction",newsfeed.UpdateNewsFeedReaction).Methods("POST")
 	// r.HandleFunc("/getNewsArticle",newsfeed.GetNewsArticle).Methods("POST")
 	// r.HandleFunc("/getNewsFeedSummary",newsfeed.GetNewsFeedSummary).Methods("POST")
 	// r.HandleFunc("/getNewsFeedArticle",newsfeed.GetNewsFeedArticle).Methods("POST")

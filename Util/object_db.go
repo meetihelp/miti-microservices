@@ -41,6 +41,6 @@ func init(){
 	db:=database.GetDB()
 	db.AutoMigrate(&Session{})
 	db.AutoMigrate(&TemporarySession{})
-	db.AutoMigrate(&Match{})
+	// db.AutoMigrate(&Match{})
 	// db.AutoMigrate(&OTPVerification{})
 }

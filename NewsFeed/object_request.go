@@ -21,7 +21,7 @@ type NewsFeedReactionHeader struct{
 }
 
 type NewsFeedReactionDS struct{
-	NewsFeedId string `json:"NewsFeedId"`
+	Id int64 `json:"Id"`
 	Reaction string `json:"Reaction"`
 }
 

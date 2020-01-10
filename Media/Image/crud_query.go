@@ -46,3 +46,16 @@ func EnterUserImage(userImageData UserImage){
 	db:=database.GetDB()
 	db.Create(&userImageData)
 }
+
+func GetUserImageByRequestId(userId string,requestId string) (UserImage,string){
+	db:=database.GetDB()
+	userImage:=UserImage{}
+	db.Where("user_id=? AND request_id=?",userId,requestId).Find(&userImage)
+	status:=""
+	if(userImage.ImageId==""){
+		status="Error"
+	}else{
+		status="Ok"
+	}
+	return userImage,status
+}

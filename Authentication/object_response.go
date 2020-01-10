@@ -85,6 +85,12 @@ type ChatListElement struct{
 	ChatId string `json:"ChatId"`
 	TempId string `json:"TemporaryUserId"`
 }
+
+type GetPhoneStatusResponse struct{
+	PhoneStatus []int `json:"PhoneStatus"`
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+}
 // type PreferenceContent struct{
 // 	Code int `json:"Code"`
 // 	Message string `json:"Message"`

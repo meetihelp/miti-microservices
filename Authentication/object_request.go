@@ -32,3 +32,15 @@ type OTPStatusHeader struct{
 type GetTempUserIdHeader struct{
 	Cookie string `header:"Miti-Cookie"`
 }
+
+type GetPhoneStatusHeader struct{
+	Cookie string `header:"Miti-Cookie"`	
+}
+
+type GetPhoneStatusRequest struct{
+	PhoneList []PhoneDS `json:"PhoneList"`
+}
+
+type PhoneDS struct{
+	Phone string `json:"Phone"`
+}

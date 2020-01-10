@@ -26,8 +26,16 @@ type Profile struct{
 	EmotionalStability int `gorm:"type:int" json:"EmotionalStability"`
 	Intellect int `gorm:"type:int" json:"Intellect"`
 	MakingChoice string `gorm:"type:varchar(20)" json:"MakingChoice"`
+	Pincode string `gorm:"type:varchar" json:"Pincode"`
 	// Latitude string `gorm:"type:varchar(20)" json:"Latitude"`
 	// Longitude string `gorm:"type:varchar(20)" json:"Longitude"`
+}
+
+type Match struct{
+	UserId1 string `gorm:"primary_key;type:varchar" json:"UserId1"`
+	UserId2 string `gorm:"primary_key;type:varchar" json:"UserId2"`
+	Like1 string `gorm:"primary_key;type:varchar" json:"Like1"`
+	Like2 string `gorm:"primary_key;type:varchar" json:"Like2"`
 }
 
 type Interest struct{
@@ -103,17 +111,47 @@ type QuestionResponse struct{
 }
 
 type Question struct{
-	Id int 
+	Id int `gorm:"int" json:"Id"`
 	Content string `gorm:"varchar(1000)" json:"Content"`
 	Type int `gorm:"type:int" json:"Type"`
 	Factor int `gorm:"int" json:"Factor"`
+}
+
+type Status struct{
+	UserId string `gorm:"primary_key;type:varchar"  json:"UserId"`
+	StatusId string `gorm:"primary_key";type:varchar json:"StatusId"`
+	CreatedAt string `gorm:"type:varchar" json:"CreatedAt"`
+	RequestId string `gorm:"type:varchar" json:"RequestId"`
+	StatusContent string `gorm:"type:varchar" json:"StatusContent"`
+	ActiveStatus string `gorm:"type:varchar" json:"ActiveStatus"`
+	//AccessType : Public or Friends or Family or Acquintence
+	AccessType string `gorm:"type:varchar" json:"AccessType"`
+}
+
+type PrimaryTrustChain struct{
+	UserId string `gorm:"primary_key;type:varchar"  json:"UserId"`
+	ChainName string `gorm:"primary_key;type:varchar" json:"ChainName"`
+	Phone1 string `gorm:"type:varchar" json:"Phone1"`
+	Phone2 string `gorm:"type:varchar" json:"Phone2"`
+	Phone3 string `gorm:"type:varchar" json:"Phone3"`
+	Phone4 string `gorm:"type:varchar" json:"Phone4"`
+	Phone5 string `gorm:"type:varchar" json:"Phone5"`
+	Phone6 string `gorm:"type:varchar" json:"Phone6"`
+}
+
+
+type SecondaryTrustChain struct{
+	UserId string `gorm:"primary_key;type:varchar"  json:"UserId"`
+	ChatId string `gorm:"primary_key;type:varchar" json:"ChatId"`
 }
 
 
 func init(){
 	db:=database.GetDB()
 	db.AutoMigrate(&Profile{})
+	db.AutoMigrate(&Match{})
 	db.AutoMigrate(&QuestionResponse{})	
 	db.AutoMigrate(&Question{})
 	db.AutoMigrate(&Interest{})
+	db.AutoMigrate(&Status{})
 }
