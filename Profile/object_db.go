@@ -13,7 +13,8 @@ type Profile struct{
 	Name string `gorm:"type:varchar(40)" validate:"required" json:"Name"`
 	DateOfBirth string `gorm:"type:varchar(100)" validate:"required" json:"DateOfBirth"`
 	Job string `gorm:"type:varchar(30)" validate:"required" "json:"Job"`
-	ProfilePicURL string `gorm:"type:varchar(100)"  json:"ProfilePicURl"`
+	ProfilePicID string `gorm:"type:varchar" json:"ProfilePicId"`
+	// ProfilePicURL string `gorm:"type:varchar(100)"  json:"ProfilePicURl"`
 	Gender string `gorm:"type:varchar(10)" validate:"required" json:"Gender"`
 	Sex string `gorm:"type:varchar(10)"  json:"Sex"`
 	RelationshipStatus string `gorm:"type:varchar(10)"  json:"RelationshipStatus"`
@@ -137,12 +138,23 @@ type PrimaryTrustChain struct{
 	Phone4 string `gorm:"type:varchar" json:"Phone4"`
 	Phone5 string `gorm:"type:varchar" json:"Phone5"`
 	Phone6 string `gorm:"type:varchar" json:"Phone6"`
+	RequestId string `gorm:"type:varchar" json:"RequestId"`
+	UpdatedAt string `gorm:"type:varchar" json:"UpdatedAt"`
 }
 
 
 type SecondaryTrustChain struct{
 	UserId string `gorm:"primary_key;type:varchar"  json:"UserId"`
 	ChatId string `gorm:"primary_key;type:varchar" json:"ChatId"`
+	CreatedAt string `gorm:"type:varchar" json:"CreatedAt"`
+	RequestId string `gorm:"type:varchar" json:"RequestId"`
+}
+
+type CheckInterest struct{
+	UserId1 string `gorm:"primary_key;type:varchar"  json:"UserId1"`
+	UserId2 string `gorm:"primary_key;type:varchar"  json:"UserId2"`
+	Interest string `gorm:"primary_key;type:varchar" json:"Interest"`
+	CreatedAt string `gorm:"type:varchar" json:"CreatedAt"`
 }
 
 
@@ -154,4 +166,7 @@ func init(){
 	db.AutoMigrate(&Question{})
 	db.AutoMigrate(&Interest{})
 	db.AutoMigrate(&Status{})
+	db.AutoMigrate(&PrimaryTrustChain{})
+	db.AutoMigrate(&SecondaryTrustChain{})
+	db.AutoMigrate(&CheckInterest{})
 }

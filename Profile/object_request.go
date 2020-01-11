@@ -70,3 +70,55 @@ type GetStatusHeader struct{
 type GetStatusRequest struct{
 	ChatId string `json:"ChatId"`
 }
+
+type CheckInterestHeader struct{
+	Cookie string `header:"Miti-Cookie"`
+}
+
+type CheckInterestRequest struct{
+	UserId string `json:"UserId"`
+	Interest string `json:""Interest`
+}
+
+type GetCheckInterestHeader struct{
+	Cookie string `header:"Miti-Cookie"`
+}
+
+type CreatePrimaryTrustChainHeader struct{
+	Cookie string `header:"Miti-Cookie"`	
+}
+
+type CreatePrimaryTrustChainRequest struct{
+	Phone string `json:"Phone"`
+	Id int `json:"Id"`
+	RequestId string `json:"RequestId"`
+}
+
+type DeletePrimaryTrustChainHeader struct{
+	Cookie string `header:"Miti-Cookie"`	
+}
+
+type DeletePrimaryTrustChainRequest struct{
+	Phone string `json:"Phone"`
+	Id int `json:"Id"`
+	RequestId string `json:"RequestId"`
+}
+
+type CreateSecondaryTrustChainHeader struct{
+	Cookie string `header:"Miti-Cookie"`	
+}
+
+type CreateSecondaryTrustChainRequest struct{
+	RequestId string `json:"RequestId"`
+	ChatId string `header:"ChatId"`
+}
+
+
+type DeleteSecondaryTrustChainHeader struct{
+	Cookie string `header:"Miti-Cookie"`	
+}
+
+type DeleteSecondaryTrustChainRequest struct{
+	ChatId string `json:"ChatId"`
+	RequestId string `json:"RequestId"`
+}

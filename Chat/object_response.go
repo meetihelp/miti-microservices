@@ -17,6 +17,7 @@ type ChatDetailResponse struct{
 	ChatType string `gorm:"varchar(100)"  json:"ChatType"`
 	CreatedAt string `gorm:"varchar(100)" json:"CreatedAt"`
 	LastUpdate string `gorm:"varchar(100)" json:"LastUpdate"`
+	Name string `json:"Name"`
 }
 
 type ChatResponse struct{

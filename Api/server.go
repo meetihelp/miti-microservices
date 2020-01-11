@@ -68,6 +68,11 @@ func Server(runMethod string){
 	r.HandleFunc("/updatePreference",profile.UpdatePreference).Methods("Post")
 	r.HandleFunc("/profileReaction",profile.ProfileReaction).Methods("POST")
 	r.HandleFunc("/createStatus",profile.CreateStatus).Methods("POST")
+	r.HandleFunc("/checkInterest",profile.CheckInterestRouter).Methods("POST")
+	r.HandleFunc("/getCheckInterest",profile.GetCheckInterestRouter).Methods("GET")
+	r.HandleFunc("/createPrimaryTrustChain",profile.CreatePrimaryTrustChain).Methods("POST")
+	r.HandleFunc("/createSecondaryTrustChain",profile.CreateSecondaryTrustChain).Methods("POST")
+	r.HandleFunc("/deletePrimaryTrustChain",profile.DeletePrimaryTrustChain).Methods("POST")
 	http.Handle("/", r)
 	
 	//GPS related APIs

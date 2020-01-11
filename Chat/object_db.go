@@ -17,6 +17,7 @@ type ChatDetail struct{
 	CreatedAt string `gorm:"varchar(100)" json:"CreatedAt"`
 	LastUpdate string `gorm:"varchar(100)" json:"LastUpdate"`
 	UserIndex int `gorm:"type:int" json:"Index"`
+	Name string `gorm:"type:varchar" json:"Name"`
 }
 type Chat struct{
 	UserId string `gorm:"varchar(100)"  json:"UserId"`

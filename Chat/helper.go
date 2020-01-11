@@ -29,6 +29,7 @@ func SendChatDetail(w http.ResponseWriter, chatDetail []ChatDetail,statusCode in
 		temp.ChatType=c.ChatType
 		temp.CreatedAt=c.CreatedAt
 		temp.LastUpdate=c.LastUpdate
+		temp.Name=c.Name
 		chatDetailResponse=append(chatDetailResponse,temp)
 	}
 	p:=&ChatDetailContent{ChatDetailResponse:chatDetailResponse,Code:statusCode,Message:msg}

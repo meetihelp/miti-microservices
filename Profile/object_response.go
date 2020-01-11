@@ -11,7 +11,8 @@ type ProfileResponse struct{
 	Name string `json:"Name"`
 	DateOfBirth string `json:"DateOfBirth"`
 	Job string `json:"Job"`
-	ProfilePicURL string `json:"ProfilePicURL"`
+	ProfilePicID string `json:"ProfilePicID"`
+	// ProfilePicURL string `json:"ProfilePicURL"`
 	Gender string `json:"Gender"`
 	Language string `json:"Language"`
 	Country string `json:"Country"`
@@ -50,4 +51,43 @@ type GetStatusResponse struct{
 	Message string `json:"Message"`
 	ChatId string `json:"ChatId"`
 	StatusList []Status `json:"StatusList"`
+}
+
+type GetCheckInterestResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	List []GetCheckInterestList `json:"List"`
+}
+
+type GetCheckInterestList struct{
+	UserId string `json:"UserId"`
+	Interest string `json:"Interest"`
+	CreatedAt string `json:"CreatedAt"`
+}
+
+type CreatePrimaryTrustChainResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	UpdatedAt string `json:"UpdatedAt"`
+	RequestId string `json:"RequestId"`
+}
+
+type DeletePrimaryTrustChainResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	UpdatedAt string `json:"UpdatedAt"`
+	RequestId string `json:"RequestId"`
+}
+
+type CreateSecondaryTrustChainResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	CreatedAt string `json:"CreatedAt"`
+	RequestId string `json:"RequestId"`
+}
+
+type DeleteSecondaryTrustChainResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	RequestId string `json:"RequestId"`
 }
