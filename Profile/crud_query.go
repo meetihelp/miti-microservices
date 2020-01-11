@@ -466,16 +466,22 @@ func DeleteSecondaryTrustChainDB(userId string,chatId string){
 	_=db.Where("user_id=? AND chat_id=?",userId,chatId).Delete(SecondaryTrustChain{}).Error
 }
 
-// func GetStatusDB(chatId string) []Status{
-// 	db:=database.GetDB()
-// 	secondaryTrustChain:=[]SecondaryTrustChain{}
-// 	db.Where("chat_id=?",chatId).Find(&secondaryTrustChain)
-// 	statusList:=make([]Status,0)
-// 	for _,chain:=range secondaryTrustChain{
-// 		status:=Status{}
-
-// 		db.Where("user_id=? AND active_status=?",userId,"active").Find(&status)
-// 		statusList=append(statusList,status)
-// 	}
-// 	return statusList
-// }
+func GetStatusDB(chatId string) []StatusResponse{
+	db:=database.GetDB()
+	secondaryTrustChain:=[]SecondaryTrustChain{}
+	db.Where("chat_id=?",chatId).Find(&secondaryTrustChain)
+	statusList:=make([]StatusResponse,0)
+	for _,chain:=range secondaryTrustChain{
+		status:=Status{}
+		userId:=chain.UserId
+		db.Where("user_id=? AND active_status=?",userId,"active").Find(&status)
+		statusResponseTemp:=StatusResponse{}
+		if(status.UserId!=""){
+			statusResponseTemp.UserId=status.UserId
+			statusResponseTemp.CreatedAt=status.CreatedAt
+			statusResponseTemp.StatusContent=status.StatusContent
+			statusList=append(statusList,statusResponseTemp)
+		}
+	}
+	return statusList
+}

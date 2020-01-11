@@ -50,7 +50,12 @@ type GetStatusResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
 	ChatId string `json:"ChatId"`
-	StatusList []Status `json:"StatusList"`
+	StatusList []StatusResponse `json:"StatusList"`
+}
+type StatusResponse struct{
+	UserId string `json:"UserId"`
+	StatusContent string `json:"Status"`
+	CreatedAt string `json:"CreatedAt"`
 }
 
 type GetCheckInterestResponse struct{

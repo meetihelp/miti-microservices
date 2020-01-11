@@ -68,6 +68,7 @@ func Server(runMethod string){
 	r.HandleFunc("/updatePreference",profile.UpdatePreference).Methods("Post")
 	r.HandleFunc("/profileReaction",profile.ProfileReaction).Methods("POST")
 	r.HandleFunc("/createStatus",profile.CreateStatus).Methods("POST")
+	r.HandleFunc("/getStatus",profile.GetStatus).Methods("POST")
 	r.HandleFunc("/checkInterest",profile.CheckInterestRouter).Methods("POST")
 	r.HandleFunc("/getCheckInterest",profile.GetCheckInterestRouter).Methods("GET")
 	r.HandleFunc("/createPrimaryTrustChain",profile.CreatePrimaryTrustChain).Methods("POST")
