@@ -13,6 +13,9 @@ import (
 	event "miti-microservices/Event"
 	newsfeed "miti-microservices/NewsFeed"
 	image "miti-microservices/Media/Image"
+	social "miti-microservices/Social"
+	security "miti-microservices/Security"
+	privacy "miti-microservices/Privacy"
 	// sms "miti-microservices/Notification/SMS"
 	"os"
 )
@@ -71,10 +74,18 @@ func Server(runMethod string){
 	r.HandleFunc("/getStatus",profile.GetStatus).Methods("POST")
 	r.HandleFunc("/checkInterest",profile.CheckInterestRouter).Methods("POST")
 	r.HandleFunc("/getCheckInterest",profile.GetCheckInterestRouter).Methods("GET")
-	r.HandleFunc("/createPrimaryTrustChain",profile.CreatePrimaryTrustChain).Methods("POST")
-	r.HandleFunc("/createSecondaryTrustChain",profile.CreateSecondaryTrustChain).Methods("POST")
-	r.HandleFunc("/deletePrimaryTrustChain",profile.DeletePrimaryTrustChain).Methods("POST")
-	http.Handle("/", r)
+	
+
+	//Security Related APIs
+	r.HandleFunc("/createPrimaryTrustChain",security.CreatePrimaryTrustChain).Methods("POST")
+	r.HandleFunc("/createSecondaryTrustChain",security.CreateSecondaryTrustChain).Methods("POST")
+	r.HandleFunc("/deletePrimaryTrustChain",security.DeletePrimaryTrustChain).Methods("POST")
+	r.HandleFunc("/deletePrimaryTrustChain",security.DeleteSecondaryTrustChain).Methods("POST")
+
+	//Privacy Related APIs
+	r.HandleFunc("/uploadBoardContent",privacy.UploadBoardContent).Methods("POST")
+	r.HandleFunc("/shareBoard",privacy.ShareBoard).Methods("POST")
+	
 	
 	//GPS related APIs
 	r.HandleFunc("/updateUserLocation",gps.UpdateUserLocation).Methods("POST")
@@ -101,7 +112,12 @@ func Server(runMethod string){
 	// r.HandleFunc("/getNewsFeedSummary",newsfeed.GetNewsFeedSummary).Methods("POST")
 	// r.HandleFunc("/getNewsFeedArticle",newsfeed.GetNewsFeedArticle).Methods("POST")
 	// r.HandleFunc("/newsFeedReaction",newsfeed.UpdateNewsFeedReaction).Methods("POST")
+
+	//Social related APIs
+	r.HandleFunc("/getPoolStatus",social.PoolStatusRouter).Methods("GET")
+	r.HandleFunc("/getInPool",social.GetInPool).Methods("GET")
 	
+	http.Handle("/", r)
 	if(runMethod=="Devlopment"){
 		port:=os.Getenv("DevlopmentPort")
 		url:="0.0.0.0:"+port

@@ -1,4 +1,4 @@
-package Profile
+package Security
 
 import(
 	"fmt"
@@ -10,8 +10,8 @@ import(
    util "miti-microservices/Util"
 )
 
-func CreateSecondaryTrustChain(w http.ResponseWriter, r *http.Request){
-	header:=CreateSecondaryTrustChainHeader{}
+func DeletePrimaryTrustChain(w http.ResponseWriter, r *http.Request){
+	header:=DeletePrimaryTrustChainHeader{}
 	util.GetHeader(r,&header)
 
 
@@ -30,21 +30,25 @@ func CreateSecondaryTrustChain(w http.ResponseWriter, r *http.Request){
 		return 
 	}
 	
-	secondaryTrustChainRequest:=CreateSecondaryTrustChainRequest{}
-	profileRequestErr:=json.Unmarshal(requestBody,&secondaryTrustChainRequest)
+	deletePrimaryTrustChainRequest:=DeletePrimaryTrustChainRequest{}
+	profileRequestErr:=json.Unmarshal(requestBody,&deletePrimaryTrustChainRequest)
 	if profileRequestErr!=nil{
 		fmt.Println("Could not Unmarshall profile data")
 		util.Message(w,1001)
 		return
 	}
-	
-	requestId:=secondaryTrustChainRequest.RequestId
-	chatId:=secondaryTrustChainRequest.ChatId
-	createdAt:=util.GetTime()
-	createdAt=InsertSecondaryTrustChain(userId,chatId,requestId,createdAt)
+	// primaryTrustChain.UserId=userId
+	// DeletePrimaryTrustChain(primaryTrustChain)
+	// util.Message(w,200)
+
+	requestId:=deletePrimaryTrustChainRequest.RequestId
+	updatedAt:=util.GetTime()
+	id:=deletePrimaryTrustChainRequest.Id
+	updatedAt=DeletePrimaryTrustChainDB(userId,id,requestId,updatedAt)
+
 	w.Header().Set("Content-Type", "application/json")
 	msg:=util.GetMessageDecode(200)
-	p:=&CreateSecondaryTrustChainResponse{Code:200,Message:msg,RequestId:requestId,CreatedAt:createdAt}
+	p:=&DeletePrimaryTrustChainResponse{Code:200,Message:msg,RequestId:requestId,UpdatedAt:updatedAt}
 	enc := json.NewEncoder(w)
 	err= enc.Encode(p)
 	if err != nil {

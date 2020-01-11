@@ -40,11 +40,23 @@ func CheckCorrectChat(userId string,chatId string) string{
 	return "Ok"
 }
 
-func GetChatDetail(userId string,offset int,numOfChat int) ([]ChatDetail,string){
+func GetChatDetail(userId string,date string,numOfChat int) ([]string,[]ChatDetail,string){
 	db:=database.GetDB()
 	chatDetail:=[]ChatDetail{}
-	db.Offset(offset).Limit(numOfChat).Where("actual_user_id=?",userId).Find(&chatDetail)
-	return chatDetail,"Ok"
+	db.Limit(numOfChat).Where("actual_user_id=? AND created_at>?",userId,date).Find(&chatDetail)
+	userId2:=make([]string,0)
+	for _,c:=range chatDetail{
+		u:=[]ChatDetail{}
+		db.Not("actual_user_id=?",c.ActualUserId).Find(&u)
+		// fmt.Println(u)
+		if(len(u)!=1){
+			userId2=append(userId2,"")
+		}else{
+			userId2=append(userId2,u[0].ActualUserId)	
+		}
+		
+	}
+	return userId2,chatDetail,"Ok"
 }
 
 func GetChatByMessageId(messageId []string)([]Chat){

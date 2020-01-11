@@ -17,14 +17,15 @@ func SendChat(w http.ResponseWriter,chat []Chat){
 	}
 }
 
-func SendChatDetail(w http.ResponseWriter, chatDetail []ChatDetail,statusCode int){
+func SendChatDetail(w http.ResponseWriter, chatDetail []ChatDetail,userId2 []string,statusCode int){
 	w.Header().Set("Content-Type", "application/json")
 	msg:=util.GetMessageDecode(statusCode)
 	chatDetailResponse:=[]ChatDetailResponse{}
-	for _,c:=range chatDetail{
+	for i,c:=range chatDetail{
 		temp:=ChatDetailResponse{}
 		// temp.UserId=c.TempUserId
 		temp.UserId=c.ActualUserId
+		temp.UserId2=userId2[i]
 		temp.ChatId=c.ChatId
 		temp.ChatType=c.ChatType
 		temp.CreatedAt=c.CreatedAt

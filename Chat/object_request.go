@@ -5,7 +5,7 @@ type GetChatDetailHeader struct{
 }
 
 type ChatDetailDs struct{
-	Offset int `json:"Offset"`
+	CreatedAt string `json:"CreatedAt"`
 	NumOfChat int `json:"NumOfChat"`
 }
 type GetChatHeader struct{

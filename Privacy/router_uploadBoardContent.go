@@ -1,4 +1,4 @@
-package Profile
+package Privacy
 
 import(
 	"fmt"
@@ -10,8 +10,8 @@ import(
    util "miti-microservices/Util"
 )
 
-func CreatePrimaryTrustChain(w http.ResponseWriter, r *http.Request){
-	header:=CreatePrimaryTrustChainHeader{}
+func UploadBoardContent(w http.ResponseWriter, r *http.Request){
+	header:=UploadBoardContentHeader{}
 	util.GetHeader(r,&header)
 
 
@@ -30,27 +30,28 @@ func CreatePrimaryTrustChain(w http.ResponseWriter, r *http.Request){
 		return 
 	}
 	
-	primaryTrustChainRequest:=CreatePrimaryTrustChainRequest{}
-	profileRequestErr:=json.Unmarshal(requestBody,&primaryTrustChainRequest)
+	uploadBoardContentRequest:=UploadBoardContentRequest{}
+	profileRequestErr:=json.Unmarshal(requestBody,&uploadBoardContentRequest)
 	if profileRequestErr!=nil{
 		fmt.Println("Could not Unmarshall profile data")
 		util.Message(w,1001)
 		return
 	}
-	// primaryTrustChainRequest.UserId=userId
-	if(primaryTrustChainRequest.Id>6 || primaryTrustChainRequest.Id<1){
+	date:=uploadBoardContentRequest.Date
+	boardId:=GetBoardId(userId,date)
+	requestId:=uploadBoardContentRequest.RequestId
+	text:=uploadBoardContentRequest.ContentText
+	imageId:=uploadBoardContentRequest.ContentImageId
+	if(text=="" || imageId==""){
 		util.Message(w,1002)
-		return
 	}
-	requestId:=primaryTrustChainRequest.RequestId
-	updatedAt:=util.GetTime()
-	id:=primaryTrustChainRequest.Id
-	phone:=primaryTrustChainRequest.Phone
-	updatedAt=UpdatePrimaryTrustChain(userId,id,phone,requestId,updatedAt)
+	contentId:=util.GenerateToken()
+	createdAt:=util.GetTime()
+	createdAt=EnterBoardContent(userId,boardId,text,imageId,contentId,requestId,createdAt)
 
 	w.Header().Set("Content-Type", "application/json")
 	msg:=util.GetMessageDecode(200)
-	p:=&CreatePrimaryTrustChainResponse{Code:200,Message:msg,RequestId:requestId,UpdatedAt:updatedAt}
+	p:=&UploadBoardContentResponse{Code:200,Message:msg,RequestId:requestId,CreatedAt:createdAt,BoardId:boardId}
 	enc := json.NewEncoder(w)
 	err= enc.Encode(p)
 	if err != nil {

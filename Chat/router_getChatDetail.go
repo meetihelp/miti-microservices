@@ -42,12 +42,12 @@ func GetChatDetailroute(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	chatDetail,chatDetailErr:=GetChatDetail(userId,chatDetailDs.Offset,chatDetailDs.NumOfChat)
+	userId2,chatDetail,chatDetailErr:=GetChatDetail(userId,chatDetailDs.CreatedAt,chatDetailDs.NumOfChat)
 	if chatDetailErr=="Error"{
-		SendChatDetail(w,chatDetail,7000)
+		SendChatDetail(w,chatDetail,userId2,7000)
 		return
 	}else{
-		SendChatDetail(w,chatDetail,200)
+		SendChatDetail(w,chatDetail,userId2,200)
 		return
 	}
 }

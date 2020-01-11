@@ -1,4 +1,4 @@
-package Profile
+package Privacy
 
 import(
 	"fmt"
@@ -10,8 +10,8 @@ import(
    util "miti-microservices/Util"
 )
 
-func DeletePrimaryTrustChain(w http.ResponseWriter, r *http.Request){
-	header:=DeletePrimaryTrustChainHeader{}
+func ShareBoard(w http.ResponseWriter, r *http.Request){
+	header:=ShareBoardHeader{}
 	util.GetHeader(r,&header)
 
 
@@ -30,25 +30,23 @@ func DeletePrimaryTrustChain(w http.ResponseWriter, r *http.Request){
 		return 
 	}
 	
-	deletePrimaryTrustChainRequest:=DeletePrimaryTrustChainRequest{}
-	profileRequestErr:=json.Unmarshal(requestBody,&deletePrimaryTrustChainRequest)
+	shareBoardRequest:=ShareBoardRequest{}
+	profileRequestErr:=json.Unmarshal(requestBody,&shareBoardRequest)
 	if profileRequestErr!=nil{
 		fmt.Println("Could not Unmarshall profile data")
 		util.Message(w,1001)
 		return
 	}
-	// primaryTrustChain.UserId=userId
-	// DeletePrimaryTrustChain(primaryTrustChain)
-	// util.Message(w,200)
+	
+	boardId:=shareBoardRequest.BoardId
+	accessType:=shareBoardRequest.AccessType
+	requestId:=shareBoardRequest.RequestId
 
-	requestId:=deletePrimaryTrustChainRequest.RequestId
-	updatedAt:=util.GetTime()
-	id:=deletePrimaryTrustChainRequest.Id
-	updatedAt=DeletePrimaryTrustChainDB(userId,id,requestId,updatedAt)
+	updatedAt:=UpdateBoardSharePolicy(userId,boardId,accessType,requestId)
 
 	w.Header().Set("Content-Type", "application/json")
 	msg:=util.GetMessageDecode(200)
-	p:=&DeletePrimaryTrustChainResponse{Code:200,Message:msg,RequestId:requestId,UpdatedAt:updatedAt}
+	p:=&ShareBoardResponse{Code:200,Message:msg,RequestId:requestId,UpdatedAt:updatedAt}
 	enc := json.NewEncoder(w)
 	err= enc.Encode(p)
 	if err != nil {
