@@ -38,7 +38,9 @@ func UploadBoardContent(w http.ResponseWriter, r *http.Request){
 		return
 	}
 	date:=uploadBoardContentRequest.Date
-	boardId:=GetBoardId(userId,date)
+	boardId:=uploadBoardContentRequest.BoardId
+	// boardId:=GetBoardId(userId,date)
+	CreateBoard(userId,date,boardId)
 	requestId:=uploadBoardContentRequest.RequestId
 	text:=uploadBoardContentRequest.ContentText
 	imageId:=uploadBoardContentRequest.ContentImageId
@@ -47,11 +49,12 @@ func UploadBoardContent(w http.ResponseWriter, r *http.Request){
 	}
 	contentId:=util.GenerateToken()
 	createdAt:=util.GetTime()
-	createdAt=EnterBoardContent(userId,boardId,text,imageId,contentId,requestId,createdAt)
+	createdAt,contentId=EnterBoardContent(userId,boardId,text,imageId,contentId,requestId,createdAt)
 
 	w.Header().Set("Content-Type", "application/json")
 	msg:=util.GetMessageDecode(200)
-	p:=&UploadBoardContentResponse{Code:200,Message:msg,RequestId:requestId,CreatedAt:createdAt,BoardId:boardId}
+	p:=&UploadBoardContentResponse{Code:200,Message:msg,RequestId:requestId,
+			CreatedAt:createdAt,BoardId:boardId,ContentId:contentId}
 	enc := json.NewEncoder(w)
 	err= enc.Encode(p)
 	if err != nil {

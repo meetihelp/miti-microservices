@@ -1,6 +1,6 @@
 package Authentication
 import (
-	database "miti-microservices/Database"
+	// database "miti-microservices/Database"
 )
 
 
@@ -45,10 +45,10 @@ type ForgetPasswordStatus struct{
 	VerificationStatus string `gorm:"type:varchar" json:"VerificationStatus"`
 }
 func init(){	
-	db:=database.GetDB()
-	db.AutoMigrate(&User{})
-	db.AutoMigrate(&OTPVerification{})
-	db.AutoMigrate(&EmailVerification{})
-	// db.AutoMigrate(&AnonymousUser{})
-	db.AutoMigrate(&ForgetPasswordStatus{})
+	// db:=database.GetDB()
+	// db.AutoMigrate(&User{})
+	// db.AutoMigrate(&OTPVerification{})
+	// db.AutoMigrate(&EmailVerification{})
+	// // db.AutoMigrate(&AnonymousUser{})
+	// db.AutoMigrate(&ForgetPasswordStatus{})
 }

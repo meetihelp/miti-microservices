@@ -4,7 +4,7 @@ import(
 	util "miti-microservices/Util"
 	database "miti-microservices/Database"
 	// "time"
-	// "fmt"
+	"fmt"
 )
 
 func GetChatMessages(chatId string,offset int,numOfRows int)([]Chat){
@@ -47,13 +47,21 @@ func GetChatDetail(userId string,date string,numOfChat int) ([]string,[]ChatDeta
 	userId2:=make([]string,0)
 	for _,c:=range chatDetail{
 		u:=[]ChatDetail{}
-		db.Not("actual_user_id=?",c.ActualUserId).Find(&u)
-		// fmt.Println(u)
-		if(len(u)!=1){
+		db.Where("chat_id=?",c.ChatId).Find(&u)
+		fmt.Println(u)
+		if(len(u)==0){
 			userId2=append(userId2,"")
+		}else if(u[0].ActualUserId==userId){
+			userId2=append(userId2,u[1].ActualUserId)	
 		}else{
-			userId2=append(userId2,u[0].ActualUserId)	
+			userId2=append(userId2,u[0].ActualUserId)
 		}
+		// fmt.Println(u)
+		// if(len(u)!=1){
+		// 	userId2=append(userId2,"")
+		// }else{
+		// 	userId2=append(userId2,u[0].ActualUserId)	
+		// }
 		
 	}
 	return userId2,chatDetail,"Ok"
@@ -153,4 +161,41 @@ func GetTempUserIdFromChatId(userId string,chatId string) string{
 	anonymousUser:=AnonymousUserHelper{}
 	db.Table("anonymous_users").Where("user_id=? AND chat_id=?",userId,chatId).Find(&anonymousUser)
 	return anonymousUser.AnonymousId
+}
+
+func InsertMessageRequestDB(userId string,phone string,requestId string,messageType string,messageContent string,createdAt string) string{
+	db:=database.GetDB()
+	messageRequest:=MessageRequest{}
+	db.Where("user_id=? AND phone=?",userId,phone).Find(&messageRequest)
+	if(messageRequest.UserId==""){
+		userPhone:=""
+		db.Table("users").Select("phone").Where("user_id=?",userId).Find(&userPhone)
+		messageRequest.UserId=userId
+		messageRequest.Phone=phone
+		messageRequest.RequestId=requestId
+		messageRequest.MessageType=messageType
+		messageRequest.MessageContent=messageContent
+		messageRequest.CreatedAt=createdAt
+		db.Create(&messageRequest)
+		return createdAt
+	}else{
+		return messageRequest.CreatedAt
+	}
+}
+
+func GetMessageRequestDB(userId string) []MessageRequestDS{
+	db:=database.GetDB()
+	phone:=""
+	db.Table("users").Select("phone").Where("user_id=?",userId).Find(&phone)
+	messageRequest:=[]MessageRequest{}
+	db.Where("phone=?",phone).Find(&messageRequest)
+	messageRequestDS:=make([]MessageRequestDS,0)
+	for _,mr:=range messageRequest{
+		MRTemp:=MessageRequestDS{}
+		MRTemp.Phone=mr.UserPhone
+		MRTemp.UserId=mr.UserId
+		MRTemp.CreatedAt=mr.CreatedAt
+		messageRequestDS=append(messageRequestDS,MRTemp)
+	}
+	return messageRequestDS
 }

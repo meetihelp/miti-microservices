@@ -1,7 +1,7 @@
 package NewsFeed
 
 import(
-	database "miti-microservices/Database"
+	// database "miti-microservices/Database"
 )
 
 type News struct{
@@ -53,10 +53,10 @@ type NewsFeedReaction struct{
 }
 
 func init(){
-	db:=database.GetDB()
-	db.AutoMigrate(&News{})
-	// db.AutoMigrate(&NewsFeed{})
-	// db.AutoMigrate(&NewsFeedSummary{})
-	// db.AutoMigrate(&NewsFeedArticle{})
-	db.AutoMigrate(&NewsFeedReaction{})
+	// db:=database.GetDB()
+	// db.AutoMigrate(&News{})
+	// // db.AutoMigrate(&NewsFeed{})
+	// // db.AutoMigrate(&NewsFeedSummary{})
+	// // db.AutoMigrate(&NewsFeedArticle{})
+	// db.AutoMigrate(&NewsFeedReaction{})
 }

@@ -43,3 +43,17 @@ type SendChatImageHeader struct{
 	RequestId string `header:"RequestId"`
 	ChatId string `header:"ChatId"`
 }
+
+type SendMessageRequestHeader struct{
+	Cookie string `header:"Miti-Cookie"`
+}
+type SendMessageRequestDS struct{
+	RequestId string `json:"RequestId"`
+	MessageContent string `json:"MessageContent"`
+	MessageType string `json:"MessageType"`
+	Phone string `json:"Phone"`
+}
+
+type GetMessageRequestHeader struct{
+	Cookie string `header:"Miti-Cookie"`
+}

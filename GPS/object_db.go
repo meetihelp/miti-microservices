@@ -1,7 +1,7 @@
 package GPS
 
 import(
-	database "miti-microservices/Database"
+	// database "miti-microservices/Database"
 )
 
 type Location struct{
@@ -26,7 +26,7 @@ type EventLocation struct{
 }
 
 func init(){
-	db:=database.GetDB()
-	db.AutoMigrate(&UserLocation{})
-	db.AutoMigrate(&EventLocation{})
+	// db:=database.GetDB()
+	// db.AutoMigrate(&UserLocation{})
+	// db.AutoMigrate(&EventLocation{})
 }

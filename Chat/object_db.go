@@ -3,7 +3,7 @@
 import (
 	// "log"
 	// "fmt"
-	database "miti-microservices/Database"
+	// database "miti-microservices/Database"
 	// "time"
 	// "github.com/jinzhu/gorm"
  // _ 	"github.com/jinzhu/gorm/dialects/postgres"
@@ -18,6 +18,17 @@ type ChatDetail struct{
 	LastUpdate string `gorm:"varchar(100)" json:"LastUpdate"`
 	UserIndex int `gorm:"type:int" json:"Index"`
 	Name string `gorm:"type:varchar" json:"Name"`
+}
+type MessageRequest struct{
+	UserId string `gorm:"primary_key;type:varchar" json:"UserId"`
+	UserPhone string `gorm:"type:varchar" json:"UserPhone"`
+	Phone string `gorm:"primary_key;type:varchar" json:"Phone"`
+	RequestId string `gorm:"varchar" json:"RequestId"`
+	AcceptStatus string `gorm:"varchar" json:"AcceptStatus"`
+	MessageType string `gorm:"varchar"  json:"MessageType"`
+	MessageContent string `gorm:"varchar"  json:"MessageContent"`
+	CreatedAt string `gorm:"varchar" json:"CreatedAt"`
+
 }
 type Chat struct{
 	UserId string `gorm:"varchar(100)"  json:"UserId"`
@@ -36,8 +47,8 @@ type ReadBy struct{
 }
 
 func init(){	
-	db:=database.GetDB()
-	db.AutoMigrate(&ChatDetail{})
-	db.AutoMigrate(&Chat{})
-	db.AutoMigrate(&ReadBy{})
+	// db:=database.GetDB()
+	// db.AutoMigrate(&ChatDetail{})
+	// db.AutoMigrate(&Chat{})
+	// db.AutoMigrate(&ReadBy{})
 }

@@ -2,7 +2,7 @@ package Util
 import (
 	// "log"
 	// "fmt"
-	database "miti-microservices/Database"
+	// database "miti-microservices/Database"
 	// "time"
 	// "github.com/jinzhu/gorm"
  // _ 	"github.com/jinzhu/gorm/dialects/postgres"
@@ -38,9 +38,9 @@ type Match struct{
 // 	CreatedAt string `gorm:"type:varchar" json:"CreatedAt"`
 // }
 func init(){
-	db:=database.GetDB()
-	db.AutoMigrate(&Session{})
-	db.AutoMigrate(&TemporarySession{})
-	// db.AutoMigrate(&Match{})
-	// db.AutoMigrate(&OTPVerification{})
+	// db:=database.GetDB()
+	// db.AutoMigrate(&Session{})
+	// db.AutoMigrate(&TemporarySession{})
+	// // db.AutoMigrate(&Match{})
+	// // db.AutoMigrate(&OTPVerification{})
 }

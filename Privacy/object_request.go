@@ -9,6 +9,7 @@ type UploadBoardContentRequest struct{
 	Date string `json:"RequestId"`
 	ContentText string `json:"ContentText"`
 	ContentImageId string `json:"ContentImageId"`
+	BoardId string `json:"BoardId"`
 }
 
 type ShareBoardHeader struct{
@@ -19,4 +20,15 @@ type ShareBoardRequest struct{
 	RequestId string `json:"RequestId"`
 	BoardId string `json:"BoardId"`
 	AccessType string `json:"AccessType"`
+}
+
+type ShareBoardContentHeader struct{
+	Cookie string `header:"Miti-Cookie"`
+}
+
+type ShareBoardContentRequest struct{
+	BoardId string `json:"BoardId"`
+	AccessType string `json:"AccessType"`
+	ContentId string `json:"ContentId"`
+	AccessRequestId string `json:"AccessRequestId"`
 }

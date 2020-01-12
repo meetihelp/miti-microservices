@@ -97,7 +97,9 @@ func getCloudFrontCredentials() (string,*rsa.PrivateKey){
 	privKey,_:=sign.LoadPEMPrivKeyFile(PrivKeyFileName)
 	return keyID,privKey
 }
-func GetSignedURL(rawURL string,expireDuration time.Duration) string{
+func GetSignedURL(filename string,expireDuration time.Duration) string{
+	dns:=os.Getenv("privateimage_cloudfrontdns")
+	rawURL:=dns+"/"+filename
 	keyID,privKey:=getCloudFrontCredentials()
 	signer := sign.NewURLSigner(keyID, privKey)
 	signedURL, err := signer.Sign(rawURL, time.Now().Add(expireDuration*time.Hour))
@@ -105,6 +107,11 @@ func GetSignedURL(rawURL string,expireDuration time.Duration) string{
 	    log.Fatalf("Failed to sign url, err: %s\n", err.Error())
 	}
 	return signedURL
+}
+func GetPublicImageURL(filename string) string{
+	dns:=os.Getenv("publicimage_cloudfrontdns")
+	url:=dns+"/"+filename
+	return url
 }
 
 func GetPublicImageBucket() string{

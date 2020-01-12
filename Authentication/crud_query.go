@@ -430,7 +430,7 @@ func CheckPhoneNumberStatusDB(getPhoneStatusRequest GetPhoneStatusRequest) ([]in
 	phoneStatusList:=make([]int,0)
 	for _,p:=range phone{
 		user:=User{}
-		db.Table("users").Where("phone=?",p).Find(&user)
+		db.Table("users").Where("phone=?",p.Phone).Find(&user)
 		if(user.UserId==""){
 			phoneStatusList=append(phoneStatusList,0)
 		}else{

@@ -27,10 +27,12 @@ type BoardContent struct{
 	AccessType string `gorm:"type:varchar" json:"AccessType"`
 	CreatedAt string `gorm:"type:varchar" json:"CreatedAt"`
 	RequestId string `gorm:"type:varchar" json:"RequestId"`
+	AccessRequestId string `gorm:"type:varchar" json:"AccessRequestId"`
+	AccessUpdatedAt string `gorm:"type:varchar" json:"AccessUpdatedAt"`
 }
 
 func init(){
 	db:=database.GetDB()
 	db.AutoMigrate(&Board{})
-	db.AutoMigrate(&BoardContent{})
+	// db.AutoMigrate(&BoardContent{})
 }

@@ -60,6 +60,8 @@ func Server(runMethod string){
 	r.HandleFunc("/chat",apnachat.ChatInsert).Methods("POST")
 	r.HandleFunc("/getChatAfterIndex",apnachat.GetChatAfterIndex).Methods("POST")
 	r.HandleFunc("/sendChatImage",apnachat.SendChatImage).Methods("POST")
+	r.HandleFunc("/sendMessageRequest",apnachat.SendMessageRequest).Methods("POST")
+	r.HandleFunc("/getMessageRequest",apnachat.GetMessageRequest).Methods("GET")
 
 
 	//Profile related APIs
@@ -85,6 +87,7 @@ func Server(runMethod string){
 	//Privacy Related APIs
 	r.HandleFunc("/uploadBoardContent",privacy.UploadBoardContent).Methods("POST")
 	r.HandleFunc("/shareBoard",privacy.ShareBoard).Methods("POST")
+	r.HandleFunc("/shareBoardContnet",privacy.ShareBoardContent).Methods("POST")
 	
 	
 	//GPS related APIs
@@ -98,7 +101,7 @@ func Server(runMethod string){
 
 	// //Image related APIs
 	r.HandleFunc("/uploadImage",image.UploadImage).Methods("POST")
-	// r.HandleFunc("/getImageById",image.GetImageById).Methods("POST")
+	r.HandleFunc("/getImageById",image.GetImageById).Methods("POST")
 	// r.HandleFunc("/uploadProfilePic",image.UploadProfilePic).Methods("POST")
 	// r.HandleFunc("/getEventImageList",image.GetEventImageList).Methods("POST")
 	// r.HandleFunc("/getUserImageList",image.GetUserImageList).Methods("POST")

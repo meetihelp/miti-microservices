@@ -23,6 +23,33 @@ func GetUserImageListDB(userId string) ([]string){
 	return imageList
 }
 
+func IsUserPermittedToSeeImage(userId string,imageId string) (string,string){
+	db:=database.GetDB()
+	userImage:=UserImage{}
+	db.Where("image_id=?",imageId).Find(&userImage)
+	if(userImage.AccessType=="Public"){
+		return userImage.UserId,"Ok"
+	}else{
+		// Write Code to check if user is permitted
+		return userImage.UserId,"Ok"
+	}
+}
+
+func GetImageURL(userId string,imageId string) string{
+	db:=database.GetDB()
+	userImage:=UserImage{}
+	db.Where("user_id=? AND image_id=?",userId,imageId).Find(&userImage)
+	filename:=userImage.GeneratedName+"."+userImage.Format
+	if(userImage.AccessType=="Private"){
+		signedURL:=GetSignedURL(filename,10)
+		return signedURL
+	}else if(userImage.AccessType=="Public"){
+		url:=GetPublicImageURL(filename)
+		return url
+	}else{
+		return ""
+	}
+}
 func GetEventImageListDB(eventId string) ([]string){
 	db:=database.GetDB()
 	eventImage:=[]EventImage{}

@@ -1,7 +1,7 @@
 package Social
 
 import(
-	database "miti-microservices/Database"
+	// database "miti-microservices/Database"
 )
 type Pool struct{
 	UserId string `gorm:"primary_key;type:varchar" json:"UserId"`
@@ -55,10 +55,10 @@ type PoolLog struct{
 }
 
 func init(){
-	db:=database.GetDB()
-	db.AutoMigrate(&Pool{})
-	db.AutoMigrate(&PoolWaiting{})
-	db.AutoMigrate(&UserPool{})
-	db.AutoMigrate(&PoolStatus{})
-	db.AutoMigrate(&PoolLog{})
+	// db:=database.GetDB()
+	// db.AutoMigrate(&Pool{})
+	// db.AutoMigrate(&PoolWaiting{})
+	// db.AutoMigrate(&UserPool{})
+	// db.AutoMigrate(&PoolStatus{})
+	// db.AutoMigrate(&PoolLog{})
 }

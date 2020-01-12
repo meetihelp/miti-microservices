@@ -1,7 +1,7 @@
 package Event
 
 import(
-	database "miti-microservices/Database"
+	// database "miti-microservices/Database"
 )
 
 type Event struct{
@@ -17,6 +17,6 @@ type Event struct{
 }
 
 func init(){
-	db:=database.GetDB()
-	db.AutoMigrate(&Event{})
+	// db:=database.GetDB()
+	// db.AutoMigrate(&Event{})
 }

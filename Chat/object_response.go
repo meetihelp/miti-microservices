@@ -39,3 +39,22 @@ type SendChatImageResponse struct{
 	CreatedAt string `json:"CreatedAt"`
 	MessageType string `json:""MessageType`
 }
+
+type SendMessageRequestResponse struct{
+	Code int `json:"Code`
+	Message string `json:"Message"`
+	RequestId string `json:"RequestId"`
+	CreatedAt string `json:"CreatedAt"`
+}
+
+type GetMessageRequestResponse struct{
+	Code int `json:"Code`
+	Message string `json:"Message"`
+	RequestList []MessageRequestDS `json:"RequestList"`
+}
+
+type MessageRequestDS struct{
+	UserId string `json:"UserId"`
+	Phone string `json:"Phone"`
+	CreatedAt string `json:"CreatedAt"`
+}

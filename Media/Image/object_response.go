@@ -13,3 +13,9 @@ type UploadImageResponse struct{
 	URL string `json:"URL"`
 	RequestId string `json:"RequstId"`
 }
+
+type GetImageByIdResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	ImageURL string `json:"ImageURL"`
+}
