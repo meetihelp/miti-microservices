@@ -6,7 +6,7 @@ type UploadBoardContentHeader struct{
 
 type UploadBoardContentRequest struct{
 	RequestId string `json:"RequestId"`
-	Date string `json:"RequestId"`
+	Date string `json:"Date"`
 	ContentText string `json:"ContentText"`
 	ContentImageId string `json:"ContentImageId"`
 	BoardId string `json:"BoardId"`

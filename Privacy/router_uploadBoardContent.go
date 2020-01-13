@@ -44,8 +44,9 @@ func UploadBoardContent(w http.ResponseWriter, r *http.Request){
 	requestId:=uploadBoardContentRequest.RequestId
 	text:=uploadBoardContentRequest.ContentText
 	imageId:=uploadBoardContentRequest.ContentImageId
-	if(text=="" || imageId==""){
+	if(text=="" && imageId==""){
 		util.Message(w,1002)
+		return
 	}
 	contentId:=util.GenerateToken()
 	createdAt:=util.GetTime()

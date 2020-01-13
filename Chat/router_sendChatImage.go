@@ -107,6 +107,8 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 		}
 	}
 
+
+	code:=200
 	if(imageUploadStatus=="Yes"){
 		chat:=Chat{}
 		chat.UserId=userId
@@ -126,11 +128,13 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 				return
 			}
 		}
+	}else{
+		code=3001
 	}
 	
 
 
-	code:=200
+	
 	msg:=util.GetMessageDecode(code)
 	w.Header().Set("Content-Type", "application/json")
 	// p:=&UploadImageResponse{Code:code,Message:msg,ImageId:imageId,URL:url}
