@@ -14,6 +14,13 @@ func GetChatMessages(chatId string,offset int,numOfRows int)([]Chat){
 	return chat
 }
 
+func GetChatByRequestId(userId string,requestId string)Chat{
+	db:=database.GetDB()
+	chat:=Chat{}
+	db.Where("user_id=? AND request_id=?",userId,requestId).Find(&chat)
+	return chat
+}
+
 func ChatInsertDB(chatData Chat) Chat {
 	// index:=GetLastChatIndex(chatData.ChatId)
 	// index=index+1

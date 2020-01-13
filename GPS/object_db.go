@@ -1,7 +1,7 @@
 package GPS
 
 import(
-	// database "miti-microservices/Database"
+	database "miti-microservices/Database"
 )
 
 type Location struct{
@@ -25,8 +25,35 @@ type EventLocation struct{
 	City string `gorm:"type:varchar" json:"City"`
 }
 
+type LocationMean struct{
+	City string `gorm:"type:varchar" json:"City"`
+	Latitude string `gorm:"type:varchar" json:"Latitude"`
+	Longitude string `gorm:"type:varchar" json:"Longitude"`
+}
+
+type CityPincode struct{
+	OfficeName string `gorm:"type:varchar" json:"OfficeName"`
+	Pincode string `gorm:"type:varchar" json:"Pincode"`
+	OfficeType string `gorm:"type:varchar" json:"OfficeType"`
+	DeliveryStatus string `gorm:"type:varchar" json:"DeliveryStatus"`
+	DivisionName string `gorm:"type:varchar" json:"DivisionName"`
+	RegionName string `gorm:"type:varchar" json:"RegionName"`
+	CircleName string `gorm:"type:varchar" json:"CircleName"`
+	Taluk string `gorm:"type:varchar" json:"Taluk"`
+	DistrictName string `gorm:"type:varchar" json:"DistrictName"`
+	StateName string `gorm:"type:varchar" json:"StateName"`
+	Telephone string `gorm:"type:varchar" json:"Telephone"`
+	RelatedSuboffice string `gorm:"type:varchar" json:"RelatedSuboffice"`
+	RelatedHeadoffice string `gorm:"type:varchar" json:"RelatedHeadoffice"`
+	Latitude string `gorm:"type:varchar" json:"Latitude"`
+	Longitude string `gorm:"type:varchar" json:"Longitude"`
+}
+
 func init(){
-	// db:=database.GetDB()
+	db:=database.GetDB()
 	// db.AutoMigrate(&UserLocation{})
 	// db.AutoMigrate(&EventLocation{})
+	// db.AutoMigrate(&LocationMean{})
+	db.AutoMigrate(&CityPincode{})
+
 }

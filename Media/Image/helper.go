@@ -15,7 +15,7 @@ import(
     "time"
 	"crypto/rsa"
 
-	// "fmt"
+	"fmt"
 )
 
 const (
@@ -66,6 +66,7 @@ func CreateImageFile() (string,*os.File){
 }
 
 func UploadToS3(buffer []byte,filename string,bucket string,format string) (int,error){
+	fmt.Println("Enter UploadToS3")
 	 s, err := session.NewSession(&aws.Config{Region: aws.String(S3_REGION)})
     if err != nil {
         log.Fatal(err)
@@ -74,7 +75,7 @@ func UploadToS3(buffer []byte,filename string,bucket string,format string) (int,
     imageType:="image/"+format
     // size:=buffer.Len()
     if(bucket==""){
-    	bucket="mymititestbucket"
+    	bucket=GetPrivateImageBucket()
     }
 	_, err = s3.New(s).PutObject(&s3.PutObjectInput{
         Bucket:               aws.String(bucket),
@@ -87,6 +88,8 @@ func UploadToS3(buffer []byte,filename string,bucket string,format string) (int,
         // ContentDisposition:   aws.String("image/png"),
         ServerSideEncryption: aws.String("AES256"),
     })
+    fmt.Print("Error UploadS3:")
+    fmt.Println(err)
     return int(size),err
 }
 
@@ -116,11 +119,13 @@ func GetPublicImageURL(filename string) string{
 
 func GetPublicImageBucket() string{
 	bucket:=os.Getenv("PublicImageBucket")
+	fmt.Println("GetPublicImageBucket:"+bucket)
 	return bucket
 }
 
 func GetPrivateImageBucket()string{
 	bucket:=os.Getenv("PrivateImageBucket")
+	fmt.Println("GetPrivateImageBucket:"+bucket)
 	return bucket
 }
 

@@ -3,6 +3,7 @@ package GPS
 import(
 	util "miti-microservices/Util"
 	database "miti-microservices/Database"
+	"math"
 	// "time"
 	// "fmt"
 )
@@ -28,6 +29,8 @@ func GetUserListByLocationDB(location Location,distance float64) ([]string){
 func UpdateUserLocationDB(userId string,location Location){
 	db:=database.GetDB()
 	city:=GetCity(location)
+	pincode:=GetPincode(location,city)
+	db.Table("profiles").Where("user_id=?",userId).Update("pincode",pincode)
 	userLocation:=UserLocation{}
 	db.Where("user_id=?",userId).Find(&userLocation)
 	if userLocation.UserId==""{
@@ -74,4 +77,54 @@ func InsertEventLocation(eventId string,eventType string,latitude string,longitu
 	eventLocation.City=GetCity(location)
 	db.Create(&eventLocation)
 	return "Ok"
+}
+
+func GetCity(location Location) string{
+	db:=database.GetDB()
+	locationCity:=Location{}
+	min_distance:=math.MaxFloat64
+	min_city:="Could Not Find"
+
+	cityList:=[]LocationMean{}
+	db.Find(&cityList)
+
+	for _,locationMean:=range cityList{
+		locationCity.Latitude=locationMean.Latitude
+		locationCity.Longitude=locationMean.Longitude
+		if(locationCity.Latitude=="NA" || locationCity.Longitude=="NA"){
+			// dis:=math.MaxFloat64
+		}else{
+			dis:=CalculateDistance(location,locationCity)
+			if(dis<min_distance){
+				min_distance=dis
+				min_city=locationMean.City
+			}	
+		}
+		
+	}
+	return min_city
+}
+
+func GetPincode(location Location,city string) string{
+	db:=database.GetDB()
+	cityPincode:=[]CityPincode{}
+	db.Table("city_pincode").Where("region_name=? OR ditrict_name=?",city,city).Find(&cityPincode)
+	locationRegion:=Location{}
+	min_distance:=math.MaxFloat64
+	pincode:="Could Not Find"
+	for _,c:=range cityPincode{
+		locationRegion.Latitude=c.Latitude
+		locationRegion.Longitude=c.Longitude
+		if(locationRegion.Latitude=="NA" || locationRegion.Longitude=="NA"){
+			// dis:=math.MaxFloat64
+		}else{
+			dis:=CalculateDistance(location,locationRegion)	
+			if(dis<min_distance){
+				min_distance=dis
+				pincode=c.Pincode
+			}
+		}
+		
+	}
+	return pincode
 }

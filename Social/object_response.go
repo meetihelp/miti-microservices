@@ -8,3 +8,10 @@ type PoolStatusResponse struct{
 	CreatedAt string `json:"CreatedAt"`
 	MatchTime string `json:"MatchTime"`
 }
+
+type GetInGroupPoolResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	CreatedAt string `json:"CreatedAt"`
+	RequestId string `json:"RequestId"`
+}

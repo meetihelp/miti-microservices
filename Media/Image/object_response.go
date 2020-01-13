@@ -12,6 +12,7 @@ type UploadImageResponse struct{
 	ImageId string `json:"ImageId"`
 	URL string `json:"URL"`
 	RequestId string `json:"RequstId"`
+	CreatedAt string `json:"CreatedAt"`
 }
 
 type GetImageByIdResponse struct{

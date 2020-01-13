@@ -32,9 +32,9 @@ type UploadImageHeader struct{
 	AccessType string `header:"Access-Type"`
 	ActualFileName string `header:"Actual-Filename"`
 	Format string `header:"Format"`
-	Latitude string `header:"Latitutde"`
+	Latitude string `header:"Latitude"`
 	Longitude string `header:"Longitude"`
 	Dimension string `header:"Dimension"`
-	RequestId string `header:"RequestId"`
+	RequestId string `header:"Request-Id"`
 }
 

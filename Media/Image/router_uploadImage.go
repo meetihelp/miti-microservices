@@ -26,7 +26,9 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 	longitude:=uploadImageHeader.Longitude
 	dimension:=uploadImageHeader.Dimension
 	requestId:=uploadImageHeader.RequestId
+	fmt.Println(uploadImageHeader)
 	userId,getChatStatus:=util.GetUserIdFromSession(sessionId)
+	fmt.Println("Enter upload Image:"+userId)
 	// fmt.Println(userId)
 	if getChatStatus=="Error"{
 		util.Message(w,1003)
@@ -35,6 +37,7 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 
 	url:=""
 	userImageData,status:=GetUserImageByRequestId(userId,requestId)
+	fmt.Println("Status:"+status)
 	if(status=="Error"){
 		file, _, err := r.FormFile("myFile")
 	    if err != nil {
@@ -89,21 +92,25 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 				url=PublicCloudFront+"/"+filename
 			}
 	
-	}
-
-	
-		code:=200
-		msg:=util.GetMessageDecode(code)
-		w.Header().Set("Content-Type", "application/json")
-		p:=&UploadImageResponse{Code:code,Message:msg,ImageId:userImageData.ImageId,URL:url,RequestId:userImageData.RequestId}
-		enc := json.NewEncoder(w)
-		err= enc.Encode(p)
-		if err != nil {
-			log.Fatal(err)
 		}
 		// uploadImageResponse.Code=200
 		// uploadImageResponse.Message=util.GetMessageDecode(200)
 		// uploadImageResponse.URL=signedURL
 		// util.Message(w,200)
+	}else{
+		if(accessType=="Public"){
+			PublicCloudFront:=os.Getenv("publicImageCloudFront")
+			filename:=userImageData.GeneratedName+"."+userImageData.Format
+			url=PublicCloudFront+"/"+filename
+		}
+	}
+	code:=200
+	msg:=util.GetMessageDecode(code)
+	w.Header().Set("Content-Type", "application/json")
+	p:=&UploadImageResponse{Code:code,Message:msg,ImageId:userImageData.ImageId,URL:url,RequestId:userImageData.RequestId,CreatedAt:userImageData.CreatedAt}
+	enc := json.NewEncoder(w)
+	err:= enc.Encode(p)
+	if err != nil {
+		log.Fatal(err)
 	}
 }

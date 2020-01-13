@@ -119,6 +119,9 @@ func Server(runMethod string){
 	//Social related APIs
 	r.HandleFunc("/getPoolStatus",social.PoolStatusRouter).Methods("GET")
 	r.HandleFunc("/getInPool",social.GetInPool).Methods("GET")
+	r.HandleFunc("/cancelPool",social.CancelPoolRouter).Methods("GET")
+	r.HandleFunc("/getInGroupPool",social.GetInGroupPool).Methods("POST")
+	r.HandleFunc("/cancelGroupPool",social.CancelGroupPoolRouter).Methods("GET")
 	
 	http.Handle("/", r)
 	if(runMethod=="Devlopment"){

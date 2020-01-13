@@ -16,15 +16,17 @@ func CalculateDistance(location1 Location,location2 Location) float64{
 	lat2,_:=strconv.ParseFloat(location2.Latitude,64)
 	long2,_:=strconv.ParseFloat(location2.Longitude,64)
 	cos:=math.Cos
-	p:= 0.017453292519943295;
-	distance:= 0.5- cos((lat2 - lat1) * p)/2 + cos(lat1 * p) * cos(lat2 * p) * (1 - cos((long2 - long1) * p))/2;
+	// p:= 0.017453292519943295;
+	p:=math.Pi/180
+	// p:=1.0
+	distance:= (1- cos((lat2 - lat1) * p))/2 + cos(lat1 * p) * cos(lat2 * p) * (1 - cos((long2 - long1) * p))/2;
 	distance=12742 * math.Asin(math.Sqrt(distance));
 	return distance
 }
 
-func GetCity(location Location) string{
-	return "Patna"
-}	
+// func GetCity(location Location) string{
+// 	return "Patna"
+// }	
 
 func SendUserList(w http.ResponseWriter,userList []string){
 	w.Header().Set("Content-Type", "application/json")

@@ -40,8 +40,8 @@ type SendChatImageHeader struct{
 	Latitude string `header:"Latitutde"`
 	Longitude string `header:"Longitude"`
 	Dimension string `header:"Dimension"`
-	RequestId string `header:"RequestId"`
-	ChatId string `header:"ChatId"`
+	RequestId string `header:"Request-Id"`
+	ChatId string `header:"Chat-Id"`
 }
 
 type SendMessageRequestHeader struct{

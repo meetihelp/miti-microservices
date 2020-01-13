@@ -24,9 +24,25 @@ func EnterInPooL(userId string,pincode string,createdAt string,gender string,sex
 	_=db.Create(&poolWait).Error
 }
 
+func EnterInGroupPooL(userId string,pincode string,interest string,createdAt string,gender string,sex string){
+	db:=database.GetDB()
+	poolWait:=GroupPoolWaiting{}
+	poolWait.UserId=userId
+	poolWait.Pincode=pincode
+	poolWait.Interest=interest
+	poolWait.CreatedAt=createdAt
+	poolWait.Gender=gender
+	poolWait.Sex=sex
+	_=db.Create(&poolWait).Error
+}
 func DeleteWaitPool(userId string) {
 	db:=database.GetDB()
 	db.Where("user_id=?",userId).Delete(&PoolWaiting{})
+}
+
+func DeleteWaitGroupPool(userId string) {
+	db:=database.GetDB()
+	db.Where("user_id=?",userId).Delete(&GroupPoolWaiting{})
 }
 
 func DeletePool(userId string,areaCode string,gender string){
@@ -45,10 +61,35 @@ func DeletePool(userId string,areaCode string,gender string){
 	}
 }
 
+func DeleteGroupPool(userId string,areaCode string,gender string){
+	db:=database.GetDB()
+	pool:=Pool{}
+	db.Where("user_id=?",userId).Find(&pool)
+	if(pool.UserId!=""){
+		status:=EnterInGroupPoolFromWait(areaCode,gender,1)
+		Complementary_gender:="Male"
+		if(gender=="Male"){
+			Complementary_gender="Female"
+		}
+		if(status=="NA"){
+			DeleteFromGroupPoolHelper(areaCode,Complementary_gender,1)
+		}
+	}
+}
 func EnterInPoolFromWait(areaCode string,gender string,number_of_person int) string{
 	return "Ok"
+	//Code for checking if user is available to replace the person who cancelled the pooling
+	//and replace the person
 }
 
 func DeleteFromPoolHelper(areaCode string,gender string,number_of_person int){
+	//Delete a user from the pool table and put him/her back to wait pool table
+}
+
+func EnterInGroupPoolFromWait(areaCode string,gender string,number_of_person int) string{
+	return "Ok"
+}
+
+func DeleteFromGroupPoolHelper(areaCode string,gender string,number_of_person int){
 
 }

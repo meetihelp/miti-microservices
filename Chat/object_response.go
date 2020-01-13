@@ -38,6 +38,7 @@ type SendChatImageResponse struct{
 	RequestId string `json:"RequestId"`
 	CreatedAt string `json:"CreatedAt"`
 	MessageType string `json:""MessageType`
+	URL string `json:"URL"`
 }
 
 type SendMessageRequestResponse struct{

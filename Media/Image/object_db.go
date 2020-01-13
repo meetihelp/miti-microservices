@@ -1,11 +1,11 @@
 package Image
 
 import(
-	// database "miti-microservices/Database"
+	database "miti-microservices/Database"
 )
 
 type UserImage struct{
-	UserId string `gorm:"primary_key;varchar(100)"  json:"UserId"`
+	UserId string `gorm:"primary_key;varchar"  json:"UserId"`
 	ImageId string `gorm:"primary_key;type:varchar" json:"ImageId"`
 	AccessType string `gorm:"type:varchar" json:"AccessType"`
 	ActualFileName string `gorm:"type:varchar" json:"ActualFileName"`
@@ -28,7 +28,7 @@ type EventImage struct{
 }
 
 func init(){
-	// db:=database.GetDB()
-	// db.AutoMigrate(&UserImage{})
+	db:=database.GetDB()
+	db.AutoMigrate(&UserImage{})
 	// db.AutoMigrate(&EventImage{})
 }
