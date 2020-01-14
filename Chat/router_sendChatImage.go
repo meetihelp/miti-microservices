@@ -33,13 +33,14 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 	userId,getChatStatus:=util.GetUserIdFromSession(sessionId)
 	// fmt.Println(userId)
 	if getChatStatus=="Error"{
+		fmt.Println("Session Error for SendChatImage")
 		util.Message(w,1003)
 		return
 	}
 
 	file, _, err := r.FormFile("myFile")
     if err != nil {
-        fmt.Println("Error Retrieving the File")
+        fmt.Println("Error Retrieving the File for SendChatImage")
         fmt.Println(err)
         util.Message(w,1002)
         return

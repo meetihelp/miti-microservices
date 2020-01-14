@@ -10,6 +10,8 @@ import(
 func GetChatDetailroute(w http.ResponseWriter, r *http.Request){
 	getChatDetailHeader:=GetChatDetailHeader{}
 	util.GetHeader(r,&getChatDetailHeader)
+	fmt.Print("GetChatDetailHeader:")
+	fmt.Println(getChatDetailHeader)
 	sessionId:=getChatDetailHeader.Cookie
 	userId,getChatStatus:=util.GetUserIdFromSession(sessionId)
 	fmt.Println(userId)
@@ -22,7 +24,7 @@ func GetChatDetailroute(w http.ResponseWriter, r *http.Request){
 	//Read body data
 	requestBody,err:=ioutil.ReadAll(r.Body)
 	if err!=nil{
-		fmt.Println("Could not read body")
+		fmt.Println("Could not read body for GetChatDetail")
 		util.Message(w,1000)
 		return 
 	}
@@ -30,14 +32,14 @@ func GetChatDetailroute(w http.ResponseWriter, r *http.Request){
 	chatDetailDs :=ChatDetailDs{}
 	errUserData:=json.Unmarshal(requestBody,&chatDetailDs)
 	if errUserData!=nil{
-		fmt.Println("Could not Unmarshall user data")
+		fmt.Println("Could not Unmarshall user data for GetChatDetail")
 		util.Message(w,1001)
 		return 
 	}
 
 	sanatizationStatus :=Sanatize(chatDetailDs)
 	if sanatizationStatus =="Error"{
-		fmt.Println("User data invalid")
+		fmt.Println("User data invalid for GetChatDetail")
 		util.Message(w,1002)
 		return
 	}

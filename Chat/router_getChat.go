@@ -15,13 +15,14 @@ func GetChat(w http.ResponseWriter, r *http.Request){
 	userId,getChatStatus:=util.GetUserIdFromSession(sessionId)
 	fmt.Println(userId)
 	if getChatStatus=="Error"{
+		fmt.Println("Session Error for Get Chat")
 		util.Message(w,1003)
 		return
 	}
 
 	requestBody,err:=ioutil.ReadAll(r.Body)
 	if err!=nil{
-		fmt.Println("Could not read body")
+		fmt.Println("Could not read body for Get Chat")
 		util.Message(w,1000)
 		return 
 	}
@@ -29,14 +30,14 @@ func GetChat(w http.ResponseWriter, r *http.Request){
 	chatData:=ChatRequest{}
 	errUserData:=json.Unmarshal(requestBody,&chatData)
 	if errUserData!=nil{
-		fmt.Println("Could not Unmarshall user data")
+		fmt.Println("Could not Unmarshall user data for Get Chat")
 		util.Message(w,1001)
 		return 
 	}
 
 	sanatizationStatus :=Sanatize(chatData)
 	if sanatizationStatus =="Error"{
-		fmt.Println("User data invalid")
+		fmt.Println("User data invalid for Get Chat")
 		util.Message(w,1002)
 		return
 	}

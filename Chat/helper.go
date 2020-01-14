@@ -37,6 +37,8 @@ func SendChatDetail(w http.ResponseWriter, chatDetail []ChatDetail,userId2 []str
 		chatDetailResponse=append(chatDetailResponse,temp)
 	}
 	p:=&ChatDetailContent{ChatDetailResponse:chatDetailResponse,Code:statusCode,Message:msg}
+	fmt.Print("GetChatDetail Response:")
+	fmt.Println(*p)
 	enc := json.NewEncoder(w)
 	err:= enc.Encode(p)
 	if err != nil {
