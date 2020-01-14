@@ -5,11 +5,14 @@ import(
 	"encoding/json"	
 	util "miti-microservices/Util"
 	"log"
+	"fmt"
 )
 func SendChat(w http.ResponseWriter,chat []Chat){
 	w.Header().Set("Content-Type", "application/json")
 	msg:=util.GetMessageDecode(200)
 	p:=&SendChatContent{Code:200,Message:msg,Chat:chat}
+	fmt.Print("GetChatResponse:")
+	fmt.Println(*p)
 	enc := json.NewEncoder(w)
 	err:= enc.Encode(p)
 	if err != nil {
@@ -45,6 +48,8 @@ func SendMessageResponse(w http.ResponseWriter,requestId string, messageId strin
 	w.Header().Set("Content-Type", "application/json")
 	msg:=util.GetMessageDecode(200)
 	p:=&ChatResponse{Code:200,Message:msg,RequestId:requestId,MessageId:messageId,CreatedAt:createdAt,MessageType:messageType,Chat:chat}
+	fmt.Print("ChatResponse:")
+	fmt.Println(*p)
 	enc := json.NewEncoder(w)
 	err:= enc.Encode(p)
 	if err != nil {

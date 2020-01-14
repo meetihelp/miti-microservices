@@ -14,6 +14,8 @@ func GetChatAfterIndex(w http.ResponseWriter,r *http.Request){
 	sessionId:=getChatAfterIndexHeader.Cookie
 	userId,getChatStatus:=util.GetUserIdFromSession(sessionId)
 	fmt.Println(userId)
+	fmt.Print("GetChatAfterIndexHeader:")
+	fmt.Println(getChatAfterIndexHeader)
 	if getChatStatus=="Error"{
 		util.Message(w,1003)
 		return

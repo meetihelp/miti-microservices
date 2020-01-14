@@ -28,6 +28,7 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 	requestId:=sendChatImageHeader.RequestId
 	chatId:=sendChatImageHeader.ChatId
 	lastUpdate:=sendChatImageHeader.CreatedAt
+	fmt.Print("SendChatImageHeader")
 	fmt.Println(sendChatImageHeader)
 	userId,getChatStatus:=util.GetUserIdFromSession(sessionId)
 	// fmt.Println(userId)
@@ -162,6 +163,7 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 	p:=&SendChatImageResponse{Code:code,Message:msg,ImageId:userImageData.ImageId,
 				RequestId:requestId,MessageId:chatResponse.MessageId,
 				CreatedAt:chatResponse.CreatedAt,MessageType:"image",URL:url,Chat:unSyncedChat}
+	fmt.Print("SendChatImageResponse:")
 	fmt.Println(*p)
 	enc := json.NewEncoder(w)
 	err= enc.Encode(p)

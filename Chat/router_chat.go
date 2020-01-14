@@ -18,7 +18,8 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 	util.GetHeader(r,&chatHeader)
 	sessionId:=chatHeader.Cookie
 	userId,loginStatus:=util.GetUserIdFromSession(sessionId)
-
+	fmt.Print("ChatInsertHeader")
+	fmt.Println(chatHeader)
 	if loginStatus=="Error"{
 		// util.Message(w,1003)
 		// return
