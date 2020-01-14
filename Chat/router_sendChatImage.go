@@ -150,6 +150,8 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 	fmt.Println(*p)
 	enc := json.NewEncoder(w)
 	err:= enc.Encode(p)
+	fmt.Print("Send Chat image response Error:")
+	fmt.Println(err)
 	if err != nil {
 		log.Fatal(err)
 	}
