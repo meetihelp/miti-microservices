@@ -36,22 +36,37 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
+	file, _, err := r.FormFile("myFile")
+    if err != nil {
+        fmt.Println("Error Retrieving the File")
+        fmt.Println(err)
+        util.Message(w,1002)
+        return
+    }
+
+	buffer, err := ioutil.ReadAll(file)
+    if err != nil {
+        fmt.Println(err)
+        util.Message(w,1002)
+        return
+    }
+
 	url:=""
 	chatResponse:=Chat{}
 	imageUploadStatus:="Yes"
 	userImageData,status:=image.GetUserImageByRequestId(userId,requestId)
 	if(status=="Error"){
-		file, _, err := r.FormFile("myFile")
-	    if err != nil {
-	        fmt.Println("Error Retrieving the File")
-	        fmt.Println(err)
-	        return
-	    }
+		// file, _, err := r.FormFile("myFile")
+	 //    if err != nil {
+	 //        fmt.Println("Error Retrieving the File")
+	 //        fmt.Println(err)
+	 //        return
+	 //    }
 
-		buffer, err := ioutil.ReadAll(file)
-	    if err != nil {
-	        fmt.Println(err)
-	    }
+		// buffer, err := ioutil.ReadAll(file)
+	 //    if err != nil {
+	 //        fmt.Println(err)
+	 //    }
 
 
 		imageId:=util.GenerateToken()
@@ -149,7 +164,7 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 				CreatedAt:chatResponse.CreatedAt,MessageType:"image",URL:url,Chat:unSyncedChat}
 	fmt.Println(*p)
 	enc := json.NewEncoder(w)
-	err:= enc.Encode(p)
+	err= enc.Encode(p)
 	fmt.Print("Send Chat image response Error:")
 	fmt.Println(err)
 	if err != nil {
