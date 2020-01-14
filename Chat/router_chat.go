@@ -47,7 +47,7 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 		return
 	}
 
-	chatData :=Chat{}
+	chatData :=SendChatRequest{}
 	errUserData:=json.Unmarshal(requestBody,&chatData)
 	if errUserData!=nil{
 		fmt.Println("Could not Unmarshall user data")
@@ -55,17 +55,23 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 		return 
 	}
 
-	sanatizationStatus :=Sanatize(chatData)
-	if sanatizationStatus =="Error"{
-		fmt.Println("User data invalid")
-		util.Message(w,1002)
-		return
-	}
+	// sanatizationStatus :=Sanatize(chatData)
+	// if sanatizationStatus =="Error"{
+	// 	fmt.Println("User data invalid")
+	// 	util.Message(w,1002)
+	// 	return
+	// }
 	// tempUserId:=GetTempUserIdFromChatId(userId,chatData.ChatId)
 	// chatData.UserId=tempUserId
-	chatData.UserId=userId
-	chatData.MessageId=util.GenerateToken()
-	chatData.CreatedAt=util.GetTime()
+	chat:=Chat{}
+	chat.UserId=userId
+	chat.MessageId=util.GenerateToken()
+	chat.CreatedAt=util.GetTime()
+	chat.ChatId=chatData.ChatId
+	chat.MessageType=chatData.MessageType
+	chat.MessageContent=chatData.MessageContent
+	chat.RequestId=chatData.RequestId
+	lastUpdate:=chatData.CreatedAt
 	// tempTime:=time.Now()
 	// chatData.CreatedAt=tempTime.Format("2006-01-02 15:04:05")
 	// index:=GetLastChatIndex(chatData.ChatId)
@@ -75,9 +81,9 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 	// fmt.Println(chatData.CreatedAt)
 	// db:=database.GetDB()
 	if(chatData.MessageContent!=""){
-		chatResponse:=ChatInsertDB(chatData)
+		chatResponse,unSyncedChat:=ChatInsertDB(chat,lastUpdate)
 	// db.Create(&chatData)
-		if(chatData.CreatedAt==chatResponse.CreatedAt){
+		if(chat.CreatedAt==chatResponse.CreatedAt){
 			e:=UpdateChatTime(chatData.ChatId,chatData.CreatedAt)
 			if e!=nil{
 				return
@@ -87,7 +93,9 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 		// userList:=GetUserListFromChatId(chatData.ChatId)
 		// EnterReadBy(userList,chatData.MessageId)
 		// util.Message(w,200)
-		SendMessageResponse(w,chatResponse.RequestId,chatResponse.MessageId,chatResponse.CreatedAt,chatResponse.MessageType)
+		// fmt.Print("Unsynced Chat:")
+		// fmt.Println(unSyncedChat)
+		SendMessageResponse(w,chatResponse.RequestId,chatResponse.MessageId,chatResponse.CreatedAt,chatResponse.MessageType,unSyncedChat)
 	}else{
 		util.Message(w,1002)
 	}

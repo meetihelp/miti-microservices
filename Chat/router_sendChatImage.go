@@ -27,6 +27,7 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 	dimension:=sendChatImageHeader.Dimension
 	requestId:=sendChatImageHeader.RequestId
 	chatId:=sendChatImageHeader.ChatId
+	lastUpdate:=sendChatImageHeader.CreatedAt
 	fmt.Println(sendChatImageHeader)
 	userId,getChatStatus:=util.GetUserIdFromSession(sessionId)
 	// fmt.Println(userId)
@@ -37,7 +38,7 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 
 	url:=""
 	chatResponse:=Chat{}
-	imageUploadStatus:=""
+	imageUploadStatus:="Yes"
 	userImageData,status:=image.GetUserImageByRequestId(userId,requestId)
 	if(status=="Error"){
 		file, _, err := r.FormFile("myFile")
@@ -69,6 +70,7 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 			//Could Not Upload Image
 			fmt.Println(err)
 			util.Message(w,3001)
+			imageUploadStatus="No"
 		}else{
 			//Uploaded image Successfully
 			// userImageData=image.UserImage{}
@@ -100,6 +102,7 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 
 	}else{
 		// chatResponse=GetChatByRequestId(userId,requestId)
+		fmt.Println("Already with this request id")
 		if(accessType=="Public"){
 			PublicCloudFront:=os.Getenv("publicImageCloudFront")
 			filename:=userImageData.GeneratedName+"."+userImageData.Format
@@ -109,7 +112,9 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 
 
 	code:=200
+	unSyncedChat:=[]Chat{}
 	if(imageUploadStatus=="Yes"){
+		fmt.Println("Image uploaded")
 		chat:=Chat{}
 		chat.UserId=userId
 		chat.ChatId=chatId
@@ -120,7 +125,7 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 		chat.MessageId=messageId
 		createdAt:=util.GetTime()
 		chat.CreatedAt=createdAt
-		chatResponse=ChatInsertDB(chat)
+		chatResponse,unSyncedChat=ChatInsertDB(chat,lastUpdate)
 		// db.Create(&chatData)
 		if(chat.CreatedAt==chatResponse.CreatedAt){
 			e:=UpdateChatTime(chat.ChatId,chat.CreatedAt)
@@ -129,6 +134,7 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 			}
 		}
 	}else{
+		fmt.Println("Image not uploaded")
 		code=3001
 	}
 	
@@ -140,7 +146,8 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 	// p:=&UploadImageResponse{Code:code,Message:msg,ImageId:imageId,URL:url}
 	p:=&SendChatImageResponse{Code:code,Message:msg,ImageId:userImageData.ImageId,
 				RequestId:requestId,MessageId:chatResponse.MessageId,
-				CreatedAt:chatResponse.CreatedAt,MessageType:"image",URL:url}
+				CreatedAt:chatResponse.CreatedAt,MessageType:"image",URL:url,Chat:unSyncedChat}
+	fmt.Println(*p)
 	enc := json.NewEncoder(w)
 	err:= enc.Encode(p)
 	if err != nil {

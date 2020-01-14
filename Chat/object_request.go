@@ -1,5 +1,13 @@
 package Chat
 
+
+type SendChatRequest struct{
+	ChatId string `json:"ChatId"`
+	MessageType string `json:"MessageType"`
+	MessageContent string `json:"MessageContent"`
+	CreatedAt string `json:"CreatedAt"`
+	RequestId string `json:"RequestId"`
+}
 type GetChatDetailHeader struct{
 	Cookie string `header:"Miti-Cookie"`
 }
@@ -19,6 +27,7 @@ type ChatRequest struct{
 	ChatId string `json:"ChatId"`
 	Offset int `json:"Offset"`
 	NumOfChat int `json:"NumOfChat"`
+	CreatedAt string `json:"CreatedAt"`
 }
 
 type GetChatAfterIndexHeader struct{
@@ -42,6 +51,7 @@ type SendChatImageHeader struct{
 	Dimension string `header:"Dimension"`
 	RequestId string `header:"Request-Id"`
 	ChatId string `header:"Chat-Id"`
+	CreatedAt string `header:"Created-At"`
 }
 
 type SendMessageRequestHeader struct{

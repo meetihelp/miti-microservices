@@ -41,10 +41,10 @@ func SendChatDetail(w http.ResponseWriter, chatDetail []ChatDetail,userId2 []str
 	}
 }
 
-func SendMessageResponse(w http.ResponseWriter,requestId string, messageId string, createdAt string,messageType string){
+func SendMessageResponse(w http.ResponseWriter,requestId string, messageId string, createdAt string,messageType string,chat []Chat){
 	w.Header().Set("Content-Type", "application/json")
 	msg:=util.GetMessageDecode(200)
-	p:=&ChatResponse{Code:200,Message:msg,RequestId:requestId,MessageId:messageId,CreatedAt:createdAt,MessageType:messageType}
+	p:=&ChatResponse{Code:200,Message:msg,RequestId:requestId,MessageId:messageId,CreatedAt:createdAt,MessageType:messageType,Chat:chat}
 	enc := json.NewEncoder(w)
 	err:= enc.Encode(p)
 	if err != nil {
