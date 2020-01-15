@@ -4,7 +4,7 @@ package Privacy
 import(
 	// "log"
 	// "fmt"
-	database "miti-microservices/Database"
+	// database "miti-microservices/Database"
 // 	"github.com/jinzhu/gorm"
 //  _ 	"github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -32,7 +32,7 @@ type BoardContent struct{
 }
 
 func init(){
-	db:=database.GetDB()
-	db.AutoMigrate(&Board{})
+	// db:=database.GetDB()
+	// db.AutoMigrate(&Board{})
 	// db.AutoMigrate(&BoardContent{})
 }

@@ -1,7 +1,7 @@
 package Image
 
 import(
-	database "miti-microservices/Database"
+	// database "miti-microservices/Database"
 )
 
 type UserImage struct{
@@ -28,7 +28,7 @@ type EventImage struct{
 }
 
 func init(){
-	db:=database.GetDB()
-	db.AutoMigrate(&UserImage{})
+	// db:=database.GetDB()
+	// db.AutoMigrate(&UserImage{})
 	// db.AutoMigrate(&EventImage{})
 }
