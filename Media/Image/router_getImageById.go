@@ -39,6 +39,8 @@ func GetImageById(w http.ResponseWriter, r *http.Request){
 		return 
 	}
 
+	fmt.Print("GetImageByIdBody:")
+	fmt.Println(getImageByIdData)
 	// imageId:=GetImageIdFromId(getImageByIdData.Id)
 	imageId:=getImageByIdData.ImageId
 	//Check If user has permission to access this image
