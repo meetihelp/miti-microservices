@@ -14,6 +14,8 @@ func GetImageById(w http.ResponseWriter, r *http.Request){
 	getImageByIdHeader:=GetImageByIdHeader{}
 	util.GetHeader(r,&getImageByIdHeader)
 	sessionId:=getImageByIdHeader.Cookie
+	fmt.Print("GetImageByIdHeader:")
+	fmt.Println(getImageByIdHeader)
 	userId,getChatStatus:=util.GetUserIdFromSession(sessionId)
 	// fmt.Println(userId)
 	if getChatStatus=="Error"{
@@ -49,6 +51,8 @@ func GetImageById(w http.ResponseWriter, r *http.Request){
 	msg:=util.GetMessageDecode(code)
 	w.Header().Set("Content-Type", "application/json")
 	p:=&GetImageByIdResponse{Code:code,Message:msg,ImageURL:imageURL}
+	fmt.Print("GetImageByIdResponse:")
+	fmt.Println(*p)
 	enc := json.NewEncoder(w)
 	err= enc.Encode(p)
 	if err != nil {
