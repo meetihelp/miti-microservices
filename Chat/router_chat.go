@@ -82,7 +82,7 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 	// fmt.Println(chatData.CreatedAt)
 	// db:=database.GetDB()
 	if(chatData.MessageContent!=""){
-		chatResponse,unSyncedChat:=ChatInsertDB(chat,lastUpdate)
+		chatResponse,unSyncedChat,code:=ChatInsertDB(chat,lastUpdate)
 	// db.Create(&chatData)
 		if(chat.CreatedAt==chatResponse.CreatedAt){
 			e:=UpdateChatTime(chatData.ChatId,chatData.CreatedAt)
@@ -96,7 +96,7 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 		// util.Message(w,200)
 		// fmt.Print("Unsynced Chat:")
 		// fmt.Println(unSyncedChat)
-		SendMessageResponse(w,chatResponse.RequestId,chatResponse.MessageId,chatResponse.CreatedAt,chatResponse.MessageType,unSyncedChat)
+		SendMessageResponse(w,code,chatResponse.RequestId,chatResponse.MessageId,chatResponse.CreatedAt,chatResponse.MessageType,unSyncedChat)
 	}else{
 		util.Message(w,1002)
 	}

@@ -142,7 +142,7 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 		chat.MessageId=messageId
 		createdAt:=util.GetTime()
 		chat.CreatedAt=createdAt
-		chatResponse,unSyncedChat=ChatInsertDB(chat,lastUpdate)
+		chatResponse,unSyncedChat,code=ChatInsertDB(chat,lastUpdate)
 		// db.Create(&chatData)
 		if(chat.CreatedAt==chatResponse.CreatedAt){
 			e:=UpdateChatTime(chat.ChatId,chat.CreatedAt)

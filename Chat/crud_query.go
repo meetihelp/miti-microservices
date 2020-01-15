@@ -21,7 +21,7 @@ func GetChatByRequestId(userId string,requestId string)Chat{
 	return chat
 }
 
-func ChatInsertDB(chatData Chat,lastUpdate string) (Chat,[]Chat) {
+func ChatInsertDB(chatData Chat,lastUpdate string) (Chat,[]Chat,int) {
 	// index:=GetLastChatIndex(chatData.ChatId)
 	// index=index+1
 	// chatData.Index=index
@@ -29,16 +29,23 @@ func ChatInsertDB(chatData Chat,lastUpdate string) (Chat,[]Chat) {
 	db:=database.GetDB()
 	unSyncedChat:=[]Chat{}
 	chatId:=chatData.ChatId
-	db.Order("created_at desc").Where("chat_id=? AND created_at>?",chatId,lastUpdate).Find(&unSyncedChat)
-	db.Where("user_id=? AND request_id=?",chatData.UserId,chatData.RequestId).Find(&chat)
+	err:=db.Order("created_at desc").Where("chat_id=? AND created_at>?",chatId,lastUpdate).Find(&unSyncedChat).Error
+	code:=200
+	if(err!=nil){
+		code=1006
+	}
+	err=db.Where("user_id=? AND request_id=?",chatData.UserId,chatData.RequestId).Find(&chat).Error
+	if(err!=nil){
+		code=1006
+	}
 	fmt.Println("ChatInsertDB")
 	fmt.Println(chat)
 	fmt.Println(chatData)
 	if(chat.UserId==""){
 		db.Create(&chatData)
-		return chatData,unSyncedChat
+		return chatData,unSyncedChat,code
 	}else{
-		return chat,unSyncedChat
+		return chat,unSyncedChat,code
 	}
 	
 }

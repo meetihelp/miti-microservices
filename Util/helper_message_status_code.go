@@ -16,7 +16,7 @@ func GetMessageDecode(status_code int) string{
 	message_decode[1004]="Profile not created"
 	message_decode[1006]="Preference not created"
 	// message_decode[1004]="User already verified"
-	// message_decode[1006]="Database Problem"
+	message_decode[1006]="Database Problem"
 	// message_decode[1007]="InvalidURL"
 	// message_decode[1008]="Profile not created"
 

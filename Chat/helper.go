@@ -46,10 +46,10 @@ func SendChatDetail(w http.ResponseWriter, chatDetail []ChatDetail,userId2 []str
 	}
 }
 
-func SendMessageResponse(w http.ResponseWriter,requestId string, messageId string, createdAt string,messageType string,chat []Chat){
+func SendMessageResponse(w http.ResponseWriter,code int,requestId string, messageId string, createdAt string,messageType string,chat []Chat){
 	w.Header().Set("Content-Type", "application/json")
-	msg:=util.GetMessageDecode(200)
-	p:=&ChatResponse{Code:200,Message:msg,RequestId:requestId,MessageId:messageId,CreatedAt:createdAt,MessageType:messageType,Chat:chat}
+	msg:=util.GetMessageDecode(code)
+	p:=&ChatResponse{Code:code,Message:msg,RequestId:requestId,MessageId:messageId,CreatedAt:createdAt,MessageType:messageType,Chat:chat}
 	fmt.Print("ChatResponse:")
 	fmt.Println(*p)
 	enc := json.NewEncoder(w)
