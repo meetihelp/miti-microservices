@@ -45,8 +45,10 @@ func GetImageById(w http.ResponseWriter, r *http.Request){
 	imageId:=getImageByIdData.ImageId
 	//Check If user has permission to access this image
 	userId2,access:=IsUserPermittedToSeeImage(userId,imageId)
+	fmt.Println("Get Image by id->Userid2:"+userId2)
 	if(access=="Error"){
 		util.Message(w,5000)
+		return
 	}
 	imageURL:=GetImageURL(userId2,imageId)
 	code:=200

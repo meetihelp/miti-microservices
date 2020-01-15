@@ -114,6 +114,7 @@ func GetSignedURL(filename string,expireDuration time.Duration) string{
 func GetPublicImageURL(filename string) string{
 	dns:=os.Getenv("publicimage_cloudfrontdns")
 	url:=dns+"/"+filename
+	fmt.Println("get Imagebyid public url:"+url)
 	return url
 }
 
