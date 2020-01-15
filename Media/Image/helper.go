@@ -105,7 +105,7 @@ func GetSignedURL(filename string,expireDuration time.Duration) string{
 	rawURL:=dns+"/"+filename
 	keyID,privKey:=getCloudFrontCredentials()
 	signer := sign.NewURLSigner(keyID, privKey)
-	signedURL, err := signer.Sign(rawURL, time.Now().Add(expireDuration*time.Hour))
+	signedURL, err := signer.Sign(rawURL, time.Now().Add(expireDuration*time.Minute))
 	if err != nil {
 	    log.Fatalf("Failed to sign url, err: %s\n", err.Error())
 	}

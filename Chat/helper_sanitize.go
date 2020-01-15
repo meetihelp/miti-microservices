@@ -12,7 +12,7 @@ type SanatizeData interface{
 }
 
 func(sendChatImageHeader SendChatImageHeader) doSanitization() string{
-	if(sendChatImageHeader.AccessType!="Public" || sendChatImageHeader.AccessType!="Private"){
+	if(sendChatImageHeader.AccessType!="Public" && sendChatImageHeader.AccessType!="Private"){
 		return "Error"
 	}
 	return "Ok"
