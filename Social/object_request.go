@@ -8,6 +8,9 @@ type PoolStatusHeader struct{
 type GetInPoolHeader struct{
 	Cookie string `header:"Miti-Cookie"`	
 }
+type GetInPoolRequest struct{
+	RequestId string `json:"RequestId"`
+}
 
 type GetInGroupPoolHeader struct{
 	Cookie string `header:"Miti-Cookie"`	
@@ -24,4 +27,9 @@ type CancelPoolHeader struct{
 
 type CancelGroupPoolHeader struct{
 	Cookie string `header:"Miti-Cookie"`	
+}
+
+type CancelGroupPoolRequest struct{
+	RequestId string `json:"RequestId"`
+	Interest string `json:"Interest"`
 }

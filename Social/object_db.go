@@ -19,6 +19,7 @@ type PoolWaiting struct{
 	CreatedAt string `gorm:"type:varchar" json:"CreatedAt"`
 	Gender string `gorm:"type:varchar" json:"Gender"`
 	Sex string `gorm:"type:varchar" json:"Sex"` 
+	RequestId string `gorm:"varchar" json:"RequestId"`
 }
 
 
@@ -35,6 +36,7 @@ type UserPool struct{
 
 type PoolStatus struct{
 	UserId string `gorm:"primary_key;type:varchar" json:"UserId"`
+	ChatId string `gorm:"type:varchar" json:"ChatId"`
 	MatchUserId string `gorm:type:varchar" json:"MatchUserId"`
 	Status string `gorm:"type:varchar" json:"Status"`
 	CreatedAt string `gorm:"type:varchar" json:"CreatedAt"`

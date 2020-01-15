@@ -2,26 +2,48 @@ package Social
 
 import(
 	database "miti-microservices/Database"
-	
+	"fmt"
+	util "miti-microservices/Util"
 )
 
 func PoolStatusDB(userId string) PoolStatus{
 	db:=database.GetDB()
 	poolStatus:=PoolStatus{}
-	db.Where("user_id=?",userId).Find(&poolStatus)
+	err:=db.Where("user_id=?",userId).Find(&poolStatus).Error
+	fmt.Print("PoolStatusDB:")
+	fmt.Println(err)
 	return poolStatus
 }
 
 
-func EnterInPooL(userId string,pincode string,createdAt string,gender string,sex string){
+func EnterInPooL(userId string,pincode string,createdAt string,gender string,sex string,requestId string) PoolStatus{
 	db:=database.GetDB()
 	poolWait:=PoolWaiting{}
-	poolWait.UserId=userId
-	poolWait.Pincode=pincode
-	poolWait.CreatedAt=createdAt
-	poolWait.Gender=gender
-	poolWait.Sex=sex
-	_=db.Create(&poolWait).Error
+
+	db.Where("user_id=? AND request_id=?",userId,requestId).Find(&poolWait)
+	if(poolWait.UserId==""){
+		poolWait.UserId=userId
+		poolWait.Pincode=pincode
+		poolWait.CreatedAt=createdAt
+		poolWait.Gender=gender
+		poolWait.Sex=sex
+		err:=db.Create(&poolWait).Error
+		fmt.Print("EnterInPooL DB1:")
+		fmt.Println(err)
+	}
+
+	poolStatus:=PoolStatus{}
+	db.Where("user_id=?",userId).Find(&poolStatus)
+	if(poolStatus.UserId==""){
+		poolStatus.UserId=userId
+		poolStatus.Status="Waiting"
+		poolStatus.CreatedAt=util.GetTime()
+		err:=db.Create(&poolStatus).Error
+		fmt.Print("EnterInPooL DB2:")
+		fmt.Println(err)
+	}
+
+	return poolStatus
 }
 
 func EnterInGroupPooL(userId string,pincode string,interest string,createdAt string,gender string,sex string){

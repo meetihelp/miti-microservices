@@ -8,6 +8,7 @@ import(
 	// "strings"
 	"encoding/json"
    util "miti-microservices/Util"
+   profile "miti-microservices/Profile"
 )
 
 func PoolStatusRouter(w http.ResponseWriter, r *http.Request){
@@ -17,8 +18,10 @@ func PoolStatusRouter(w http.ResponseWriter, r *http.Request){
 
 	sessionId:=header.Cookie
 	userId,dErr:=util.GetUserIdFromSession(sessionId)
+	fmt.Print("PoolStatusHeader:")
+	fmt.Println(header)
 	if dErr=="Error"{
-		fmt.Println("Session Does not exist")
+		fmt.Println("Session Does not exist PoolStatusRouter")
 		util.Message(w,1003)
 		return
 	}
@@ -29,14 +32,13 @@ func PoolStatusRouter(w http.ResponseWriter, r *http.Request){
 	status:=poolStatus.Status
 	createdAt:=poolStatus.CreatedAt
 	matchTime:=poolStatus.MatchTime
-
+	ipip:=profile.CheckIPIPStatus(userId)
 	code:=200
-	if(status=="Matched"){
-		code=200
-	}
 	msg:=util.GetMessageDecode(code)
 	p:=&PoolStatusResponse{Code:code,Message:msg,MatchUserId:matchUsedId,
-			Status:status,CreatedAt:createdAt,MatchTime:matchTime}
+			Status:status,CreatedAt:createdAt,MatchTime:matchTime,IPIP:ipip}
+	fmt.Print("PoolStatusResponse:")
+	fmt.Println(*p)
 	enc := json.NewEncoder(w)
 	err:= enc.Encode(p)
 	if err != nil {
