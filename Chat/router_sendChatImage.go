@@ -30,6 +30,10 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 	lastUpdate:=sendChatImageHeader.CreatedAt
 	fmt.Print("SendChatImageHeader")
 	fmt.Println(sendChatImageHeader)
+	sanatize:=Sanatize(sendChatImageHeader)
+	if(sanatize=="Error"){
+		util.Message(w,1002)
+	}
 	userId,getChatStatus:=util.GetUserIdFromSession(sessionId)
 	// fmt.Println(userId)
 	if getChatStatus=="Error"{

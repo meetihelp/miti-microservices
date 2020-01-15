@@ -11,6 +11,13 @@ type SanatizeData interface{
 	doSanitization() string
 }
 
+func(sendChatImageHeader SendChatImageHeader) doSanitization() string{
+	if(sendChatImageHeader.AccessType!="Public" || sendChatImageHeader.AccessType!="Private"){
+		return "Error"
+	}
+	return "Ok"
+}
+
 func(chatData Chat) doSanitization() string {
 	validate :=validator.New()
 	err:= validate.Struct(chatData)
