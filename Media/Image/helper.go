@@ -109,6 +109,7 @@ func GetSignedURL(filename string,expireDuration time.Duration) string{
 	if err != nil {
 	    log.Fatalf("Failed to sign url, err: %s\n", err.Error())
 	}
+	fmt.Println("get Imagebyid private url:"+signedURL)
 	return signedURL
 }
 func GetPublicImageURL(filename string) string{
