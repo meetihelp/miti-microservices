@@ -32,10 +32,14 @@ func ChatInsertDB(chatData Chat,lastUpdate string) (Chat,[]Chat,int) {
 	err:=db.Order("created_at desc").Where("chat_id=? AND created_at>?",chatId,lastUpdate).Find(&unSyncedChat).Error
 	code:=200
 	if(err!=nil){
+		fmt.Print("ChatInsertDB Error 1")
+		fmt.Println(err)
 		code=1006
 	}
 	err=db.Where("user_id=? AND request_id=?",chatData.UserId,chatData.RequestId).Find(&chat).Error
 	if(err!=nil){
+		fmt.Print("ChatInsertDB Error 2")
+		fmt.Println(err)
 		code=1006
 	}
 	fmt.Println("ChatInsertDB")
