@@ -96,3 +96,15 @@ func ConvertQuestionResponseToArray(questionResponse QuestionResponse) ([]int){
 	response[50]=questionResponse.QuestionId50
 	return response
 }
+
+type User struct{
+	UserId string `json:"UserId"`
+	Phone string `json:"Phone"`
+	Email string  `json:"Email"`
+	// Password string `gorm:"type:varchar(100)" validate:"required" json:"Password"`
+	Status string `son:"Status"`  //Verified/Unverified/Deleted
+	ProfileCreationStatus string `json:"ProfileCreationStatus"`
+	PreferenceCreationStatus int `json:"PreferenceCreationStatus"`
+	IPIPStatus int `json:"IPIPStatus"`
+	CreatedAt string `json:"CreatedAt"`
+}

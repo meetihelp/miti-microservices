@@ -17,9 +17,9 @@ func GetProfileDB(userId string) Profile{
 
 func CheckIPIPStatus(userId string) int{
 	db:=database.GetDB()
-	ipipStatus:=0
-	db.Table("users").Select("ip_ip_status").Where("user_id=?",userId).Find(&ipipStatus)
-	return ipipStatus
+	user:=User{}
+	db.Table("users").Where("user_id=?",userId).Find(&user)
+	return user.IPIPStatus
 }
 func EnterProfileData(profileData Profile){
 	fmt.Println("Enter_profile_data")
