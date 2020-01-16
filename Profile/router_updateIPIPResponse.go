@@ -20,6 +20,8 @@ func UpdateIPIPResponse(w http.ResponseWriter, r *http.Request){
 	sessionId:=header.Cookie
 
 	userId,dErr:=util.GetUserIdFromSession(sessionId)
+	fmt.Print("UpdateIPIP Header:")
+	fmt.Println(header)
 	if dErr=="Error"{
 		fmt.Println("Session Does not exist")
 		util.Message(w,1003)
@@ -40,6 +42,9 @@ func UpdateIPIPResponse(w http.ResponseWriter, r *http.Request){
 		util.Message(w,1001)
 		return
 	}
+
+	fmt.Print("UpdateIPIP Body:")
+	fmt.Println(updateIPIPRequest)
 	
     data:=make(map[string]int)
     data["IPIP1"]=updateIPIPRequest.IPIP1
