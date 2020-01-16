@@ -52,17 +52,17 @@ func EnterInPooL(userId string,pincode string,createdAt string,gender string,sex
 	return poolStatusResponse
 }
 
-func EnterInGroupPooL(userId string,pincode string,interest string,createdAt string,gender string,sex string){
-	db:=database.GetDB()
-	poolWait:=GroupPoolWaiting{}
-	poolWait.UserId=userId
-	poolWait.Pincode=pincode
-	poolWait.Interest=interest
-	poolWait.CreatedAt=createdAt
-	poolWait.Gender=gender
-	poolWait.Sex=sex
-	_=db.Create(&poolWait).Error
-}
+// func EnterInGroupPooL(userId string,pincode string,interest string,createdAt string,gender string,sex string) GroupPoolStatus{
+// 	db:=database.GetDB()
+// 	poolWait:=GroupPoolWaiting{}
+// 	poolWait.UserId=userId
+// 	poolWait.Pincode=pincode
+// 	poolWait.Interest=interest
+// 	poolWait.CreatedAt=createdAt
+// 	poolWait.Gender=gender
+// 	poolWait.Sex=sex
+// 	_=db.Create(&poolWait).Error
+// }
 func DeleteWaitPool(userId string) {
 	db:=database.GetDB()
 	db.Where("user_id=?",userId).Delete(&PoolWaiting{})

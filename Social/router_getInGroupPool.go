@@ -42,6 +42,7 @@ package Social
 // 	fmt.Print("GetInGroupPoolRequest:")
 // 	fmt.Println(getInGroupPoolRequest)
 
+// 	interest:=getInGroupPoolRequest.Interest
 // 	profileData:=profile.GetProfileDB(userId)
 // 	pincode:=profileData.Pincode
 // 	createdAt:=util.GetTime()
@@ -53,14 +54,13 @@ package Social
 // 	if(ipip<5){
 // 		code=2003
 // 	}else{
-// 		interest:=getInGroupPoolRequest.Interest
-// 		requestId:=getInGroupPoolRequest.RequestId
-// 		groupPoolStatus=EnterInGroupPooL(userId,pincode,interest,createdAt,gender,sex,requestId)
+// 		// requestId:=getInGroupPoolRequest.RequestId
+// 		groupPoolStatus=EnterInGroupPooL(userId,pincode,interest,createdAt,gender,sex)
 // 	}
 // 	// util.Message(w,200)
 // 	w.Header().Set("Content-Type", "application/json")
 // 	msg:=util.GetMessageDecode(code)
-// 	p:=&GetInGroupPoolResponse{Code:code,Message:msg,RequestId:requestId,
+// 	p:=&GetInGroupPoolResponse{Code:code,Message:msg,Interest:interest,
 // 			CreatedAt:createdAt,GroupPoolStatus:groupPoolStatus}
 // 	fmt.Print("GetInGroupPoolResponse:")
 // 	fmt.Println(*p)

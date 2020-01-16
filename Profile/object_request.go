@@ -21,6 +21,15 @@ type UpdateQuestionResponseHeader struct{
 	Agent1 string `header:"agent"`
 	Cookie string `header:"Miti-Cookie"`	
 }
+
+type UpdateIPIPRequest struct{
+	Page int `json:"Page"`
+	IPIP1 int `json:"IPIP1"`
+	IPIP2 int `json:"IPIP2"`
+	IPIP3 int `json:"IPIP3"`
+	IPIP4 int `json:"IPIP4"`
+	IPIP5 int `json:"IPIP5"`
+}
 type UpdatePreferenceResponseHeader struct{
 	Method1 string `header:"method"`
 	Agent1 string `header:"agent"`

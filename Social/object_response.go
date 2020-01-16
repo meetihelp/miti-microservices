@@ -40,7 +40,7 @@ type GetInGroupPoolResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
 	CreatedAt string `json:"CreatedAt"`
-	RequestId string `json:"RequestId"`
+	Interest string `json:"Interest"`
 }
 
 type CancelGroupPoolResponse struct{

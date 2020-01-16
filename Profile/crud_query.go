@@ -158,7 +158,7 @@ func InsertQuestionInDB(content string,TypeofQuestion int,factor int){
 }
 
 
-func UpdateIPIPResponseDB(userId string,response map[string]int) int{
+func UpdateIPIPResponseDB(userId string,response map[string]int,page int) {
 	db:=database.GetDB()
 	questionResponse:=QuestionResponse{}
 	db.Where("user_id=?",userId).Find(&questionResponse)
@@ -166,14 +166,13 @@ func UpdateIPIPResponseDB(userId string,response map[string]int) int{
 	if(questionResponse.UserId==""){
 		flag=0
 	}
-	ipipStatus,questionResponse:=getDataInQuestionResponseForm(questionResponse,response)
+	questionResponse=getDataInQuestionResponseForm(questionResponse,response,page)
 	if(flag==0){
 		db.Create(&questionResponse)
 	}else{
 		db.Model(&questionResponse).Where("user_id=?",userId).Update(questionResponse)	
 	}
 	
-	return ipipStatus
 }
 
 func UpdatePreferecePResponseDB(userId string,response PreferenceRequest) int{
