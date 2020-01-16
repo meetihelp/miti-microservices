@@ -3,6 +3,7 @@ package Social
 type PoolStatusResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
+	ChatId string `json:"ChatId"`
 	MatchUserId string `json:"MatchUserId"`
 	Status string `json:"Status"`
 	CreatedAt string `json:"CreatedAt"`
@@ -14,8 +15,14 @@ type GetInPoolResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
 	IPIP int `json:"IPIP"`
-	RequestId string `json:"RequestId"`
-	PoolStatus PoolStatus `json:"PoolStatus"`
+	// RequestId string `json:"RequestId"`
+	PoolStatus PoolStatusHelper `json:"PoolStatus"`
+}
+
+type PoolStatusHelper struct{
+	ChatId string `json:"ChatId"`
+	MatchUserId string `json:"MatchUserId"`
+	Status string `json:"Status"`
 }
 
 type GetInGroupPoolResponse struct{

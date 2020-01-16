@@ -19,7 +19,7 @@ type PoolWaiting struct{
 	CreatedAt string `gorm:"type:varchar" json:"CreatedAt"`
 	Gender string `gorm:"type:varchar" json:"Gender"`
 	Sex string `gorm:"type:varchar" json:"Sex"` 
-	RequestId string `gorm:"varchar" json:"RequestId"`
+	// RequestId string `gorm:"varchar" json:"RequestId"`
 }
 
 

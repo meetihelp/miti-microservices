@@ -16,11 +16,11 @@ func PoolStatusDB(userId string) PoolStatus{
 }
 
 
-func EnterInPooL(userId string,pincode string,createdAt string,gender string,sex string,requestId string) PoolStatus{
+func EnterInPooL(userId string,pincode string,createdAt string,gender string,sex string) PoolStatusHelper{
 	db:=database.GetDB()
 	poolWait:=PoolWaiting{}
 
-	db.Where("user_id=? AND request_id=?",userId,requestId).Find(&poolWait)
+	db.Where("user_id=?",userId).Find(&poolWait)
 	if(poolWait.UserId==""){
 		poolWait.UserId=userId
 		poolWait.Pincode=pincode
@@ -33,6 +33,7 @@ func EnterInPooL(userId string,pincode string,createdAt string,gender string,sex
 	}
 
 	poolStatus:=PoolStatus{}
+	poolStatusResponse:=PoolStatusHelper{}
 	db.Where("user_id=?",userId).Find(&poolStatus)
 	if(poolStatus.UserId==""){
 		poolStatus.UserId=userId
@@ -41,9 +42,14 @@ func EnterInPooL(userId string,pincode string,createdAt string,gender string,sex
 		err:=db.Create(&poolStatus).Error
 		fmt.Print("EnterInPooL DB2:")
 		fmt.Println(err)
+
+
 	}
 
-	return poolStatus
+	poolStatusResponse.ChatId=poolStatus.ChatId
+	poolStatusResponse.MatchUserId=poolStatus.MatchUserId
+	poolStatusResponse.Status=poolStatus.Status
+	return poolStatusResponse
 }
 
 func EnterInGroupPooL(userId string,pincode string,interest string,createdAt string,gender string,sex string){

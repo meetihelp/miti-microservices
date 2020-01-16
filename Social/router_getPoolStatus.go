@@ -32,10 +32,14 @@ func PoolStatusRouter(w http.ResponseWriter, r *http.Request){
 	status:=poolStatus.Status
 	createdAt:=poolStatus.CreatedAt
 	matchTime:=poolStatus.MatchTime
+	chatId:=poolStatus.ChatId
 	ipip:=profile.CheckIPIPStatus(userId)
 	code:=200
+	if(ipip<5){
+		code=2003
+	}
 	msg:=util.GetMessageDecode(code)
-	p:=&PoolStatusResponse{Code:code,Message:msg,MatchUserId:matchUsedId,
+	p:=&PoolStatusResponse{Code:code,Message:msg,ChatId:chatId,MatchUserId:matchUsedId,
 			Status:status,CreatedAt:createdAt,MatchTime:matchTime,IPIP:ipip}
 	fmt.Print("PoolStatusResponse:")
 	fmt.Println(*p)

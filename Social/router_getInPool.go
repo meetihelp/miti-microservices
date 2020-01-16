@@ -4,7 +4,7 @@ import(
 	"fmt"
 	"net/http"
 	"log"
-	"io/ioutil"
+	// "io/ioutil"
 	// "strings"
 	"encoding/json"
 	profile "miti-microservices/Profile"
@@ -26,25 +26,25 @@ func GetInPool(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	requestBody,err:=ioutil.ReadAll(r.Body)
-	if err!=nil{
-		fmt.Println("Could not read body")
-		util.Message(w,1000)
-		return 
-	}
+	// requestBody,err:=ioutil.ReadAll(r.Body)
+	// if err!=nil{
+	// 	fmt.Println("Could not read body")
+	// 	util.Message(w,1000)
+	// 	return 
+	// }
 
-	getInPoolRequest:=GetInPoolRequest{}
-	errQuestionData:=json.Unmarshal(requestBody,&getInPoolRequest)
-	if errQuestionData!=nil{
-		fmt.Println("Could not Unmarshall profile data")
-		util.Message(w,1001)
-		return
-	}
+	// getInPoolRequest:=GetInPoolRequest{}
+	// errQuestionData:=json.Unmarshal(requestBody,&getInPoolRequest)
+	// if errQuestionData!=nil{
+	// 	fmt.Println("Could not Unmarshall profile data")
+	// 	util.Message(w,1001)
+	// 	return
+	// }
 
-	fmt.Print("GetInPoolBody:")
-	fmt.Println(getInPoolRequest)
+	// fmt.Print("GetInPoolBody:")
+	// fmt.Println(getInPoolRequest)
 
-	requestId:=getInPoolRequest.RequestId
+	// requestId:=getInPoolRequest.RequestId
 	profileData:=profile.GetProfileDB(userId)
 	pincode:=profileData.Pincode
 	createdAt:=util.GetTime()
@@ -52,21 +52,21 @@ func GetInPool(w http.ResponseWriter, r *http.Request){
 	sex:=profileData.Sex
 	ipip:=profile.CheckIPIPStatus(userId)
 	code:=200
-	poolStatus:=PoolStatus{}
+	poolStatus:=PoolStatusHelper{}
 	if(ipip<5){
 		code=2003
 	}else{
-		poolStatus=EnterInPooL(userId,pincode,createdAt,gender,sex,requestId)
+		poolStatus=EnterInPooL(userId,pincode,createdAt,gender,sex)
 		code=200
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	msg:=util.GetMessageDecode(code)
-	p:=&GetInPoolResponse{Code:code,Message:msg,IPIP:ipip,RequestId:requestId,PoolStatus:poolStatus}
+	p:=&GetInPoolResponse{Code:code,Message:msg,IPIP:ipip,PoolStatus:poolStatus}
 	fmt.Print("GetInPoolResponse:")
 	fmt.Println(*p)
 	enc := json.NewEncoder(w)
-	err= enc.Encode(p)
+	err:= enc.Encode(p)
 	if err != nil {
 		log.Fatal(err)
 	}

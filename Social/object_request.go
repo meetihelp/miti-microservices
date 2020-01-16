@@ -8,9 +8,9 @@ type PoolStatusHeader struct{
 type GetInPoolHeader struct{
 	Cookie string `header:"Miti-Cookie"`	
 }
-type GetInPoolRequest struct{
-	RequestId string `json:"RequestId"`
-}
+// type GetInPoolRequest struct{
+// 	RequestId string `json:"RequestId"`
+// }
 
 type GetInGroupPoolHeader struct{
 	Cookie string `header:"Miti-Cookie"`	
