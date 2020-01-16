@@ -121,3 +121,13 @@ func EnterInGroupPoolFromWait(areaCode string,gender string,number_of_person int
 func DeleteFromGroupPoolHelper(areaCode string,gender string,number_of_person int){
 
 }
+
+
+func GroupPoolStatusDB(userId string,interest string) GroupPoolStatus{
+	db:=database.GetDB()
+	groupPoolStatus:=GroupPoolStatus{}
+	err:=db.Where("user_id=? AND interest=?",userId,interest).Find(&groupPoolStatus).Error
+	fmt.Print("PoolStatusDB:")
+	fmt.Println(err)
+	return groupPoolStatus
+}

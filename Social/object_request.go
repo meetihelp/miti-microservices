@@ -12,6 +12,13 @@ type GetInPoolHeader struct{
 // 	RequestId string `json:"RequestId"`
 // }
 
+type GroupPoolStatusHeader struct{
+	Cookie string `header:"Miti-Cookie"`
+}
+
+type GroupPoolStatusRequest struct{
+	Interest string `json:"Interest"`
+}
 type GetInGroupPoolHeader struct{
 	Cookie string `header:"Miti-Cookie"`	
 }

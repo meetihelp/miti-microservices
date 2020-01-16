@@ -92,12 +92,10 @@ type GroupUserPool struct{
 
 type GroupPoolStatus struct{
 	UserId string `gorm:"primary_key;type:varchar" json:"UserId"`
-	MatchUserId string `gorm:type:varchar" json:"MatchUserId"`
-	Status string `gorm:"type:varchar" json:"Status"`
+	ChatId string `gorm:type:varchar" json:"ChatId"`
+	Status string `gorm:"type:varchar" json:"Status"` //PERMANENT,TEMPORARY,WAITING
 	CreatedAt string `gorm:"type:varchar" json:"CreatedAt"`
-	Like1Time string `gorm:"type:varchar" json:"Like1Time"`
-	Like2TIme string `gorm:"type:varchar" json:"Like2TIme"`
-	MatchTime string `gorm:"type:varchar" json:"MatchTime"`
+	Interest string `gorm:"primary_key;type:varchar" json:"Interest"`
 }
 func init(){
 	db:=database.GetDB()
@@ -106,4 +104,6 @@ func init(){
 	db.AutoMigrate(&UserPool{})
 	db.AutoMigrate(&PoolStatus{})
 	db.AutoMigrate(&PoolLog{})
+
+	db.AutoMigrate(&GroupPoolStatus{})
 }

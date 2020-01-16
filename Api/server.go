@@ -121,6 +121,7 @@ func Server(runMethod string){
 	r.HandleFunc("/getInPool",social.GetInPool).Methods("GET")
 	// r.HandleFunc("/cancelPool",social.CancelPoolRouter).Methods("GET")
 	// r.HandleFunc("/getInGroupPool",social.GetInGroupPool).Methods("POST")
+	r.HandleFunc("/groupPoolStatus",social.GroupPoolStatusRouter).Methods("POST")
 	r.HandleFunc("/cancelGroupPool",social.CancelGroupPoolRouter).Methods("POST")
 	
 	http.Handle("/", r)

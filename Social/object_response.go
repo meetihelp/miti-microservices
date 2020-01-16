@@ -11,6 +11,17 @@ type PoolStatusResponse struct{
 	IPIP int `json:"IPIP"`
 }
 
+type GroupPoolStatusResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	ChatId string `json:"ChatId"`
+	Interest string `json:"Interest"`
+	Status string `json:"Status"`
+	CreatedAt string `json:"CreatedAt"`
+	MatchTime string `json:"MatchTime"`
+	IPIP int `json:"IPIP"`
+}
+
 type GetInPoolResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
