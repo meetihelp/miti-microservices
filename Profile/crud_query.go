@@ -286,7 +286,7 @@ func UpdateScore(userId string,score []int){
 	score[2]=profile.Conscientiousness+score[2]
 	score[3]=profile.EmotionalStability+score[3]
 	score[4]=profile.Intellect+score[4]
-	db.Table("profiles").Where("UserId=?",userId).Updates(Profile{Extraversion:score[0],
+	db.Table("profiles").Where("user_id=?",userId).Updates(Profile{Extraversion:score[0],
 		Agreeableness:score[1],Conscientiousness:score[2],EmotionalStability:score[3],Intellect:score[4]})
 }
 

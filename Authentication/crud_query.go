@@ -396,7 +396,7 @@ func IsProfileCreated(userId string) string{
 func UpdateIPIPStatus(userId string,ipipStatus int){
 	db:=database.GetDB()
 	user:=User{}
-	db.Model(&user).Where("user_id=?",userId).Update("ipip_status",ipipStatus)
+	db.Model(&user).Where("user_id=?",userId).Update("ip_ip_status",ipipStatus)
 }
 
 // func GetTemporaryIdList(userId string) TempUserList{

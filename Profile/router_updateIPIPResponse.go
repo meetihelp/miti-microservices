@@ -53,7 +53,8 @@ func UpdateIPIPResponse(w http.ResponseWriter, r *http.Request){
     data["IPIP4"]=updateIPIPRequest.IPIP4
     data["IPIP5"]=updateIPIPRequest.IPIP5
 	UpdateIPIPResponseDB(userId,data,updateIPIPRequest.Page)
-	auth.UpdateIPIPStatus(userId,updateIPIPRequest.Page)
+	ipipStatus:=updateIPIPRequest.Page+1
+	auth.UpdateIPIPStatus(userId,ipipStatus)
 	UpdateIPIPScore(userId)
 	util.Message(w,200)
 }
