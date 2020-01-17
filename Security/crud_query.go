@@ -46,24 +46,32 @@ func UpdatePrimaryTrustChain(userId string,chainId string,phone string,name stri
 	
 }
 
-func DeletePrimaryTrustChainDB(userId string,phoneId int,requestId string,updatedAt string) string{
+func DeletePrimaryTrustChainDB(userId string,chainId string,phone string,requestId string,updatedAt string) string{
 	db:=database.GetDB()
 	primaryTrustChain:=PrimaryTrustChain{}
-	db.Where("user_id=?",userId).Find(&primaryTrustChain)
+	db.Where("user_id=? AND chain_id=?",userId,chainId).Find(&primaryTrustChain)
 
-	if(phoneId==1){
+	if(primaryTrustChain.Phone1==phone){
 		primaryTrustChain.Phone1=""
-	}else if(phoneId==2){
+		primaryTrustChain.Name1=""
+	}else if(primaryTrustChain.Phone2==phone){
 		primaryTrustChain.Phone2=""
-	}else if(phoneId==3){
+		primaryTrustChain.Name2=""
+	}else if(primaryTrustChain.Phone3==phone){
 		primaryTrustChain.Phone3=""
-	}else if(phoneId==4){
+		primaryTrustChain.Name3=""
+	}else if(primaryTrustChain.Phone4==phone){
 		primaryTrustChain.Phone4=""
-	}else if(phoneId==5){
+		primaryTrustChain.Name4=""
+	}else if(primaryTrustChain.Phone5==phone){
 		primaryTrustChain.Phone5=""
-	}else if(phoneId==6){
+		primaryTrustChain.Name5=""
+	}else if(primaryTrustChain.Phone6==phone){
 		primaryTrustChain.Phone6=""
+		primaryTrustChain.Name6=""
 	}
+
+
 	if(primaryTrustChain.UserId==""){
 		primaryTrustChain.UserId=userId
 		primaryTrustChain.RequestId=requestId

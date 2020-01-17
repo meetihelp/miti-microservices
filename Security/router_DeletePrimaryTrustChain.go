@@ -13,10 +13,10 @@ import(
 func DeletePrimaryTrustChain(w http.ResponseWriter, r *http.Request){
 	header:=DeletePrimaryTrustChainHeader{}
 	util.GetHeader(r,&header)
-
-
 	sessionId:=header.Cookie
 	userId,dErr:=util.GetUserIdFromSession(sessionId)
+	fmt.Print("DeletePrimaryTrustChainHeader:->")
+	fmt.Println(header)
 	if dErr=="Error"{
 		fmt.Println("Session Does not exist")
 		util.Message(w,1003)
@@ -37,18 +37,24 @@ func DeletePrimaryTrustChain(w http.ResponseWriter, r *http.Request){
 		util.Message(w,1001)
 		return
 	}
+
+	fmt.Print("DeletePrimaryTrust Body->")
+	fmt.Println(deletePrimaryTrustChainRequest)
 	// primaryTrustChain.UserId=userId
 	// DeletePrimaryTrustChain(primaryTrustChain)
 	// util.Message(w,200)
 
 	requestId:=deletePrimaryTrustChainRequest.RequestId
+	phone:=deletePrimaryTrustChainRequest.Phone
+	chainId:=deletePrimaryTrustChainRequest.ChainId
 	updatedAt:=util.GetTime()
-	id:=deletePrimaryTrustChainRequest.Id
-	updatedAt=DeletePrimaryTrustChainDB(userId,id,requestId,updatedAt)
+	updatedAt=DeletePrimaryTrustChainDB(userId,chainId,phone,requestId,updatedAt)
 
 	w.Header().Set("Content-Type", "application/json")
 	msg:=util.GetMessageDecode(200)
 	p:=&DeletePrimaryTrustChainResponse{Code:200,Message:msg,RequestId:requestId,UpdatedAt:updatedAt}
+	fmt.Print("DeletePrimaryTrustChainResponse:->")
+	fmt.Println(*p)
 	enc := json.NewEncoder(w)
 	err= enc.Encode(p)
 	if err != nil {

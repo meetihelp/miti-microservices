@@ -17,8 +17,9 @@ type DeletePrimaryTrustChainHeader struct{
 
 type DeletePrimaryTrustChainRequest struct{
 	Phone string `json:"Phone"`
-	Id int `json:"Id"`
+	ChainId string `json:"ChainId"`
 	RequestId string `json:"RequestId"`
+	Name string `json:"Name"`
 }
 
 type CreateSecondaryTrustChainHeader struct{
