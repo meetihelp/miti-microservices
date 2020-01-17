@@ -3,7 +3,7 @@ package Security
 import (
 	// "log"
 	// "fmt"
-	database "miti-microservices/Database"
+	// database "miti-microservices/Database"
 // 	"github.com/jinzhu/gorm"
 //  _ 	"github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -37,7 +37,7 @@ type SecondaryTrustChain struct{
 }
 
 func init(){
-	db:=database.GetDB()
-	db.AutoMigrate(&PrimaryTrustChain{})
+	// db:=database.GetDB()
+	// db.AutoMigrate(&PrimaryTrustChain{})
 	// db.AutoMigrate(&SecondaryTrustChain{})
 }
