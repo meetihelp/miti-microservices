@@ -6,7 +6,8 @@ type CreatePrimaryTrustChainHeader struct{
 
 type CreatePrimaryTrustChainRequest struct{
 	Phone string `json:"Phone"`
-	Id int `json:"Id"`
+	ChainId string `json:"ChainId"`
+	Name string `json:"Name"`
 	RequestId string `json:"RequestId"`
 }
 

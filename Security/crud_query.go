@@ -2,28 +2,35 @@ package Security
 
 import(
 	database "miti-microservices/Database"
+	// util "miti-microservices/Util"
 )
 
-func UpdatePrimaryTrustChain(userId string,phoneId int,phone string,requestId string,updatedAt string) string{
+func UpdatePrimaryTrustChain(userId string,chainId string,phone string,name string,requestId string,updatedAt string) string{
 	db:=database.GetDB()
 	primaryTrustChain:=PrimaryTrustChain{}
-	db.Where("user_id=?",userId).Find(&primaryTrustChain)
-
-	if(phoneId==1){
+	db.Where("user_id=? AND chain_id=?",userId,chainId).Find(&primaryTrustChain)
+	if(primaryTrustChain.Phone1==""){
 		primaryTrustChain.Phone1=phone
-	}else if(phoneId==2){
+		primaryTrustChain.Name1=name
+	}else if(primaryTrustChain.Phone2==""){
 		primaryTrustChain.Phone2=phone
-	}else if(phoneId==3){
+		primaryTrustChain.Name2=name
+	}else if(primaryTrustChain.Phone3==""){
 		primaryTrustChain.Phone3=phone
-	}else if(phoneId==4){
+		primaryTrustChain.Name3=name
+	}else if(primaryTrustChain.Phone4==""){
 		primaryTrustChain.Phone4=phone
-	}else if(phoneId==5){
+		primaryTrustChain.Name4=name
+	}else if(primaryTrustChain.Phone5==""){
 		primaryTrustChain.Phone5=phone
-	}else if(phoneId==6){
+		primaryTrustChain.Name5=name
+	}else if(primaryTrustChain.Phone6==""){
 		primaryTrustChain.Phone6=phone
+		primaryTrustChain.Name6=name
 	}
 	if(primaryTrustChain.UserId==""){
 		primaryTrustChain.UserId=userId
+		primaryTrustChain.ChainId=chainId
 		primaryTrustChain.RequestId=requestId
 		primaryTrustChain.UpdatedAt=updatedAt
 		db.Create(&primaryTrustChain)

@@ -14,9 +14,11 @@ func CreatePrimaryTrustChain(w http.ResponseWriter, r *http.Request){
 	header:=CreatePrimaryTrustChainHeader{}
 	util.GetHeader(r,&header)
 
-
 	sessionId:=header.Cookie
 	userId,dErr:=util.GetUserIdFromSession(sessionId)
+
+	fmt.Print("CreatePrimaryTrustChainHeader:")
+	fmt.Println(header)
 	if dErr=="Error"{
 		fmt.Println("Session Does not exist")
 		util.Message(w,1003)
@@ -37,16 +39,20 @@ func CreatePrimaryTrustChain(w http.ResponseWriter, r *http.Request){
 		util.Message(w,1001)
 		return
 	}
+
+	fmt.Print("CreatePrimaryTrustChain Body:->")
+	fmt.Println(primaryTrustChainRequest)
 	// primaryTrustChainRequest.UserId=userId
-	if(primaryTrustChainRequest.Id>6 || primaryTrustChainRequest.Id<1){
-		util.Message(w,1002)
-		return
-	}
+	// if(primaryTrustChainRequest.Id>6 || primaryTrustChainRequest.Id<1){
+	// 	util.Message(w,1002)
+	// 	return
+	// }
 	requestId:=primaryTrustChainRequest.RequestId
 	updatedAt:=util.GetTime()
-	id:=primaryTrustChainRequest.Id
+	chainId:=primaryTrustChainRequest.ChainId
 	phone:=primaryTrustChainRequest.Phone
-	updatedAt=UpdatePrimaryTrustChain(userId,id,phone,requestId,updatedAt)
+	name:=primaryTrustChainRequest.Name
+	updatedAt=UpdatePrimaryTrustChain(userId,chainId,phone,name,requestId,updatedAt)
 
 	w.Header().Set("Content-Type", "application/json")
 	msg:=util.GetMessageDecode(200)
