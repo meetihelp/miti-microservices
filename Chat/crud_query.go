@@ -40,12 +40,13 @@ func ChatInsertDB(chatData Chat,lastUpdate string) (Chat,[]Chat,int) {
 	if(err!=nil){
 		fmt.Print("ChatInsertDB Error 2")
 		fmt.Println(err)
-		code=1006
+		// code=1006
 	}
 	fmt.Println("ChatInsertDB")
 	fmt.Println(chat)
 	fmt.Println(chatData)
 	if(chat.UserId==""){
+		code=200
 		db.Create(&chatData)
 		return chatData,unSyncedChat,code
 	}else{
