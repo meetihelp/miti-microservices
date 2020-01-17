@@ -92,7 +92,8 @@ func DeletePrimaryTrustChainDB(userId string,chainId string,phone string,request
 		primaryTrustChain.RequestId=requestId
 		fmt.Print("Updating Primary Trust Chain:->")
 		fmt.Println(primaryTrustChain)
-		db.Table("primary_trust_chains").Where("user_id=? AND chain_id=?",userId,chainId).Updates(primaryTrustChain)
+		// db.Table("primary_trust_chains").Where("user_id=? AND chain_id=?",userId,chainId).Updates(&primaryTrustChain)
+		db.Save(&primaryTrustChain)
 		return updatedAt	
 	}
 }
