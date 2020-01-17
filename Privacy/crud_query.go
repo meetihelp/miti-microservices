@@ -8,7 +8,7 @@ import(
 func CreateBoard(userId string,date string,boardId string){
 	db:=database.GetDB()
 	board:=Board{}
-	db.Where("user_id=? AND board_id=?",userId,boardId).Find(&board)
+	db.Where("user_id=? AND date=? AND boardId=?",userId,date,boardId).Find(&board)
 	if(board.UserId==""){
 		board.UserId=userId
 		board.Date=date
