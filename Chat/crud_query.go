@@ -192,7 +192,7 @@ func GetTempUserIdFromChatId(userId string,chatId string) string{
 func InsertMessageRequestDB(userId string,name string,senderPhone string,phone string,requestId string,messageType string,messageContent string,createdAt string) string{
 	db:=database.GetDB()
 	messageRequest:=MessageRequest{}
-	db.Where("user_id=? AND phone=? AND request_id=?",userId,phone,requestId).Find(&messageRequest)
+	db.Where("sender_user_id=? AND phone=? AND request_id=?",userId,phone,requestId).Find(&messageRequest)
 	if(messageRequest.SenderUserId==""){
 		messageRequest.SenderUserId=userId
 		messageRequest.SenderPhone=senderPhone
