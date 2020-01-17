@@ -83,7 +83,7 @@ func DeletePrimaryTrustChainDB(userId string,chainId string,phone string,request
 	}else{
 		primaryTrustChain.UpdatedAt=updatedAt
 		primaryTrustChain.RequestId=requestId
-		db.Table("primary_trust_chain").Where("user_id=?",userId).Updates(primaryTrustChain)
+		db.Table("primary_trust_chains").Where("user_id=?",userId).Updates(primaryTrustChain)
 		return updatedAt	
 	}
 }
