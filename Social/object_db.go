@@ -97,6 +97,22 @@ type GroupPoolStatus struct{
 	CreatedAt string `gorm:"type:varchar" json:"CreatedAt"`
 	Interest string `gorm:"primary_key;type:varchar" json:"Interest"`
 }
+
+type Group struct{
+	UserId string `gorm:"primary_key;type:varchar" json:"UserId"`
+	ChatId string `gorm:"type:varchar" json:"ChatId"`
+	Interest string `gorm:"primary_key;type:varchar" json:"Interest"`
+	CreatedAt string `gorm:"varchar" json:"CreatedAt"`
+	Membership string `gorm:"varchar" json:"Membership"`
+}
+
+type GroupStats struct{
+	ChatId string `gorm:"primary_key;type:varchar" json:"ChatId"`
+	NumberOfMember int `gorm:"type:int" json:"NumberOfMember"`
+	NumberOfTemporaryMember int `gorm:"type:int" json:"NumberOfTemporaryMember"`
+	Interest string `gorm:"type:varchar" json:"Interest"`
+	Pincode string `gorm:"type:varchar" json:"Pincode"`
+}
 func init(){
 	db:=database.GetDB()
 	db.AutoMigrate(&Pool{})

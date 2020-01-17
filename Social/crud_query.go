@@ -52,17 +52,30 @@ func EnterInPooL(userId string,pincode string,createdAt string,gender string,sex
 	return poolStatusResponse
 }
 
-// func EnterInGroupPooL(userId string,pincode string,interest string,createdAt string,gender string,sex string) GroupPoolStatus{
-// 	db:=database.GetDB()
-// 	poolWait:=GroupPoolWaiting{}
-// 	poolWait.UserId=userId
-// 	poolWait.Pincode=pincode
-// 	poolWait.Interest=interest
-// 	poolWait.CreatedAt=createdAt
-// 	poolWait.Gender=gender
-// 	poolWait.Sex=sex
-// 	_=db.Create(&poolWait).Error
-// }
+func EnterInGroupPooL(userId string,pincode string,interest string,createdAt string,gender string,sex string) GroupPoolStatusHelper{
+	db:=database.GetDB()
+	poolWait:=GroupPoolWaiting{}
+	poolWait.UserId=userId
+	poolWait.Pincode=pincode
+	poolWait.Interest=interest
+	poolWait.CreatedAt=createdAt
+	poolWait.Gender=gender
+	poolWait.Sex=sex
+	_=db.Create(&poolWait).Error
+
+	groupPoolStatus:=GroupPoolStatus{}
+	db.Where("user_id=? AND interest=?",userId,interest).Find(&groupPoolStatus)
+	if(groupPoolStatus.UserId==""){
+		groupPoolStatus.UserId=userId
+		groupPoolStatus.Status="Waiting"
+		groupPoolStatus.Interest=interest
+	}
+	groupPoolStatusHelper:=GroupPoolStatusHelper{}
+	groupPoolStatusHelper.ChatId=groupPoolStatus.ChatId
+	groupPoolStatusHelper.Status=groupPoolStatus.Status
+
+	return groupPoolStatusHelper
+}
 func DeleteWaitPool(userId string) {
 	db:=database.GetDB()
 	db.Where("user_id=?",userId).Delete(&PoolWaiting{})
@@ -130,4 +143,72 @@ func GroupPoolStatusDB(userId string,interest string) GroupPoolStatus{
 	fmt.Print("PoolStatusDB:")
 	fmt.Println(err)
 	return groupPoolStatus
+}
+
+func GetGroupAvailabilty(pincode string,interest string) (string,string){
+	db:=database.GetDB()
+	groupStats:=GroupStats{}
+	db.Where("pincode=? AND interest=? AND number_of_temporary_member<?",pincode,interest,MAX_NUMBER_OF_TEMPORARY_MEMBER).Find(&groupStats)
+	if(groupStats.ChatId==""){
+		return "","None"
+	}else{
+		return groupStats.ChatId,"temporary"
+	}
+}
+
+func InsertInGroup(chatId string,userId string,membership string,interest string) GroupPoolStatusHelper{
+	db:=database.GetDB()
+	createdAt:=util.GetTime()
+	group:=Group{}
+	group.UserId=userId
+	group.ChatId=chatId
+	group.Interest=interest
+	group.CreatedAt=createdAt
+	group.Membership=membership
+	groupTemp:=Group{}
+	db.Where("user_id=? AND chat_id=?",userId,chatId).Find(&groupTemp)
+	if(groupTemp.UserId==""){
+		db.Create(&group)
+
+		chatDetails:=ChatDetail{}
+		chatDetails.ActualUserId=userId
+		chatDetails.ChatId=chatId
+		chatDetails.CreatedAt=createdAt
+		chatDetails.ChatType="Group"
+		chatDetails.Name=util.GetGroupName(interest)
+		db.Create(&chatDetails)
+	}else{
+		db.Table("chat_details").Where("user_id=? AND chat_id=?",userId,chatId).Update("chat_id=?",chatId)
+		db.Table("group").Where("user_id=? AND chat_id=?",userId,chatId).Updates(group)
+	}
+	groupStats:=GroupStats{}
+	db.Where("chat_id=?",chatId).Find(&groupStats)
+	if(membership=="temporary"){
+		numberOfTemporaryMember:=groupStats.NumberOfTemporaryMember+1
+		db.Model(&groupStats).Where("chat_id=?",chatId).Update("number_of_temporary_member",numberOfTemporaryMember)
+	}else if(membership=="permanent"){
+		numberOfMember:=groupStats.NumberOfMember+1
+		db.Model(&groupStats).Where("chat_id=?",chatId).Update("number_of_member",numberOfMember)
+	}
+
+	groupPoolStatus:=GroupPoolStatus{}
+	groupPoolStatus.UserId=userId
+	groupPoolStatus.ChatId=chatId
+	groupPoolStatus.CreatedAt=createdAt
+	groupPoolStatus.Interest=interest
+	groupPoolStatus.Status=membership
+
+	groupPoolStatusTemp:=GroupPoolStatus{}
+	db.Where("user_id=? AND interest=?",userId,interest).Find(&groupPoolStatusTemp)
+	if(groupPoolStatusTemp.UserId==""){
+		db.Create(&groupPoolStatus)
+	}else{
+		db.Table("group_pool_status").Where("user_id=? AND interest=?",userId,interest).Updates(groupPoolStatus)
+	}
+
+	groupPoolStatusHelper:=GroupPoolStatusHelper{}
+	groupPoolStatusHelper.ChatId=chatId
+	groupPoolStatusHelper.Status=membership
+
+	return groupPoolStatusHelper
 }

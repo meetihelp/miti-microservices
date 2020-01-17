@@ -40,6 +40,7 @@ func GetMessageDecode(status_code int) string{
 	// //MESSAGE STATUS CODE FOR VERIFY OTP
 	message_decode[1401]="Wrong OTP"
 	message_decode[2003]="IPIP not completed"
+	message_decode[2004]="No group Available"
 	message_decode[3001]="Could Not upload Image"
 	//message_decode[2001]="No Message Sent"
 
