@@ -2,6 +2,7 @@ package Security
 
 import(
 	database "miti-microservices/Database"
+	"fmt"
 	// util "miti-microservices/Util"
 )
 
@@ -52,21 +53,27 @@ func DeletePrimaryTrustChainDB(userId string,chainId string,phone string,request
 	db.Where("user_id=? AND chain_id=?",userId,chainId).Find(&primaryTrustChain)
 
 	if(primaryTrustChain.Phone1==phone){
+		fmt.Println("Deleting Phone1")
 		primaryTrustChain.Phone1=""
 		primaryTrustChain.Name1=""
 	}else if(primaryTrustChain.Phone2==phone){
+		fmt.Println("Deleting Phone2")
 		primaryTrustChain.Phone2=""
 		primaryTrustChain.Name2=""
 	}else if(primaryTrustChain.Phone3==phone){
+		fmt.Println("Deleting Phone3")
 		primaryTrustChain.Phone3=""
 		primaryTrustChain.Name3=""
 	}else if(primaryTrustChain.Phone4==phone){
+		fmt.Println("Deleting Phone4")
 		primaryTrustChain.Phone4=""
 		primaryTrustChain.Name4=""
 	}else if(primaryTrustChain.Phone5==phone){
+		fmt.Println("Deleting Phone5")
 		primaryTrustChain.Phone5=""
 		primaryTrustChain.Name5=""
 	}else if(primaryTrustChain.Phone6==phone){
+		fmt.Println("Deleting Phone6")
 		primaryTrustChain.Phone6=""
 		primaryTrustChain.Name6=""
 	}
@@ -83,7 +90,7 @@ func DeletePrimaryTrustChainDB(userId string,chainId string,phone string,request
 	}else{
 		primaryTrustChain.UpdatedAt=updatedAt
 		primaryTrustChain.RequestId=requestId
-		db.Table("primary_trust_chains").Where("user_id=?",userId).Updates(primaryTrustChain)
+		db.Table("primary_trust_chains").Where("user_id=? AND chain_id=?",userId,chainId).Updates(primaryTrustChain)
 		return updatedAt	
 	}
 }
