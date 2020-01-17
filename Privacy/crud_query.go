@@ -43,6 +43,7 @@ func EnterBoardContent(userId string,boardId string,text string,imageId string,c
 		boardContent.UserId=userId
 		boardContent.BoardId=boardId
 		boardContent.ContentId=contentId
+		boardContent.ContentText=text
 		boardContent.ContentImageId=imageId
 		boardContent.AccessType="Private"
 		boardContent.CreatedAt=createdAt
