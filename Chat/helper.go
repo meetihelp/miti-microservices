@@ -67,3 +67,15 @@ type AnonymousUserHelper struct{
 	Status string `gorm:"type:varchar(6)" json:"Status"`  // status for Liked/not liked/ none
 	CreatedAt string `gorm:"type:varchar(100)" json:"CreatedAt"`
 }
+
+type User struct{
+	UserId string `json:"UserId"`
+	Phone string `json:"Phone"`
+	Email string  `json:"Email"`
+	// Password string `gorm:"type:varchar(100)" validate:"required" json:"Password"`
+	Status string `json:"Status"`  //Verified/Unverified/Deleted
+	ProfileCreationStatus string `json:"ProfileCreationStatus"`
+	PreferenceCreationStatus int `son:"PreferenceCreationStatus"`
+	IPIPStatus int `json:"IPIPStatus"`
+	CreatedAt string `json:"CreatedAt"`
+}

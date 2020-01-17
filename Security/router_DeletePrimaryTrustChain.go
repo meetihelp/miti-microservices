@@ -47,6 +47,10 @@ func DeletePrimaryTrustChain(w http.ResponseWriter, r *http.Request){
 	requestId:=deletePrimaryTrustChainRequest.RequestId
 	phone:=deletePrimaryTrustChainRequest.Phone
 	chainId:=deletePrimaryTrustChainRequest.ChainId
+	if(chainId=="" || phone=="" || requestId==""){
+		util.Message(w,1002)
+		return
+	}
 	updatedAt:=util.GetTime()
 	updatedAt=DeletePrimaryTrustChainDB(userId,chainId,phone,requestId,updatedAt)
 

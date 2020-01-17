@@ -57,7 +57,15 @@ type GetMessageRequestResponse struct{
 }
 
 type MessageRequestDS struct{
-	UserId string `json:"UserId"`
+	// UserId string `json:"UserId"`
+	Name string `json:"Name"`
 	Phone string `json:"Phone"`
+	CreatedAt string `json:"CreatedAt"`
+}
+
+type ActionMessageRequestResponse struct{
+	Code int `json:"Code`
+	Message string `json:"Message"`
+	RequestId string `json:"RequestId"`
 	CreatedAt string `json:"CreatedAt"`
 }

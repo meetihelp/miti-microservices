@@ -189,19 +189,19 @@ func GetTempUserIdFromChatId(userId string,chatId string) string{
 	return anonymousUser.AnonymousId
 }
 
-func InsertMessageRequestDB(userId string,phone string,requestId string,messageType string,messageContent string,createdAt string) string{
+func InsertMessageRequestDB(userId string,name string,senderPhone string,phone string,requestId string,messageType string,messageContent string,createdAt string) string{
 	db:=database.GetDB()
 	messageRequest:=MessageRequest{}
-	db.Where("user_id=? AND phone=?",userId,phone).Find(&messageRequest)
-	if(messageRequest.UserId==""){
-		userPhone:=""
-		db.Table("users").Select("phone").Where("user_id=?",userId).Find(&userPhone)
-		messageRequest.UserId=userId
+	db.Where("user_id=? AND phone=? AND request_id=?",userId,phone,requestId).Find(&messageRequest)
+	if(messageRequest.SenderUserId==""){
+		messageRequest.SenderUserId=userId
+		messageRequest.SenderPhone=senderPhone
 		messageRequest.Phone=phone
 		messageRequest.RequestId=requestId
 		messageRequest.MessageType=messageType
 		messageRequest.MessageContent=messageContent
 		messageRequest.CreatedAt=createdAt
+		messageRequest.Status="Wait"
 		db.Create(&messageRequest)
 		return createdAt
 	}else{
@@ -218,10 +218,65 @@ func GetMessageRequestDB(userId string) []MessageRequestDS{
 	messageRequestDS:=make([]MessageRequestDS,0)
 	for _,mr:=range messageRequest{
 		MRTemp:=MessageRequestDS{}
-		MRTemp.Phone=mr.UserPhone
-		MRTemp.UserId=mr.UserId
+		MRTemp.Phone=mr.SenderPhone
+		MRTemp.Name=mr.SenderName
+		// MRTemp.UserId=mr.UserId
 		MRTemp.CreatedAt=mr.CreatedAt
 		messageRequestDS=append(messageRequestDS,MRTemp)
 	}
 	return messageRequestDS
 }
+
+func GetUserPhone(userId string) string{
+	db:=database.GetDB()
+	user:=User{}
+	db.Table("users").Select("phone").Where("user_id=?",userId).Find(&user)
+	fmt.Println("GetuserPhone:->"+user.Phone)
+	return user.Phone
+}
+
+func UpdateMessageRequestDB(phone string,senderPhone string,action string,actionRequestId string,updatedAt string) (string,string){
+	db:=database.GetDB()
+	messageRequest:=MessageRequest{}
+	db.Where("sender_phone=? AND phone=?",senderPhone,phone,actionRequestId).Find(&messageRequest)
+	if(messageRequest.SenderPhone==""){
+		return "",""
+	}else if(messageRequest.ActionRequestId==actionRequestId){
+		return messageRequest.SenderUserId,messageRequest.UpdatedAt
+	}else{
+		messageRequest.Status=action
+		messageRequest.UpdatedAt=updatedAt
+		messageRequest.ActionRequestId=actionRequestId
+		db.Save(&messageRequest)
+		return messageRequest.SenderUserId,messageRequest.UpdatedAt
+	}
+}
+
+func InsertChatDetail(userId1 string,userId2 string){
+	db:=database.GetDB()
+	chatDetail:=ChatDetail{}
+	chatDetail.CreatedAt=util.GetTime()
+	chatDetail.ChatId=util.GenerateToken()
+	chatDetail.ChatType="one-to-one"
+
+	chatDetail.ActualUserId=userId1
+	db.Create(&chatDetail)
+
+	chatDetail.ActualUserId=userId2
+	db.Create(&chatDetail)
+}
+
+func IsPhoneNumberExist(phone string) string{
+	db:=database.GetDB()
+	user:=User{}
+	db.Table("users").Where("phone=?",phone).Find(&user)
+	if(user.UserId==""){
+		return "No"
+	}
+	return "Yes"
+}
+// func UpdateMessageRequestDB(userid string,userPhone string,action string,actionRequestId string,updatedAt string)(string,string){
+// 	db:=database.GetDB()
+// 	messageRequest:=MessageRequest{}
+
+// }

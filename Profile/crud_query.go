@@ -433,3 +433,9 @@ func GetUserInterest(userId string) []string{
 	return interestList
 }
 
+func GetUserName(userId string) string{
+	db:=database.GetDB()
+	profile:=Profile{}
+	db.Table("profiles").Where("user_id=?",userId).Find(&profile)
+	return profile.Name
+}

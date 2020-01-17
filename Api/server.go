@@ -62,6 +62,7 @@ func Server(runMethod string){
 	r.HandleFunc("/sendChatImage",apnachat.SendChatImage).Methods("POST")
 	r.HandleFunc("/sendMessageRequest",apnachat.SendMessageRequest).Methods("POST")
 	r.HandleFunc("/getMessageRequest",apnachat.GetMessageRequest).Methods("GET")
+	r.HandleFunc("/actionMessageRequest",apnachat.ActionMessageRequest).Methods("POST")
 
 
 	//Profile related APIs

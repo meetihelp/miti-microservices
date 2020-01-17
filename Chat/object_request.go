@@ -67,3 +67,13 @@ type SendMessageRequestDS struct{
 type GetMessageRequestHeader struct{
 	Cookie string `header:"Miti-Cookie"`
 }
+
+type AcceptMessageRequestHeader struct{
+	Cookie string `header:"Miti-Cookie"`	
+}
+
+type AcceptMessageRequestDS struct{
+	RequestId string `json:"RequestId"`
+	Phone string `json:"Phone"`
+	Action string `json:"Action"`
+}
