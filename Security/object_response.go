@@ -26,3 +26,8 @@ type DeleteSecondaryTrustChainResponse struct{
 	Message string `json:"Message"`
 	RequestId string `json:"RequestId"`
 }
+
+type AlertMessageResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+}

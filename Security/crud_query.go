@@ -118,3 +118,39 @@ func DeleteSecondaryTrustChainDB(userId string,chatId string){
 	db:=database.GetDB()
 	_=db.Where("user_id=? AND chat_id=?",userId,chatId).Delete(SecondaryTrustChain{}).Error
 }
+
+
+func GetPrimaryTrustPhoneList(userId string) []string{
+	db:=database.GetDB()
+	primaryTrustChain:=PrimaryTrustChain{}
+	db.Where("user_id=?",userId).Find(&primaryTrustChain)
+
+	phoneList:=make([]string,0)
+	if(primaryTrustChain.Phone1!=""){
+		phoneList=append(phoneList,primaryTrustChain.Phone1)
+	}
+	if(primaryTrustChain.Phone2!=""){
+		phoneList=append(phoneList,primaryTrustChain.Phone2)
+	}
+	if(primaryTrustChain.Phone3!=""){
+		phoneList=append(phoneList,primaryTrustChain.Phone3)
+	}
+	if(primaryTrustChain.Phone4!=""){
+		phoneList=append(phoneList,primaryTrustChain.Phone4)
+	}
+	if(primaryTrustChain.Phone5!=""){
+		phoneList=append(phoneList,primaryTrustChain.Phone5)
+	}
+	if(primaryTrustChain.Phone6!=""){
+		phoneList=append(phoneList,primaryTrustChain.Phone6)
+	}
+
+	return phoneList
+}
+
+func GetUserName(userId string) string{
+	db:=database.GetDB()
+	profile:=Profile{}
+	db.Table("profiles").Where("user_id=?",userId).Find(&profile)
+	return profile.Name
+}

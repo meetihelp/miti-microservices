@@ -42,6 +42,8 @@ func GetMessageDecode(status_code int) string{
 	message_decode[2003]="IPIP not completed"
 	message_decode[2004]="No group Available"
 	message_decode[3001]="Could Not upload Image"
+
+	message_decode[2005]="Could not send alert message"
 	//message_decode[2001]="No Message Sent"
 
 	// //MESSAGE STATUS CODE FOR LOGIN

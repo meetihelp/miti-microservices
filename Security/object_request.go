@@ -40,3 +40,12 @@ type DeleteSecondaryTrustChainRequest struct{
 	ChatId string `json:"ChatId"`
 	RequestId string `json:"RequestId"`
 }
+
+type AlertMessageHeader struct{
+	Cookie string `header:"Miti-Cookie"`	
+}
+
+type AlertMessageRequest struct{
+	Latitude string `json:"Latitude"`
+	Longitude string `json:"Longitude"`
+}

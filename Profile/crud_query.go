@@ -432,3 +432,4 @@ func GetUserInterest(userId string) []string{
 
 	return interestList
 }
+
