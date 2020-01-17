@@ -46,6 +46,11 @@ func AlertMessage(w http.ResponseWriter, r *http.Request){
 
 	latitude:=alertMessageRequest.Latitude
 	longitude:=alertMessageRequest.Longitude
+
+	if(latitude=="" || longitude==""){
+		util.Message(w,1002)
+		return
+	}
 	phoneList:=GetPrimaryTrustPhoneList(userId)
 	name:=GetUserName(userId)
 
