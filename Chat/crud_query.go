@@ -50,6 +50,7 @@ func ChatInsertDB(chatData Chat,lastUpdate string) (Chat,[]Chat,int) {
 		db.Create(&chatData)
 		return chatData,unSyncedChat,code
 	}else{
+		code=200
 		return chat,unSyncedChat,code
 	}
 	
