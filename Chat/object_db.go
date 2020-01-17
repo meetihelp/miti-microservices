@@ -3,7 +3,7 @@
 import (
 	// "log"
 	// "fmt"
-	// database "miti-microservices/Database"
+	database "miti-microservices/Database"
 	// "time"
 	// "github.com/jinzhu/gorm"
  // _ 	"github.com/jinzhu/gorm/dialects/postgres"
@@ -50,7 +50,8 @@ type ReadBy struct{
 }
 
 func init(){	
-	// db:=database.GetDB()
+	db:=database.GetDB()
+	db.AutoMigrate(&MessageRequest{})
 	// db.AutoMigrate(&ChatDetail{})
 	// db.AutoMigrate(&Chat{})
 	// db.AutoMigrate(&ReadBy{})
