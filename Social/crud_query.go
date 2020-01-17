@@ -2,6 +2,7 @@ package Social
 
 import(
 	database "miti-microservices/Database"
+	profile "miti-microservices/Profile"
 	"fmt"
 	util "miti-microservices/Util"
 )
@@ -45,7 +46,7 @@ func EnterInPooL(userId string,pincode string,createdAt string,gender string,sex
 
 
 	}
-
+	
 	poolStatusResponse.ChatId=poolStatus.ChatId
 	poolStatusResponse.MatchUserId=poolStatus.MatchUserId
 	poolStatusResponse.Status=poolStatus.Status
@@ -136,10 +137,10 @@ func DeleteFromGroupPoolHelper(areaCode string,gender string,number_of_person in
 }
 
 
-func GroupPoolStatusDB(userId string) []GroupPoolStatusHelper{
+func GroupPoolStatusDB(userId string) ([]string,[]GroupPoolStatusHelper){
 	db:=database.GetDB()
 	groupPoolStatus:=[]GroupPoolStatus{}
-	err:=db.Where("user_id=? AND interest=?",userId).Find(&groupPoolStatus).Error
+	err:=db.Where("user_id=?",userId).Find(&groupPoolStatus).Error
 	fmt.Print("PoolStatusDB:")
 	fmt.Println(err)
 	groupPoolStatusHelper:=[]GroupPoolStatusHelper{}
@@ -151,7 +152,10 @@ func GroupPoolStatusDB(userId string) []GroupPoolStatusHelper{
 		groupPoolStatusHelperTemp.CreatedAt=g.CreatedAt
 		groupPoolStatusHelper=append(groupPoolStatusHelper,groupPoolStatusHelperTemp)
 	}
-	return groupPoolStatusHelper
+
+	interest:=profile.GetUserInterest(userId)
+
+	return interest,groupPoolStatusHelper
 }
 
 func GetGroupAvailabilty(pincode string,interest string) (string,string){

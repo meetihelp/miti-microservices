@@ -410,3 +410,25 @@ func GetStatusDB(chatId string) []StatusResponse{
 	}
 	return statusList
 }
+
+func GetUserInterest(userId string) []string{
+	db:=database.GetDB()
+	interest:=Interest{}
+	db.Where("user_id=?",userId).Find(&interest)
+
+	interestList:=make([]string,0)
+	interestList=append(interestList,interest.InterestOutdoorPassive1)
+	interestList=append(interestList,interest.InterestOutdoorPassive2)
+	interestList=append(interestList,interest.InterestOutdoorActive1)
+	interestList=append(interestList,interest.InterestOutdoorActive2)
+	interestList=append(interestList,interest.InterestIndoorPassive1)
+	interestList=append(interestList,interest.InterestIndoorPassive2)
+	interestList=append(interestList,interest.InterestIndoorActive1)
+	interestList=append(interestList,interest.InterestIndoorActive2)
+	interestList=append(interestList,interest.InterestOthers1)
+	interestList=append(interestList,interest.InterestOthers2)
+	interestList=append(interestList,interest.InterestIdeology1)
+	interestList=append(interestList,interest.InterestIdeology2)
+
+	return interestList
+}

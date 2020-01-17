@@ -42,7 +42,7 @@ func GroupPoolStatusRouter(w http.ResponseWriter, r *http.Request){
 	// }
 	// interest:=groupPoolStatusRequest.Interest
 
-	groupPoolStatus:=GroupPoolStatusDB(userId)
+	interest,groupPoolStatus:=GroupPoolStatusDB(userId)
 	w.Header().Set("Content-Type", "application/json")
 	// status:=groupPoolStatus.Status
 	// createdAt:=groupPoolStatus.CreatedAt
@@ -53,7 +53,7 @@ func GroupPoolStatusRouter(w http.ResponseWriter, r *http.Request){
 		code=2003
 	}
 	msg:=util.GetMessageDecode(code)
-	p:=&GroupPoolStatusResponse{Code:code,Message:msg,Status:groupPoolStatus,IPIP:ipip}
+	p:=&GroupPoolStatusResponse{Code:code,Message:msg,Interest:interest,Status:groupPoolStatus,IPIP:ipip}
 	fmt.Print("GroupPoolStatusResponse:")
 	fmt.Println(*p)
 	enc := json.NewEncoder(w)

@@ -15,7 +15,7 @@ type GroupPoolStatusResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
 	// ChatId string `json:"ChatId"`
-	// Interest string `json:"Interest"`
+	Interest []string `json:"Interest"`
 	Status []GroupPoolStatusHelper `json:"Status"`
 	// CreatedAt string `json:"CreatedAt"`
 	// MatchTime string `json:"MatchTime"`
