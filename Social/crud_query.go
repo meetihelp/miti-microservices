@@ -136,13 +136,22 @@ func DeleteFromGroupPoolHelper(areaCode string,gender string,number_of_person in
 }
 
 
-func GroupPoolStatusDB(userId string,interest string) GroupPoolStatus{
+func GroupPoolStatusDB(userId string) []GroupPoolStatusHelper{
 	db:=database.GetDB()
-	groupPoolStatus:=GroupPoolStatus{}
-	err:=db.Where("user_id=? AND interest=?",userId,interest).Find(&groupPoolStatus).Error
+	groupPoolStatus:=[]GroupPoolStatus{}
+	err:=db.Where("user_id=? AND interest=?",userId).Find(&groupPoolStatus).Error
 	fmt.Print("PoolStatusDB:")
 	fmt.Println(err)
-	return groupPoolStatus
+	groupPoolStatusHelper:=[]GroupPoolStatusHelper{}
+	for _,g:=range groupPoolStatusHelper{
+		groupPoolStatusHelperTemp:=GroupPoolStatusHelper{}
+		groupPoolStatusHelperTemp.ChatId=g.ChatId
+		groupPoolStatusHelperTemp.Status=g.Status
+		groupPoolStatusHelperTemp.Interest=g.Interest
+		groupPoolStatusHelperTemp.CreatedAt=g.CreatedAt
+		groupPoolStatusHelper=append(groupPoolStatusHelper,groupPoolStatusHelperTemp)
+	}
+	return groupPoolStatusHelper
 }
 
 func GetGroupAvailabilty(pincode string,interest string) (string,string){

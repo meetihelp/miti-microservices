@@ -14,10 +14,10 @@ type PoolStatusResponse struct{
 type GroupPoolStatusResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
-	ChatId string `json:"ChatId"`
-	Interest string `json:"Interest"`
-	Status string `json:"Status"`
-	CreatedAt string `json:"CreatedAt"`
+	// ChatId string `json:"ChatId"`
+	// Interest string `json:"Interest"`
+	Status []GroupPoolStatusHelper `json:"Status"`
+	// CreatedAt string `json:"CreatedAt"`
 	// MatchTime string `json:"MatchTime"`
 	IPIP int `json:"IPIP"`
 }
@@ -39,14 +39,16 @@ type PoolStatusHelper struct{
 type GetInGroupPoolResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
-	CreatedAt string `json:"CreatedAt"`
 	Interest string `json:"Interest"`
 	Status GroupPoolStatusHelper `json:"Status"`
+	CreatedAt string `json:"CreatedAt"`
 }
 
 type GroupPoolStatusHelper struct{
 	ChatId string `json:"ChatId"`
 	Status string `json:"Status"`
+	Interest string `json:"Interest"`
+	CreatedAt string `json:"CreatedAt"`
 }
 
 type CancelGroupPoolResponse struct{
