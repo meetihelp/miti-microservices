@@ -5,7 +5,7 @@ import(
 	"net/http"
 	"log"
 	"io/ioutil"
-	// "strings"
+	"strings"
 	"encoding/json"
    util "miti-microservices/Util"
 )
@@ -42,25 +42,29 @@ func ActionMessageRequest(w http.ResponseWriter,r *http.Request){
 	fmt.Print("ActionMessageRequest Body:->")
 	fmt.Println(acceptMessageRequestData)
 
+	code:=200
 	actionRequestId:=acceptMessageRequestData.RequestId
 	action:=acceptMessageRequestData.Action
+	action=strings.ToLower(action)
 	senderPhone:=acceptMessageRequestData.Phone
 	phone:=GetUserPhone(userId)
 	updatedAt:=util.GetTime()
-	if(action=="Accept"){
-		userId2,updatedAtTemp:=UpdateMessageRequestDB(phone,senderPhone,action,actionRequestId,updatedAt)
+	if(action=="accept"){
+		userId2,updatedAtTemp,messageRequest:=UpdateMessageRequestDB(phone,senderPhone,action,actionRequestId,updatedAt)
 		updatedAt=updatedAtTemp
-		InsertChatDetail(userId,userId2)
-	}else if(action=="Reject"){
-		_,updatedAt=UpdateMessageRequestDB(phone,senderPhone,action,actionRequestId,updatedAt)
+		codeTemp,chatId:=InsertChatDetail(userId,userId2,actionRequestId)
+		code=codeTemp
+		code=InsertIntoChatFromMessageRequest(chatId,actionRequestId,messageRequest)
+	}else if(action=="reject"){
+		_,updatedAt,_=UpdateMessageRequestDB(phone,senderPhone,action,actionRequestId,updatedAt)
 	}else{
 		util.Message(w,1002)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	msg:=util.GetMessageDecode(200)
-	p:=&ActionMessageRequestResponse{Code:200,Message:msg,RequestId:actionRequestId,CreatedAt:updatedAt}
+	msg:=util.GetMessageDecode(code)
+	p:=&ActionMessageRequestResponse{Code:code,Message:msg,RequestId:actionRequestId,CreatedAt:updatedAt}
 	fmt.Print("ActionMessageRequest Response:->")
 	fmt.Println(*p)
 	enc := json.NewEncoder(w)

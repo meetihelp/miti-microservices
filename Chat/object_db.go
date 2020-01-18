@@ -18,6 +18,7 @@ type ChatDetail struct{
 	LastUpdate string `gorm:"varchar(100)" json:"LastUpdate"`
 	UserIndex int `gorm:"type:int" json:"Index"`
 	Name string `gorm:"type:varchar" json:"Name"`
+	RequestId string `gorm:"type:varchar" json:"RequestId"`
 }
 type MessageRequest struct{
 	SenderUserId string `gorm:"primary_key;type:varchar" json:"SenderUserId"`
@@ -26,6 +27,7 @@ type MessageRequest struct{
 	Phone string `gorm:"primary_key;type:varchar" json:"Phone"`
 	RequestId string `gorm:"varchar" json:"RequestId"`
 	Status string `gorm:"varchar" json:"AcceptStatus"`
+	MessageId string `gorm:"type:varchar"  json:"MessageId"`
 	MessageType string `gorm:"varchar"  json:"MessageType"`
 	MessageContent string `gorm:"varchar"  json:"MessageContent"`
 	CreatedAt string `gorm:"varchar" json:"CreatedAt"`
