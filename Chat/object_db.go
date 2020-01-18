@@ -54,7 +54,7 @@ type ReadBy struct{
 func init(){	
 	db:=database.GetDB()
 	db.AutoMigrate(&MessageRequest{})
-	// db.AutoMigrate(&ChatDetail{})
+	db.AutoMigrate(&ChatDetail{})
 	// db.AutoMigrate(&Chat{})
 	// db.AutoMigrate(&ReadBy{})
 }

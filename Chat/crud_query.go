@@ -263,9 +263,9 @@ func InsertChatDetail(userId1 string,userId2 string,requestId string) (int,strin
 	code:=200
 
 	chatDetailTemp1:=ChatDetail{}
-	db.Where("user_id=? AND request_id=?",userId1,requestId).Find(&chatDetailTemp1)
+	db.Where("actual_user_id=? AND request_id=?",userId1,requestId).Find(&chatDetailTemp1)
 	chatDetailTemp2:=ChatDetail{}
-	db.Where("user_id=? AND request_id=?",userId2,requestId).Find(&chatDetailTemp2)
+	db.Where("actual_user_id=? AND request_id=?",userId2,requestId).Find(&chatDetailTemp2)
 
 	if(chatDetailTemp1.ChatId!=""){
 		chatDetail.ChatId=chatDetailTemp1.ChatId
