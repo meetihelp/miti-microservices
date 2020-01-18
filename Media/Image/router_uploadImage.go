@@ -9,6 +9,7 @@ import(
 	"encoding/json"
 	"os"
 	"log"
+	"strings"
 
 )
 
@@ -19,6 +20,7 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 	sessionId:=uploadImageHeader.Cookie
 	log.Println("upload Image Cookie:"+sessionId)
 	accessType:=uploadImageHeader.AccessType
+	accessType=strings.ToLower(accessType)
 	log.Println("upload Image AccessType:"+accessType)
 	actualFileName:=uploadImageHeader.ActualFileName
 	format:=uploadImageHeader.Format
@@ -51,13 +53,17 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 	        fmt.Println(err)
 	    }
 
+	    if(accessType!="private" && accessType!="public"){
+	    	util.Message(w,1002)
+	    	return
+	    }
 
 		imageId:=util.GenerateToken()
 		generatedName:=util.GenerateToken()
 		filename:=generatedName+"."+format
 		bucket:=""
 		fmt.Println("AccessType:"+accessType)
-		if(accessType=="Private"){
+		if(accessType=="private"){
 			bucket=GetPrivateImageBucket()
 			fmt.Println("Bucket:"+bucket)
 		}else{
@@ -87,7 +93,7 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 
 			// signedURL:=""
 			// url:=""
-			if(accessType=="Public"){
+			if(accessType=="public"){
 				PublicCloudFront:=os.Getenv("publicImageCloudFront")
 				url=PublicCloudFront+"/"+filename
 			}
@@ -98,7 +104,7 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 		// uploadImageResponse.URL=signedURL
 		// util.Message(w,200)
 	}else{
-		if(accessType=="Public"){
+		if(accessType=="public"){
 			PublicCloudFront:=os.Getenv("publicImageCloudFront")
 			filename:=userImageData.GeneratedName+"."+userImageData.Format
 			url=PublicCloudFront+"/"+filename

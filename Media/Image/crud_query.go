@@ -27,7 +27,7 @@ func IsUserPermittedToSeeImage(userId string,imageId string) (string,string){
 	db:=database.GetDB()
 	userImage:=UserImage{}
 	db.Where("image_id=?",imageId).Find(&userImage)
-	if(userImage.AccessType=="Public"){
+	if(userImage.AccessType=="public"){
 		return userImage.UserId,"Ok"
 	}else{
 		// Write Code to check if user is permitted
@@ -40,10 +40,10 @@ func GetImageURL(userId string,imageId string) string{
 	userImage:=UserImage{}
 	db.Where("user_id=? AND image_id=?",userId,imageId).Find(&userImage)
 	filename:=userImage.GeneratedName+"."+userImage.Format
-	if(userImage.AccessType=="Private"){
+	if(userImage.AccessType=="private"){
 		signedURL:=GetSignedURL(filename,10)
 		return signedURL
-	}else if(userImage.AccessType=="Public"){
+	}else if(userImage.AccessType=="public"){
 		url:=GetPublicImageURL(filename)
 		return url
 	}else{

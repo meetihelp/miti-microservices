@@ -9,6 +9,7 @@ import(
 	"encoding/json"
 	"os"
 	"log"
+	"strings"
 
 )
 
@@ -19,6 +20,7 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 	sessionId:=sendChatImageHeader.Cookie
 	log.Println("upload Image Cookie:"+sessionId)
 	accessType:=sendChatImageHeader.AccessType
+	accessType=strings.ToLower(accessType)
 	log.Println("upload Image AccessType:"+accessType)
 	actualFileName:=sendChatImageHeader.ActualFileName
 	format:=sendChatImageHeader.Format
@@ -118,7 +120,7 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 
 		// signedURL:=""
 		// url:=""
-		if(accessType=="Public"){
+		if(accessType=="public"){
 			PublicCloudFront:=os.Getenv("publicImageCloudFront")
 			url=PublicCloudFront+"/"+filename
 		}
@@ -126,7 +128,7 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 	}else{
 		// chatResponse=GetChatByRequestId(userId,requestId)
 		fmt.Println("Already with this request id")
-		if(accessType=="Public"){
+		if(accessType=="public"){
 			PublicCloudFront:=os.Getenv("publicImageCloudFront")
 			filename:=userImageData.GeneratedName+"."+userImageData.Format
 			url=PublicCloudFront+"/"+filename
