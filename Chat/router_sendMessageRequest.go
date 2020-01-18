@@ -43,9 +43,13 @@ func SendMessageRequest(w http.ResponseWriter,r *http.Request){
 	fmt.Print("SendMessageRequest Body:->")
 	fmt.Println(sendMessageRequestData)
 
+	phoneErr,phone:=util.GetPhoneInFormat(sendMessageRequestData.Phone)
+	if(phoneErr=="Error"){
+		util.Message(w,1002)
+		return
+	}
 	requestId:=sendMessageRequestData.RequestId
 	senderPhone:=GetUserPhone(userId)
-	phone:=sendMessageRequestData.Phone
 	messageType:=sendMessageRequestData.MessageType
 	messageContent:=sendMessageRequestData.MessageContent
 	senderName:=profile.GetUserName(userId)
