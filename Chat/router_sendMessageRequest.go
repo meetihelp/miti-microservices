@@ -35,7 +35,8 @@ func SendMessageRequest(w http.ResponseWriter,r *http.Request){
 	sendMessageRequestData:=SendMessageRequestDS{}
 	profileRequestErr:=json.Unmarshal(requestBody,&sendMessageRequestData)
 	if profileRequestErr!=nil{
-		fmt.Println("Could not Unmarshall profile data")
+		fmt.Print("Could not Unmarshall sendMessageRequestData data:->")
+		fmt.Println(profileRequestErr)
 		util.Message(w,1001)
 		return
 	}
