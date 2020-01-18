@@ -212,9 +212,8 @@ func InsertMessageRequestDB(userId string,senderName string,senderPhone string,p
 
 func GetMessageRequestDB(userId string) []MessageRequestDS{
 	db:=database.GetDB()
-	phone:=""
-	db.Table("users").Select("phone").Where("user_id=?",userId).Find(&phone)
-	messageRequest:=[]MessageRequest{}
+	phone:=GetUserPhone(userId)
+	messageRequest:=make([]MessageRequest,0)
 	db.Where("phone=?",phone).Find(&messageRequest)
 	messageRequestDS:=make([]MessageRequestDS,0)
 	for _,mr:=range messageRequest{
