@@ -239,7 +239,7 @@ func GetUserPhone(userId string) string{
 func UpdateMessageRequestDB(phone string,senderPhone string,action string,actionRequestId string,updatedAt string) (string,string,MessageRequest){
 	db:=database.GetDB()
 	messageRequest:=MessageRequest{}
-	db.Where("sender_phone=? AND phone=?",senderPhone,phone,actionRequestId).Find(&messageRequest)
+	db.Where("sender_phone=? AND phone=?",senderPhone,phone).Find(&messageRequest)
 	if(messageRequest.SenderPhone==""){
 		return "","",messageRequest
 	}else if(messageRequest.ActionRequestId==actionRequestId){
