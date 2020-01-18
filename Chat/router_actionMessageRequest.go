@@ -47,6 +47,10 @@ func ActionMessageRequest(w http.ResponseWriter,r *http.Request){
 	action:=acceptMessageRequestData.Action
 	action=strings.ToLower(action)
 	senderPhone:=acceptMessageRequestData.Phone
+	if(senderPhone==""){
+		util.Message(w,1002)
+		return
+	}
 	phone:=GetUserPhone(userId)
 	updatedAt:=util.GetTime()
 	if(action=="accept"){
