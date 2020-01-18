@@ -21,7 +21,7 @@ type Board struct{
 type BoardContent struct{
 	BoardId string `gorm:"type:varchar" json:"BoardId"`
 	UserId string `gorm:"primary_key;type:varchar" json:"UserId"`
-	ContentId string `gorm:"type:varchar" json:"ContentId"`
+	ContentId string `gorm:"primary_key;type:varchar" json:"ContentId"`
 	ContentText string `gorm:"type:varchar" json:"ContentText"`
 	ContentImageId string `gorm:"type:varchar" json:"ContentImageId"`
 	AccessType string `gorm:"type:varchar" json:"AccessType"`

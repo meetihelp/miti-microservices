@@ -53,6 +53,10 @@ func UploadBoardContent(w http.ResponseWriter, r *http.Request){
 		util.Message(w,1002)
 		return
 	}
+	if(boardId==""){
+		util.Message(w,1002)
+		return
+	}
 	contentId:=util.GenerateToken()
 	createdAt:=util.GetTime()
 	createdAt,contentId=EnterBoardContent(userId,boardId,text,imageId,contentId,requestId,createdAt)
