@@ -57,13 +57,14 @@ func UploadBoardContent(w http.ResponseWriter, r *http.Request){
 		util.Message(w,1002)
 		return
 	}
+	code:=200
 	contentId:=util.GenerateToken()
 	createdAt:=util.GetTime()
-	createdAt,contentId=EnterBoardContent(userId,boardId,text,imageId,contentId,requestId,createdAt)
+	createdAt,contentId,code=EnterBoardContent(userId,boardId,text,imageId,contentId,requestId,createdAt)
 
 	w.Header().Set("Content-Type", "application/json")
-	msg:=util.GetMessageDecode(200)
-	p:=&UploadBoardContentResponse{Code:200,Message:msg,RequestId:requestId,
+	msg:=util.GetMessageDecode(code)
+	p:=&UploadBoardContentResponse{Code:code,Message:msg,RequestId:requestId,
 			CreatedAt:createdAt,BoardId:boardId,ContentId:contentId}
 	fmt.Print("UploadBoardContent Response:->")
 	fmt.Println(*p)

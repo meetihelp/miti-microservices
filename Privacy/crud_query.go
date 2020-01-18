@@ -3,6 +3,7 @@ package Privacy
 import(
 	database "miti-microservices/Database"
 	util "miti-microservices/Util"
+	"fmt"
 )
 
 func CreateBoard(userId string,date string,boardId string){
@@ -35,9 +36,10 @@ func GetBoardId(userId string,date string) string{
 	return board.BoardId
 }
 
-func EnterBoardContent(userId string,boardId string,text string,imageId string,contentId string,requestId string,createdAt string) (string,string){
+func EnterBoardContent(userId string,boardId string,text string,imageId string,contentId string,requestId string,createdAt string) (string,string,int){
 	db:=database.GetDB()
 	boardContent:=BoardContent{}
+	code:=200
 	db.Where("user_id=? AND board_id=? AND request_id=?",userId,boardId,requestId).Find(&boardContent)
 	if(boardContent.UserId==""){
 		boardContent.UserId=userId
@@ -48,10 +50,15 @@ func EnterBoardContent(userId string,boardId string,text string,imageId string,c
 		boardContent.AccessType="Private"
 		boardContent.CreatedAt=createdAt
 		boardContent.RequestId=requestId
-		db.Create(&boardContent)
-		return createdAt,boardContent.ContentId
+		err:=db.Create(&boardContent).Error
+		if(err!=nil){
+			code=1006
+			fmt.Print("EnterBoardContent DB Error:")
+			fmt.Println(err)
+		}
+		return createdAt,boardContent.ContentId,code
 	}else{
-		return boardContent.CreatedAt,boardContent.ContentId
+		return boardContent.CreatedAt,boardContent.ContentId,code
 	}
 }
 
