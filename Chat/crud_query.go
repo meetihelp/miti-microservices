@@ -211,11 +211,11 @@ func InsertMessageRequestDB(userId string,senderName string,senderPhone string,p
 	}
 }
 
-func GetMessageRequestDB(userId string) []MessageRequestDS{
+func GetMessageRequestDB(userId string,createdAt string) []MessageRequestDS{
 	db:=database.GetDB()
 	phone:=GetUserPhone(userId)
 	messageRequest:=make([]MessageRequest,0)
-	db.Where("phone=?",phone).Find(&messageRequest)
+	db.Where("phone=? AND created_at>?",phone,createdAt).Find(&messageRequest)
 	messageRequestDS:=make([]MessageRequestDS,0)
 	for _,mr:=range messageRequest{
 		MRTemp:=MessageRequestDS{}

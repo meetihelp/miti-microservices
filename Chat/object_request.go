@@ -68,6 +68,10 @@ type GetMessageRequestHeader struct{
 	Cookie string `header:"Miti-Cookie"`
 }
 
+type GetMessageRequestDS struct{
+	CreatedAt string `json:"CreatedAt"`
+}
+
 type AcceptMessageRequestHeader struct{
 	Cookie string `header:"Miti-Cookie"`	
 }

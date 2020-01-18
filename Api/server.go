@@ -61,7 +61,7 @@ func Server(runMethod string){
 	r.HandleFunc("/getChatAfterIndex",apnachat.GetChatAfterIndex).Methods("POST")
 	r.HandleFunc("/sendChatImage",apnachat.SendChatImage).Methods("POST")
 	r.HandleFunc("/sendMessageRequest",apnachat.SendMessageRequest).Methods("POST")
-	r.HandleFunc("/getMessageRequest",apnachat.GetMessageRequest).Methods("GET")
+	r.HandleFunc("/getMessageRequest",apnachat.GetMessageRequest).Methods("POST")
 	r.HandleFunc("/actionMessageRequest",apnachat.ActionMessageRequest).Methods("POST")
 
 
