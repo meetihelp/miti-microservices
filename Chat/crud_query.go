@@ -75,32 +75,17 @@ func GetChatDetail(userId string,date string,numOfChat int) ([]string,[]ChatDeta
 		user:=[]ChatDetail{}
 		db.Where("chat_id=?",c.ChatId).Find(&user)
 		// fmt.Println(u)
+		flag:=0
 		for _,u:=range user{
-			if(u.ActualUserId!=userId){
+			if(u.ActualUserId!=userId && flag==0){
 				userId2=append(userId2,u.ActualUserId)
+				flag=1
 			}
 		}
-		// if(len(u)==0){
-		// 	userId2=append(userId2,"")
-		// }else if(u[0].ActualUserId==userId){
-		// 	userId2=append(userId2,u[1].ActualUserId)	
-		// }else{
-		// 	userId2=append(userId2,u[0].ActualUserId)
-		// }
-		// fmt.Println(u)
-		// if(len(u)!=1){
-		// 	userId2=append(userId2,"")
-		// }else{
-		// 	userId2=append(userId2,u[0].ActualUserId)	
-		// }
+		if(flag==0){
+			userId2=append(userId2,"")
+		}
 		
-	}
-	if(len(userId2)>1){
-		userId2[0]=""
-		return userId2[:1],chatDetail,"Ok"
-	}else if(len(userId2)==0){
-		userId2=append(userId2,"")
-		return userId2,chatDetail,"Ok"
 	}
 	return userId2,chatDetail,"Ok"
 }
