@@ -49,3 +49,8 @@ type AlertMessageRequest struct{
 	Latitude string `json:"Latitude"`
 	Longitude string `json:"Longitude"`
 }
+
+type GetPrimaryTrustChainHeader struct{
+	Cookie string `header:"Miti-Cookie"`	
+}
+

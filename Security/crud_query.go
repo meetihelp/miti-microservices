@@ -154,3 +154,46 @@ func GetUserName(userId string) string{
 	db.Table("profiles").Where("user_id=?",userId).Find(&profile)
 	return profile.Name
 }
+
+func GetPrimaryTrustChainDB(userId string) ([]PrimaryTrustChainList,string,string,string){
+	db:=database.GetDB()
+	primaryTrustChain:=PrimaryTrustChain{}
+	db.Where("user_id=?",userId).Find(&primaryTrustChain)
+	chainName:=primaryTrustChain.ChainName
+	chainId:=primaryTrustChain.ChainId
+	updatedAt:=primaryTrustChain.UpdatedAt
+	primaryTrustChainList:=make([]PrimaryTrustChainList,0)
+	primaryTrustChainListTemp:=PrimaryTrustChainList{}
+	if(primaryTrustChain.Phone1!=""){
+		primaryTrustChainListTemp.Phone=primaryTrustChain.Phone1
+		primaryTrustChainListTemp.Name=primaryTrustChain.Name1
+		primaryTrustChainList=append(primaryTrustChainList,primaryTrustChainListTemp)
+	}
+	if(primaryTrustChain.Phone2!=""){
+		primaryTrustChainListTemp.Phone=primaryTrustChain.Phone2
+		primaryTrustChainListTemp.Name=primaryTrustChain.Name2
+		primaryTrustChainList=append(primaryTrustChainList,primaryTrustChainListTemp)
+	}
+	if(primaryTrustChain.Phone3!=""){
+		primaryTrustChainListTemp.Phone=primaryTrustChain.Phone3
+		primaryTrustChainListTemp.Name=primaryTrustChain.Name3
+		primaryTrustChainList=append(primaryTrustChainList,primaryTrustChainListTemp)
+	}
+	if(primaryTrustChain.Phone4!=""){
+		primaryTrustChainListTemp.Phone=primaryTrustChain.Phone4
+		primaryTrustChainListTemp.Name=primaryTrustChain.Name4
+		primaryTrustChainList=append(primaryTrustChainList,primaryTrustChainListTemp)
+	}
+	if(primaryTrustChain.Phone5!=""){
+		primaryTrustChainListTemp.Phone=primaryTrustChain.Phone5
+		primaryTrustChainListTemp.Name=primaryTrustChain.Name5
+		primaryTrustChainList=append(primaryTrustChainList,primaryTrustChainListTemp)
+	}
+	if(primaryTrustChain.Phone6!=""){
+		primaryTrustChainListTemp.Phone=primaryTrustChain.Phone6
+		primaryTrustChainListTemp.Name=primaryTrustChain.Name6
+		primaryTrustChainList=append(primaryTrustChainList,primaryTrustChainListTemp)
+	}
+
+	return primaryTrustChainList,chainName,chainId,updatedAt
+}

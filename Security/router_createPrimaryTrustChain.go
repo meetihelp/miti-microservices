@@ -50,7 +50,11 @@ func CreatePrimaryTrustChain(w http.ResponseWriter, r *http.Request){
 	requestId:=primaryTrustChainRequest.RequestId
 	updatedAt:=util.GetTime()
 	chainId:=primaryTrustChainRequest.ChainId
-	phone:=primaryTrustChainRequest.Phone
+	phoneStatus,phone:=util.GetPhoneInFormat(primaryTrustChainRequest.Phone)
+	if(phoneStatus=="Error"){
+		util.Message(w,1002)
+		return
+	}
 	name:=primaryTrustChainRequest.Name
 	updatedAt=UpdatePrimaryTrustChain(userId,chainId,phone,name,requestId,updatedAt)
 
