@@ -2,7 +2,7 @@ package Authentication
 
 import(
 	"net/http"
-	// "fmt"
+	"fmt"
 	util "miti-microservices/Util"
     "io/ioutil"
     "encoding/json"
@@ -14,6 +14,10 @@ func VerifyOTPUserverification(w http.ResponseWriter,r *http.Request){
     ipAddress:=util.GetIPAddress(r)
     verifyOtpHeader:=VerifyOTPHeader{}
     util.GetHeader(r,&verifyOtpHeader)
+
+    fmt.Print("Verify OTP Header")
+    fmt.Println(verifyOtpHeader)
+
     sessionId:=verifyOtpHeader.Cookie
     statusCode:=0
     moveTo:=0
@@ -131,6 +135,9 @@ func VerifyOTPUserverification(w http.ResponseWriter,r *http.Request){
         return
     }
 
+    fmt.Print("Verify otp Body:")
+    fmt.Println(otpVerification)
+
     otpVerify,otpVerificationDB:=VerifyOTPDB(otpVerification.UserId,otpVerification.OTP)
     if otpVerify{
         //CHANGE STATUS OF USER TO VERIFIED
@@ -209,6 +216,8 @@ func VerifyOTPUserverification(w http.ResponseWriter,r *http.Request){
     }
     w=util.GetResponseFormatHeader(w,data)
     p:=&content
+    fmt.Print("Verify OTP Response:")
+    fmt.Println(*p)     
     enc := json.NewEncoder(w)
     err= enc.Encode(p)
     if err != nil {
