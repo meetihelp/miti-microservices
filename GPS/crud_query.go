@@ -108,7 +108,7 @@ func GetCity(location Location) string{
 func GetPincode(location Location,city string) string{
 	db:=database.GetDB()
 	cityPincode:=[]CityPincode{}
-	db.Table("city_pincodes").Where("region_name=? OR ditrict_name=?",city,city).Find(&cityPincode)
+	db.Table("city_pincodes").Where("region_name=? OR district_name=?",city,city).Find(&cityPincode)
 	locationRegion:=Location{}
 	min_distance:=math.MaxFloat64
 	pincode:="Could Not Find"
