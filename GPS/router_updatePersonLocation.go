@@ -27,6 +27,7 @@ func UpdateUserLocation(w http.ResponseWriter, r *http.Request){
 		return 
 	}
 
+
 	updateUserLocationData :=Location{}
 	errUserData:=json.Unmarshal(requestBody,&updateUserLocationData)
 	if errUserData!=nil{
@@ -34,6 +35,8 @@ func UpdateUserLocation(w http.ResponseWriter, r *http.Request){
 		util.Message(w,1001)
 		return 
 	}
+	fmt.Print("UpdateUserLocation Body:")
+	fmt.Println(updateUserLocationData)
 
 	UpdateUserLocationDB(userId,updateUserLocationData)
 	util.Message(w,200)

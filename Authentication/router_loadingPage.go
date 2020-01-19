@@ -1,7 +1,7 @@
 package Authentication
 import (
 	"net/http"
-	// "fmt"
+	"fmt"
 	util "miti-microservices/Util"
 	// "io/ioutil"
 	"encoding/json"
@@ -27,6 +27,7 @@ func LoadingPage(w http.ResponseWriter,r *http.Request){
 
 	log.Println("session "+loginStatus)
 	if loginStatus=="Ok"{
+		fmt.Println("Loading Page Session Ok")
 		statusCode=200
 		moveTo:=6
 		content.Code=statusCode
@@ -46,6 +47,7 @@ func LoadingPage(w http.ResponseWriter,r *http.Request){
 	}else{
 		userId,loginStatus=util.GetUserIdFromTemporarySession(sessionId)
 		if loginStatus=="Error"{
+			fmt.Println("Loading Page Session Error")
 			content,w:=util.GetSessionErrorContent(w)
 			p:=&content
 			enc := json.NewEncoder(w)
@@ -75,6 +77,7 @@ func LoadingPage(w http.ResponseWriter,r *http.Request){
 			IsUserVerified,IsProfileCreated,Preference:=LoadingPageQuery(userId)
 			if !IsUserVerified{
 				// util.Message(w,1004)
+				fmt.Println("Loading Page user not verified")
 				statusCode=1004
 				moveTo=3
 				content.Code=statusCode
@@ -91,6 +94,7 @@ func LoadingPage(w http.ResponseWriter,r *http.Request){
 				w=util.GetResponseFormatHeader(w,data)
 			}else if !IsProfileCreated{
 				// util.Message(w,2002)
+				fmt.Println("Loading Page Profile not created")
 				statusCode=1005
 				moveTo=4
 				content.Code=statusCode
@@ -107,6 +111,7 @@ func LoadingPage(w http.ResponseWriter,r *http.Request){
 				w=util.GetResponseFormatHeader(w,data)
 			} else if Preference<NUM_OF_PREFERENCE{
 				// SendPreference(w,Preferece,1006)
+				fmt.Println("Loading Page Preference not created")
 				statusCode=1003
 				moveTo=2
 				content.Code=statusCode
@@ -123,6 +128,22 @@ func LoadingPage(w http.ResponseWriter,r *http.Request){
 		    	}
 				w=util.GetResponseFormatHeader(w,data)
 				
+			}else{
+				statusCode=1004
+				moveTo=3
+				content.Code=statusCode
+				content.MoveTo=moveTo
+				content.Preference=Preference
+				content.Message=util.GetMessageDecode(statusCode)
+				responseHeader:=LoadingToPreferenceHeader{}
+				responseHeader.ContentType="application/json"
+				headerBytes:=new(bytes.Buffer)
+				json.NewEncoder(headerBytes).Encode(responseHeader)
+				responseHeaderBytes:=headerBytes.Bytes()
+				if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+		        	panic(err)
+		    	}
+				w=util.GetResponseFormatHeader(w,data)
 			}
 		}
 	}
