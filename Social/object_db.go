@@ -103,6 +103,7 @@ type Group struct{
 	ChatId string `gorm:"type:varchar" json:"ChatId"`
 	Interest string `gorm:"primary_key;type:varchar" json:"Interest"`
 	CreatedAt string `gorm:"varchar" json:"CreatedAt"`
+	Pincode string `gorm:"varchar" json:"Pincode"`
 	Membership string `gorm:"varchar" json:"Membership"`
 }
 

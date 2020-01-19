@@ -220,7 +220,7 @@ func CreateNewGroup(pincode string,interest string) (string,string){
 
 
 
-func InsertInGroup(chatId string,userId string,membership string,interest string) GroupPoolStatusHelper{
+func InsertInGroup(chatId string,pincode string,userId string,membership string,interest string) GroupPoolStatusHelper{
 	db:=database.GetDB()
 	createdAt:=util.GetTime()
 	group:=Group{}
@@ -228,6 +228,7 @@ func InsertInGroup(chatId string,userId string,membership string,interest string
 	group.ChatId=chatId
 	group.Interest=interest
 	group.CreatedAt=createdAt
+	group.Pincode=pincode
 	group.Membership=membership
 	groupTemp:=Group{}
 	db.Where("user_id=? AND chat_id=?",userId,chatId).Find(&groupTemp)

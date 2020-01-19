@@ -61,9 +61,9 @@ func GetInGroupPool(w http.ResponseWriter, r *http.Request){
 		groupPoolStatus=EnterInGroupPooL(userId,pincode,interest,createdAt,gender,sex)
 		code=2004
 	}else if(groupAvailabilty=="permanent"){
-		groupPoolStatus=InsertInGroup(chatId,userId,"permanent",interest)
+		groupPoolStatus=InsertInGroup(chatId,pincode,userId,"permanent",interest)
 	}else{
-		groupPoolStatus=InsertInGroup(chatId,userId,"temporary",interest)
+		groupPoolStatus=InsertInGroup(chatId,pincode,userId,"temporary",interest)
 	}
 	// code:=200
 	// groupPoolStatus:=GroupPoolStatusHelper{}
