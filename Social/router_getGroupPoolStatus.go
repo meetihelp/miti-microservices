@@ -4,10 +4,11 @@ import(
 	"fmt"
 	"net/http"
 	"log"
-	// "io/ioutil"
+	"io/ioutil"
 	// "strings"
 	"encoding/json"
    util "miti-microservices/Util"
+   gps "miti-microservices/GPS"
    profile "miti-microservices/Profile"
 )
 
@@ -26,21 +27,25 @@ func GroupPoolStatusRouter(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	// requestBody,err:=ioutil.ReadAll(r.Body)
-	// if err!=nil{
-	// 	fmt.Println("Could not read body GroupPoolStatusRouter")
-	// 	util.Message(w,1000)
-	// 	return 
-	// }
+	requestBody,err:=ioutil.ReadAll(r.Body)
+	if err!=nil{
+		fmt.Println("Could not read body GroupPoolStatusRouter")
+		util.Message(w,1000)
+		return 
+	}
 
-	// groupPoolStatusRequest:=GroupPoolStatusRequest{}
-	// errQuestionData:=json.Unmarshal(requestBody,&groupPoolStatusRequest)
-	// if errQuestionData!=nil{
-	// 	fmt.Println("Could not Unmarshall profile data")
-	// 	util.Message(w,1001)
-	// 	return
-	// }
-	// interest:=groupPoolStatusRequest.Interest
+	groupPoolStatusRequest:=GroupPoolStatusRequest{}
+	errQuestionData:=json.Unmarshal(requestBody,&groupPoolStatusRequest)
+	if errQuestionData!=nil{
+		fmt.Println("Could not Unmarshall profile data")
+		util.Message(w,1001)
+		return
+	}
+	fmt.Print("Get Group Pool Status Body:")
+	fmt.Println(groupPoolStatusRequest)
+	latitude:=groupPoolStatusRequest.Latitude
+	longitude:=groupPoolStatusRequest.Longitude
+	gps.UpdateUserCurrentLocation(userId,latitude,longitude)
 
 	interest,groupPoolStatus:=GroupPoolStatusDB(userId)
 	w.Header().Set("Content-Type", "application/json")
@@ -57,7 +62,7 @@ func GroupPoolStatusRouter(w http.ResponseWriter, r *http.Request){
 	fmt.Print("GroupPoolStatusResponse:")
 	fmt.Println(*p)
 	enc := json.NewEncoder(w)
-	err:= enc.Encode(p)
+	err= enc.Encode(p)
 	if err != nil {
 		log.Fatal(err)
 	}

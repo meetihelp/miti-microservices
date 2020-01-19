@@ -128,3 +128,36 @@ func GetPincode(location Location,city string) string{
 	}
 	return pincode
 }
+
+func UpdateUserCurrentLocation(userId string,latitude string,longitude string){
+	db:=database.GetDB()
+	userCurrentLocationTemp:=UserCurrentLocation{}
+	userCurrentLocation:=UserCurrentLocation{}
+	location:=Location{}
+	location.Latitude=latitude
+	location.Longitude=longitude
+
+	city:=GetCity(location)
+	pincode:=GetPincode(location,city)
+
+	userCurrentLocation.UserId=userId
+	userCurrentLocation.Latitude=latitude
+	userCurrentLocation.Longitude=longitude
+	userCurrentLocation.UpdatedAt=util.GetTime()
+	userCurrentLocation.City=city
+	userCurrentLocation.Pincode=pincode
+
+	db.Where("user_id=?").Find(&userCurrentLocationTemp)
+	if(userCurrentLocationTemp.UserId==""){
+		db.Create(&userCurrentLocation)
+	}else{
+		db.Save(&userCurrentLocation)
+	}
+}
+
+func GetUserCurrentPincode(userId string) string{
+	db:=database.GetDB()
+	userCurrentLocation:=UserCurrentLocation{}
+	db.Where("user_id=?",userId).Find(&userCurrentLocation)
+	return userCurrentLocation.Pincode
+}

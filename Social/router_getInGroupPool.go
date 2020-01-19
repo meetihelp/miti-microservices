@@ -7,6 +7,7 @@ import(
 	"io/ioutil"
 	// "strings"
 	"encoding/json"
+	gps "miti-microservices/GPS"
 	profile "miti-microservices/Profile"
    util "miti-microservices/Util"
 )
@@ -48,8 +49,8 @@ func GetInGroupPool(w http.ResponseWriter, r *http.Request){
 		util.Message(w,1002)
 		return
 	}
+	pincode:=gps.GetUserCurrentPincode(userId)
 	profileData:=profile.GetProfileDB(userId)
-	pincode:=profileData.Pincode
 	createdAt:=util.GetTime()
 	gender:=profileData.Gender
 	sex:=profileData.Sex

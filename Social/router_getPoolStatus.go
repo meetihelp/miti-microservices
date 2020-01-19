@@ -4,10 +4,11 @@ import(
 	"fmt"
 	"net/http"
 	"log"
-	// "io/ioutil"
+	"io/ioutil"
 	// "strings"
 	"encoding/json"
    util "miti-microservices/Util"
+   gps "miti-microservices/GPS"
    profile "miti-microservices/Profile"
 )
 
@@ -25,6 +26,28 @@ func PoolStatusRouter(w http.ResponseWriter, r *http.Request){
 		util.Message(w,1003)
 		return
 	}
+
+	requestBody,err:=ioutil.ReadAll(r.Body)
+	if err!=nil{
+		fmt.Println("Could not read body")
+		util.Message(w,1000)
+		return 
+	}
+
+	poolStatusRequest:=PoolStatusRequest{}
+	errQuestionData:=json.Unmarshal(requestBody,&poolStatusRequest)
+	if errQuestionData!=nil{
+		fmt.Println("Could not Unmarshall profile data")
+		util.Message(w,1001)
+		return
+	}
+
+	fmt.Print("Get Pool status request:")
+	fmt.Println(poolStatusRequest)
+
+	latitude:=poolStatusRequest.Latitude
+	longitude:=poolStatusRequest.Longitude
+	gps.UpdateUserCurrentLocation(userId,latitude,longitude)
 
 	poolStatus:=PoolStatusDB(userId)
 	w.Header().Set("Content-Type", "application/json")
@@ -44,7 +67,7 @@ func PoolStatusRouter(w http.ResponseWriter, r *http.Request){
 	fmt.Print("PoolStatusResponse:")
 	fmt.Println(*p)
 	enc := json.NewEncoder(w)
-	err:= enc.Encode(p)
+	err= enc.Encode(p)
 	if err != nil {
 		log.Fatal(err)
 	}

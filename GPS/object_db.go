@@ -9,6 +9,15 @@ type Location struct{
 	Longitude string `json:"Longitude"`
 }
 
+type UserCurrentLocation struct{
+	UserId string `gorm:"primary_key;type:varchar(100)"  json:"UserId"`
+	Longitude string `gorm:"type:varchar" json:"Longitude"`
+	Latitude string `gorm:"type:varchar" json:"Latitude"`
+	City string `gorm:"type:varchar" json:"City"`
+	Pincode string `gorm:"type:varchar" json:"Pincode"`
+	UpdatedAt string `gorm:"type:varchar" json:"UpdatedAt"`
+}
+
 type UserLocation struct{
 	UserId string `gorm:"primary_key;type:varchar(100)"  json:"UserId"`
 	Longitude string `gorm:"type:varchar" json:"Longitude"`
@@ -54,6 +63,7 @@ func init(){
 	// db.AutoMigrate(&UserLocation{})
 	// db.AutoMigrate(&EventLocation{})
 	// db.AutoMigrate(&LocationMean{})
-	db.AutoMigrate(&CityPincode{})
+	// db.AutoMigrate(&CityPincode{})
+	db.AutoMigrate(&UserCurrentLocation{})
 
 }

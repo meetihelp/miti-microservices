@@ -121,11 +121,11 @@ func Server(runMethod string){
 	// r.HandleFunc("/newsFeedReaction",newsfeed.UpdateNewsFeedReaction).Methods("POST")
 
 	//Social related APIs
-	r.HandleFunc("/getPoolStatus",social.PoolStatusRouter).Methods("GET")
+	r.HandleFunc("/getPoolStatus",social.PoolStatusRouter).Methods("POST")
 	r.HandleFunc("/getInPool",social.GetInPool).Methods("GET")
 	// r.HandleFunc("/cancelPool",social.CancelPoolRouter).Methods("GET")
 	r.HandleFunc("/getInGroupPool",social.GetInGroupPool).Methods("POST")
-	r.HandleFunc("/groupPoolStatus",social.GroupPoolStatusRouter).Methods("GET")
+	r.HandleFunc("/groupPoolStatus",social.GroupPoolStatusRouter).Methods("POST")
 	r.HandleFunc("/cancelGroupPool",social.CancelGroupPoolRouter).Methods("POST")
 	
 	http.Handle("/", r)
