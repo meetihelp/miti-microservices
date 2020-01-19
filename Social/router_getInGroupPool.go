@@ -43,6 +43,11 @@ func GetInGroupPool(w http.ResponseWriter, r *http.Request){
 	fmt.Println(getInGroupPoolRequest)
 
 	interest:=getInGroupPoolRequest.Interest
+	interestStatus:=util.CheckInterestAvailablity(interest)
+	if(interestStatus=="Error"){
+		util.Message(w,1002)
+		return
+	}
 	profileData:=profile.GetProfileDB(userId)
 	pincode:=profileData.Pincode
 	createdAt:=util.GetTime()
