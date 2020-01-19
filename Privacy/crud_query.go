@@ -99,7 +99,7 @@ func UpdateBoardContentSharePolicy(userId string,contentId string,boardId string
 func GetBoardContentDB(userId string,createdAt string) []BoardContentList{
 	db:=database.GetDB()
 	boardContent:=[]BoardContent{}
-	db.Where("user_id=? AND created_at>?",userId,createdAt).Find(&boardContent)
+	db.Order("created_at").Where("user_id=? AND created_at>?",userId,createdAt).Find(&boardContent)
 	boardContentList:=make([]BoardContentList,0)
 	for _,content:=range boardContent{
 		listElement:=BoardContentList{}

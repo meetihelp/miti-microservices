@@ -24,7 +24,7 @@ type GetInGroupPoolHeader struct{
 }
 
 type GetInGroupPoolRequest struct{
-	// RequestId string `json:"RequestId"`
+	RequestId string `json:"RequestId"`
 	Interest string `json:"Interest"`
 }
 

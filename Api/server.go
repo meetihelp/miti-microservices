@@ -130,7 +130,7 @@ func Server(runMethod string){
 	
 	http.Handle("/", r)
 	certificates:=os.Getenv("SSLCertificatePath")
-	crt:=certificates+"/certificate.crt"
+	crt:=certificates+"/all.crt"
 	key:=certificates+"/private.key"
 	if(runMethod=="Devlopment"){
 		port:=os.Getenv("DevlopmentPort")

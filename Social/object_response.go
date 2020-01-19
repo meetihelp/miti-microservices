@@ -42,6 +42,7 @@ type GetInGroupPoolResponse struct{
 	Interest string `json:"Interest"`
 	Status GroupPoolStatusHelper `json:"Status"`
 	CreatedAt string `json:"CreatedAt"`
+	RequestId string `json:"RequestId"`
 }
 
 type GroupPoolStatusHelper struct{

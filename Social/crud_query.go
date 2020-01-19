@@ -158,9 +158,14 @@ func GroupPoolStatusDB(userId string) ([]string,[]GroupPoolStatusHelper){
 	return interest,groupPoolStatusHelper
 }
 
-func GetGroupAvailabilty(pincode string,interest string) (string,string){
+func GetGroupAvailabilty(userId string,pincode string,interest string,requestId string) (string,string){
 	db:=database.GetDB()
 	groupStats:=GroupStats{}
+	group:=Group{}
+	db.Where("user_id=? AND pincode=? AND interest=? AND request_id=?",userId,pincode,interest,requestId).Find(&group)
+	if(group.UserId!=""){
+		return "already",group.ChatId
+	}
 	db.Where("pincode=? AND interest=? AND number_of_member<?",pincode,interest,MAX_NUMBER_OF_MEMBER)
 	if(groupStats.ChatId!=""){
 		return groupStats.ChatId,"permanent"
@@ -181,10 +186,11 @@ func GetGroupAvailabilty(pincode string,interest string) (string,string){
 
 func CreateNewGroup(pincode string,interest string) (string,string){
 	db:=database.GetDB()
+	createdAt:=util.GetTime()
 	chatDetail:=ChatDetail{}
 	chatDetail.ChatId=util.GenerateToken()
 	chatDetail.ChatType="group"
-	chatDetail.CreatedAt=util.GetTime()
+	chatDetail.CreatedAt=createdAt
 	chatDetail.Name=util.GetGroupName(interest)
 
 	groupStats:=GroupStats{}
@@ -199,7 +205,7 @@ func CreateNewGroup(pincode string,interest string) (string,string){
 	for _,member:=range group{
 		userId:=member.UserId
 		chatId:=member.ChatId
-		db.Table("group").Where("user_id=? AND interest=?",userId,interest).Updates(Group{ChatId:chatDetail.ChatId,Membership:"permanent"})
+		db.Table("group").Where("user_id=? AND interest=?",userId,interest).Updates(Group{ChatId:chatDetail.ChatId,Membership:"permanent",CreatedAt:createdAt})
 		db.Where("actual_user_id=? AND chat_id=?",userId,chatId).Delete(&ChatDetail{})
 		chatDetail.ActualUserId=userId
 		db.Create(&chatDetail)
@@ -212,6 +218,7 @@ func CreateNewGroup(pincode string,interest string) (string,string){
 	newGroupStats.NumberOfTemporaryMember=0
 	newGroupStats.Interest=interest
 	newGroupStats.Pincode=pincode
+	newGroupStats.CreatedAt=createdAt
 	db.Create(&newGroupStats)
 
 
@@ -275,5 +282,17 @@ func InsertInGroup(chatId string,pincode string,userId string,membership string,
 	groupPoolStatusHelper.ChatId=chatId
 	groupPoolStatusHelper.Status=membership
 
+	return groupPoolStatusHelper
+}
+
+func GetGroupPoolStatus(userId string,pincode string,interest string) GroupPoolStatusHelper{
+	db:=database.GetDB()
+	group:=Group{}
+	db.Where("user_id=? AND pincode=? AND interest=?",userId,pincode,interest).Find(&group)
+	groupPoolStatusHelper:=GroupPoolStatusHelper{}
+	groupPoolStatusHelper.ChatId=group.ChatId
+	groupPoolStatusHelper.Status=group.Membership
+	groupPoolStatusHelper.Interest=group.Interest
+	groupPoolStatusHelper.CreatedAt=group.CreatedAt
 	return groupPoolStatusHelper
 }

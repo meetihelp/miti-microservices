@@ -41,8 +41,8 @@ func GetInGroupPool(w http.ResponseWriter, r *http.Request){
 
 	fmt.Print("GetInGroupPoolRequest:")
 	fmt.Println(getInGroupPoolRequest)
-
 	interest:=getInGroupPoolRequest.Interest
+	requestId:=getInGroupPoolRequest.RequestId
 	interestStatus:=util.CheckInterestAvailablity(interest)
 	if(interestStatus=="Error"){
 		util.Message(w,1002)
@@ -56,8 +56,10 @@ func GetInGroupPool(w http.ResponseWriter, r *http.Request){
 	// ipip:=profile.CheckIPIPStatus(userId)
 	groupPoolStatus:=GroupPoolStatusHelper{}
 	code:=200
-	chatId,groupAvailabilty:=GetGroupAvailabilty(pincode,interest)
-	if(groupAvailabilty=="None"){
+	chatId,groupAvailabilty:=GetGroupAvailabilty(userId,pincode,interest,requestId)
+	if(groupAvailabilty=="already"){
+		groupPoolStatus=GetGroupPoolStatus(userId,pincode,interest)
+	}else if(groupAvailabilty=="None"){
 		groupPoolStatus=EnterInGroupPooL(userId,pincode,interest,createdAt,gender,sex)
 		code=2004
 	}else if(groupAvailabilty=="permanent"){
@@ -77,7 +79,7 @@ func GetInGroupPool(w http.ResponseWriter, r *http.Request){
 	w.Header().Set("Content-Type", "application/json")
 	msg:=util.GetMessageDecode(code)
 	p:=&GetInGroupPoolResponse{Code:code,Message:msg,Interest:interest,
-			CreatedAt:createdAt,Status:groupPoolStatus}
+			CreatedAt:createdAt,Status:groupPoolStatus,RequestId:requestId}
 	fmt.Print("GetInGroupPoolResponse:")
 	fmt.Println(*p)
 	enc := json.NewEncoder(w)

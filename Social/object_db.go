@@ -113,6 +113,7 @@ type GroupStats struct{
 	NumberOfTemporaryMember int `gorm:"type:int" json:"NumberOfTemporaryMember"`
 	Interest string `gorm:"type:varchar" json:"Interest"`
 	Pincode string `gorm:"type:varchar" json:"Pincode"`
+	CreatedAt string `gorm:"type:varchar" json:"CreatedAt"`
 }
 func init(){
 	db:=database.GetDB()
