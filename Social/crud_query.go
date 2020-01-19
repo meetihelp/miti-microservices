@@ -251,8 +251,8 @@ func InsertInGroup(chatId string,pincode string,userId string,membership string,
 		chatDetails.Name=util.GetGroupName(interest)
 		db.Create(&chatDetails)
 	}else{
-		db.Table("chat_details").Where("user_id=? AND chat_id=?",userId,chatId).Update("chat_id=?",chatId)
-		db.Table("group").Where("user_id=? AND chat_id=?",userId,chatId).Updates(group)
+		db.Table("chat_details").Where("actual_user_id=? AND chat_id=?",userId,chatId).Update("chat_id",chatId)
+		db.Table("groups").Where("user_id=? AND chat_id=?",userId,chatId).Updates(group)
 	}
 	groupStats:=GroupStats{}
 	db.Where("chat_id=?",chatId).Find(&groupStats)
