@@ -98,6 +98,7 @@ func Server(runMethod string){
 	r.HandleFunc("/updateUserLocation",gps.UpdateUserLocation).Methods("POST")
 	r.HandleFunc("/getUserListByLocation",gps.GetUserListByLocation).Methods("POST")
 	r.HandleFunc("/getEventListByLocation",gps.GetEventListByLocation).Methods("POST")
+	r.HandleFunc("/updateUserLocation",gps.UpdateUserLocation).Methods("POST")
 
 	//Event related APIs
 	r.HandleFunc("/createEvent",event.CreateEvent).Methods("POST")
