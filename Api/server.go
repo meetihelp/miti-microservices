@@ -129,16 +129,19 @@ func Server(runMethod string){
 	r.HandleFunc("/cancelGroupPool",social.CancelGroupPoolRouter).Methods("POST")
 	
 	http.Handle("/", r)
+	certificates:=os.Getenv("SSLCertificatePath")
+	crt:=certificates+"/certificate.crt"
+	key:=certificates+"/private.key"
 	if(runMethod=="Devlopment"){
 		port:=os.Getenv("DevlopmentPort")
 		url:="0.0.0.0:"+port
-		if err := http.ListenAndServe(url,nil); err != nil {
+		if err := http.ListenAndServeTLS(url,crt,key,nil); err != nil {
 			log.Fatal(err)
 		}
 	}else if(runMethod=="production"){
 		port:=os.Getenv("ProductionPort")
 		url:="0.0.0.0:"+port
-		if err := http.ListenAndServe(url,nil); err != nil {
+		if err := http.ListenAndServeTLS(url,crt,key,nil); err != nil {
 			log.Fatal(err)
 		}
 	}else{

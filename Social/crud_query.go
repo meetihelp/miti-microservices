@@ -161,13 +161,64 @@ func GroupPoolStatusDB(userId string) ([]string,[]GroupPoolStatusHelper){
 func GetGroupAvailabilty(pincode string,interest string) (string,string){
 	db:=database.GetDB()
 	groupStats:=GroupStats{}
+	db.Where("pincode=? AND interest=? AND number_of_member<?",pincode,interest,MAX_NUMBER_OF_MEMBER)
+	if(groupStats.ChatId!=""){
+		return groupStats.ChatId,"permanent"
+	}
 	db.Where("pincode=? AND interest=? AND number_of_temporary_member<?",pincode,interest,MAX_NUMBER_OF_TEMPORARY_MEMBER).Find(&groupStats)
 	if(groupStats.ChatId==""){
-		return "","None"
+		chatId,status:=CreateNewGroup(pincode,interest)
+		if(chatId==""){
+			return "","None"
+		}else{
+			return chatId,status
+		}
+		
 	}else{
 		return groupStats.ChatId,"temporary"
 	}
 }
+
+func CreateNewGroup(pincode string,interest string) (string,string){
+	db:=database.GetDB()
+	chatDetail:=ChatDetail{}
+	chatDetail.ChatId=util.GenerateToken()
+	chatDetail.ChatType="group"
+	chatDetail.CreatedAt=util.GetTime()
+	chatDetail.Name=util.GetGroupName(interest)
+
+	groupStats:=GroupStats{}
+	db.Where("pincode=? AND interest=? AND number_of_temporary_member=?",pincode,interest,MAX_NUMBER_OF_TEMPORARY_MEMBER).Find(&groupStats)
+	group:=[]Group{}
+	chatId:=groupStats.ChatId
+	db.Where("pincode=? AND interest=? AND chat_id=?",pincode,interest,chatId).Find(&group)
+	db.Table("group_stats").Where("chat_id=?",chatId).Update("number_of_temporary_member",0)
+	count:=0
+
+
+	for _,member:=range group{
+		userId:=member.UserId
+		chatId:=member.ChatId
+		db.Table("group").Where("user_id=? AND interest=?",userId,interest).Updates(Group{ChatId:chatDetail.ChatId,Membership:"permanent"})
+		db.Where("actual_user_id=? AND chat_id=?",userId,chatId).Delete(&ChatDetail{})
+		chatDetail.ActualUserId=userId
+		db.Create(&chatDetail)
+		count++;
+	}
+
+	newGroupStats:=GroupStats{}
+	newGroupStats.ChatId=chatDetail.ChatId
+	newGroupStats.NumberOfMember=count
+	newGroupStats.NumberOfTemporaryMember=0
+	newGroupStats.Interest=interest
+	newGroupStats.Pincode=pincode
+	db.Create(&newGroupStats)
+
+
+	return chatDetail.ChatId,"permanent"
+}
+
+
 
 func InsertInGroup(chatId string,userId string,membership string,interest string) GroupPoolStatusHelper{
 	db:=database.GetDB()
