@@ -84,6 +84,7 @@ func Server(runMethod string){
 	r.HandleFunc("/createSecondaryTrustChain",security.CreateSecondaryTrustChain).Methods("POST")
 	r.HandleFunc("/deletePrimaryTrustChain",security.DeletePrimaryTrustChain).Methods("POST")
 	r.HandleFunc("/deletePrimaryTrustChain",security.DeleteSecondaryTrustChain).Methods("POST")
+	r.HandleFunc("/getPrimaryTrustChain",security.GetPrimaryTrustChain).Methods("GET")
 	r.HandleFunc("/alertMessage",security.AlertMessage).Methods("POST")
 
 	//Privacy Related APIs
