@@ -105,6 +105,7 @@ type Group struct{
 	CreatedAt string `gorm:"varchar" json:"CreatedAt"`
 	Pincode string `gorm:"varchar" json:"Pincode"`
 	Membership string `gorm:"varchar" json:"Membership"`
+	RequestId string `gorm:"varchar" json:"RequestId"`
 }
 
 type GroupStats struct{
