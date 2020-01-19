@@ -95,6 +95,13 @@ func GetChatDetail(userId string,date string,numOfChat int) ([]string,[]ChatDeta
 		// }
 		
 	}
+	if(len(userId2)>1){
+		userId2[0]=""
+		return userId2[:1],chatDetail,"Ok"
+	}else if(len(userId2)==0){
+		userId2=append(userId2,"")
+		return userId2,chatDetail,"Ok"
+	}
 	return userId2,chatDetail,"Ok"
 }
 

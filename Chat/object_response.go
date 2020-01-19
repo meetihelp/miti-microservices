@@ -11,6 +11,7 @@ type ChatDetailContent struct{
 	Message string `json:"Message"`
 }
 
+
 type ChatDetailResponse struct{
 	UserId string `gorm:"varchar(100)"  json:"UserId"`
 	UserId2 string `json:"UserId2"`
