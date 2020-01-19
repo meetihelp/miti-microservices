@@ -239,7 +239,7 @@ func InsertInGroup(chatId string,pincode string,userId string,membership string,
 	group.RequestId=requestId
 	group.Membership=membership
 	groupTemp:=Group{}
-	db.Where("user_id=? AND chat_id=?",userId,chatId).Find(&groupTemp)
+	db.Where("user_id=? AND interest=?",userId,interest).Find(&groupTemp)
 	if(groupTemp.UserId==""){
 		db.Create(&group)
 
@@ -276,7 +276,7 @@ func InsertInGroup(chatId string,pincode string,userId string,membership string,
 	if(groupPoolStatusTemp.UserId==""){
 		db.Create(&groupPoolStatus)
 	}else{
-		db.Table("group_pool_status").Where("user_id=? AND interest=?",userId,interest).Updates(groupPoolStatus)
+		db.Table("group_pool_statuses").Where("user_id=? AND interest=?",userId,interest).Updates(groupPoolStatus)
 	}
 
 	groupPoolStatusHelper:=GroupPoolStatusHelper{}

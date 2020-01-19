@@ -108,7 +108,7 @@ func GetCity(location Location) string{
 func GetPincode(location Location,city string) string{
 	db:=database.GetDB()
 	cityPincode:=[]CityPincode{}
-	db.Table("city_pincode").Where("region_name=? OR ditrict_name=?",city,city).Find(&cityPincode)
+	db.Table("city_pincodes").Where("region_name=? OR ditrict_name=?",city,city).Find(&cityPincode)
 	locationRegion:=Location{}
 	min_distance:=math.MaxFloat64
 	pincode:="Could Not Find"
@@ -147,7 +147,7 @@ func UpdateUserCurrentLocation(userId string,latitude string,longitude string){
 	userCurrentLocation.City=city
 	userCurrentLocation.Pincode=pincode
 
-	db.Where("user_id=?").Find(&userCurrentLocationTemp)
+	db.Where("user_id=?",userId).Find(&userCurrentLocationTemp)
 	if(userCurrentLocationTemp.UserId==""){
 		db.Create(&userCurrentLocation)
 	}else{
