@@ -30,12 +30,12 @@ func (userData User) doSanitization() string {
 }
 
 func (otpVerification OTPVerification) doSanitization() string{
-	validate:=validator.New()
-	err:=validate.Struct(otpVerification)
-	if err!=nil{
-		fmt.Println(err.Error())
-		return "Error"
-	}
+	// validate:=validator.New()
+	// err:=validate.Struct(otpVerification)
+	// if err!=nil{
+	// 	fmt.Println(err.Error())
+	// 	return "Error"
+	// }
 	return "Ok"
 }
 

@@ -2,7 +2,7 @@ package Authentication
 
 import(
 	"net/http"
-	// "fmt"
+	"fmt"
     "log"
 	util "miti-microservices/Util"
     "encoding/json"
@@ -18,6 +18,8 @@ func VerifyUser(w http.ResponseWriter,r *http.Request){
     sessionId:=verifyOtpHeader.Cookie
     userId,sessionErr:=util.GetUserIdFromTemporarySession(sessionId)
     // fmt.Println(sessionId)
+    fmt.Print("Generate Otp Header:")
+    fmt.Println(verifyOtpHeader)
     statusCode:=0
     moveTo:=0
     var data map[string]string
@@ -135,6 +137,8 @@ func VerifyUser(w http.ResponseWriter,r *http.Request){
         } 
         w=util.GetResponseFormatHeader(w,data)
         p:=&content
+        fmt.Print("Generate OTP Response:")
+        fmt.Println(*p)
         enc := json.NewEncoder(w)
         err:= enc.Encode(p)
         if err != nil {

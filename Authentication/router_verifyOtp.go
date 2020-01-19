@@ -14,6 +14,8 @@ func VerifyOTP(w http.ResponseWriter,r *http.Request){
     util.GetHeader(r,&verifyOtpHeader)
     sessionId:=verifyOtpHeader.Cookie
     userId,sessionErr:=util.GetUserIdFromTemporarySession(sessionId)
+    fmt.Print("Verify OTP Header")
+    fmt.Println(verifyOtpHeader)
     if sessionErr=="Error"{
         fmt.Println("Session Does not exist")
         util.Message(w,1003)
@@ -45,6 +47,8 @@ func VerifyOTP(w http.ResponseWriter,r *http.Request){
         return
     }
 
+    fmt.Print("Verify otp Body:")
+    fmt.Println(otpVerification)
     otpVerify,_:=VerifyOTPDB(otpVerification.UserId,otpVerification.OTP)
     if otpVerify{
         //CHANGE STATUS OF USER TO VERIFIED
