@@ -95,3 +95,22 @@ func UpdateBoardContentSharePolicy(userId string,contentId string,boardId string
 		return boardContent.AccessRequestId
 	}
 }
+
+func GetBoardContentDB(userId string,createdAt string) []BoardContentList{
+	db:=database.GetDB()
+	boardContent:=[]BoardContent{}
+	db.Where("user_id=? AND created_at>?",userId,createdAt).Find(&boardContent)
+	boardContentList:=make([]BoardContentList,0)
+	for _,content:=range boardContent{
+		listElement:=BoardContentList{}
+		listElement.UserId=content.UserId
+		listElement.ContentId=content.ContentId
+		listElement.BoardId=content.BoardId
+		listElement.AccessType=content.AccessType
+		listElement.ContentText=content.ContentText
+		listElement.ContentImageId=content.ContentImageId
+		listElement.CreatedAt=content.CreatedAt
+		boardContentList=append(boardContentList,listElement)
+	}
+	return boardContentList
+}

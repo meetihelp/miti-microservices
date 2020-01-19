@@ -316,7 +316,7 @@ func InsertIntoChatFromMessageRequest(chatId string,requestId string,messageRequ
 	messageType:=messageRequest.MessageType
 	createdAt:=messageRequest.CreatedAt
 	chat:=Chat{}
-	db.Where("user_id=? AND chat_id=? AND request_id=?",userId,chatId,requestId).Find(&chat)
+	db.Where("user_id=? AND chat_id=? AND message_id=?",userId,chatId,messageId).Find(&chat)
 	code:=200
 	if(chat.ChatId==""){
 		chat.UserId=userId

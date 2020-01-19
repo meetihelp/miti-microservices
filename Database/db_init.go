@@ -32,3 +32,4 @@ func init() {
 func GetDB() *gorm.DB{
 	return db
 }
+

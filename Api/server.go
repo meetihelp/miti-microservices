@@ -90,6 +90,7 @@ func Server(runMethod string){
 	r.HandleFunc("/uploadBoardContent",privacy.UploadBoardContent).Methods("POST")
 	r.HandleFunc("/shareBoard",privacy.ShareBoard).Methods("POST")
 	r.HandleFunc("/shareBoardContnet",privacy.ShareBoardContent).Methods("POST")
+	r.HandleFunc("/getBoardContent",privacy.GetBoardContent).Methods("POST")
 	
 	
 	//GPS related APIs

@@ -32,3 +32,11 @@ type ShareBoardContentRequest struct{
 	ContentId string `json:"ContentId"`
 	AccessRequestId string `json:"AccessRequestId"`
 }
+
+type GetBoardContentHeader struct{
+	Cookie string `header:"Miti-Cookie"`
+}
+
+type GetBoardContentRequest struct{
+	CreatedAt string `json:"CreatedAt"`
+}
