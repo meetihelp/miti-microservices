@@ -3,6 +3,7 @@ package Util
 import(
 	database "miti-microservices/Database"
 	"github.com/nu7hatch/gouuid"
+	"github.com/jinzhu/gorm"
 	"time"
 	"net/http"
 	"fmt"
@@ -33,19 +34,19 @@ func InsertSession(UserId string,ipAddress string) string{
 	return cookie.Value
 }
 
-func InsertSessionValue(tempSession string,userId string,ipAddress string){
+func InsertSessionValue(db *gorm.DB,tempSession string,userId string,ipAddress string){
 	session:=Session{}
 	session.SessionId=tempSession
 	session.UserId=userId
 	session.IP=ipAddress
 	// session.CreatedAt =time.Now()
 	session.CreatedAt=GetTime()
-	db:=database.GetDB()
+	// db:=database.GetDB()
 	db.Create(&session)
 	fmt.Println("Session inserted in Session Table")
 }
 
-func InsertTemporarySession(UserId string,ipAddress string) string{
+func InsertTemporarySession(db *gorm.DB,UserId string,ipAddress string) string{
 	cookie:= getCookie()
 	session:=TemporarySession{}
 	session.TemporarySessionId=cookie.Value
@@ -53,7 +54,7 @@ func InsertTemporarySession(UserId string,ipAddress string) string{
 	session.IP=ipAddress
 	// session.CreatedAt =time.Now()
 	session.CreatedAt=GetTime()
-	db:=database.GetDB()
+	// db:=database.GetDB()
 	db.Create(&session)
 	fmt.Println("Session inserted in User Verification Session Table")
 	// return cookie
@@ -80,6 +81,26 @@ func GetUserIdFromTemporarySession(sessionId string) (string,string){
 	return session.UserId,"Ok"
 }
 
+func GetUserIdFromSession2(db *gorm.DB,sessionId string) (string,string){
+	// db:=database.GetDB()
+	session:=Session{}
+	db.Where("session_id=?",sessionId).First(&session)
+	if session.UserId==""{
+		return "","Error"
+	}
+	return session.UserId,"Ok"
+}
+func GetUserIdFromTemporarySession2(db *gorm.DB,sessionId string) (string,string){
+	// db:=database.GetDB()
+	session:=TemporarySession{}
+	fmt.Println(sessionId)
+	db.Where("temporary_session_id=?",sessionId).First(&session)
+	if session.UserId==""{
+		return "","Error"
+	}
+	return session.UserId,"Ok"
+}
+
 
 
 func DeleteSession(sessionId string) (string){
@@ -89,8 +110,8 @@ func DeleteSession(sessionId string) (string){
 	return "Ok"
 }
 
-func DeleteTemporarySession(sessionId string) (string){
-	db:=database.GetDB()
+func DeleteTemporarySession(db *gorm.DB,sessionId string) (string){
+	// db:=database.GetDB()
 	fmt.Println("Delete ",sessionId)
 	db.Where("temporary_session_id=?",sessionId).Delete(&TemporarySession{})
 	return "Ok"

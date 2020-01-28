@@ -4,6 +4,7 @@ import(
 	"net/http"
 	util "miti-microservices/Util"
 	image "miti-microservices/Media/Image"
+	database "miti-microservices/Database"
 	"io/ioutil"
 	"fmt"
 	"encoding/json"
@@ -32,12 +33,14 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 	lastUpdate:=sendChatImageHeader.CreatedAt
 	fmt.Print("SendChatImageHeader")
 	fmt.Println(sendChatImageHeader)
+	db:=database.DBConnection()
 
-	userId,getChatStatus:=util.GetUserIdFromSession(sessionId)
+	userId,getChatStatus:=util.GetUserIdFromSession2(db,sessionId)
 	// fmt.Println(userId)
 	if getChatStatus=="Error"{
 		fmt.Println("Session Error for SendChatImage")
 		util.Message(w,1003)
+		db.Close()
 		return
 	}
 
@@ -46,6 +49,7 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
         fmt.Println("Error Retrieving the File for SendChatImage")
         fmt.Println(err)
         util.Message(w,1002)
+        db.Close()
         return
     }
 
@@ -53,18 +57,20 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
     if err != nil {
         fmt.Println(err)
         util.Message(w,1002)
+        db.Close()
         return
     }
     sanatize:=Sanatize(sendChatImageHeader)
 	if(sanatize=="Error"){
 		util.Message(w,1002)
+		db.Close()
 		return
 	}
 
 	url:=""
 	chatResponse:=Chat{}
 	imageUploadStatus:="Yes"
-	userImageData,status:=image.GetUserImageByRequestId(userId,requestId)
+	userImageData,status:=image.GetUserImageByRequestId(db,userId,requestId)
 	if(status=="Error"){
 		// file, _, err := r.FormFile("myFile")
 	 //    if err != nil {
@@ -84,11 +90,15 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 		filename:=generatedName+"."+format
 		bucket:=""
 		fmt.Println("AccessType:"+accessType)
-		if(accessType=="Private"){
+		if(accessType=="private"){
 			bucket=image.GetPrivateImageBucket()
 			fmt.Println("Bucket:"+bucket)
-		}else{
+		}else if(accessType=="public"){
 			bucket=image.GetPublicImageBucket()
+		}else{
+			util.Message(w,1002)
+			db.Close()
+			return
 		}
 		size,err:=image.UploadToS3(buffer,filename,bucket,format)
 		if(err!=nil){
@@ -113,7 +123,7 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 			userImageData.GeneratedName=generatedName
 			userImageData.RequestId=requestId
 			userImageData.CreatedAt=util.GetTime()
-			image.EnterUserImage(userImageData)
+			image.EnterUserImage(db,userImageData)
 			imageUploadStatus="Yes"
 		}
 	
@@ -150,11 +160,12 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 		chat.MessageId=messageId
 		createdAt:=util.GetTime()
 		chat.CreatedAt=createdAt
-		chatResponse,unSyncedChat,code=ChatInsertDB(chat,lastUpdate)
+		chatResponse,unSyncedChat,code=ChatInsertDB(db,chat,lastUpdate)
 		// db.Create(&chatData)
 		if(chat.CreatedAt==chatResponse.CreatedAt){
-			e:=UpdateChatTime(chat.ChatId,chat.CreatedAt)
+			e:=UpdateChatTime(db,chat.ChatId,chat.CreatedAt)
 			if e!=nil{
+				db.Close()
 				return
 			}
 		}
@@ -181,4 +192,5 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 	if err != nil {
 		log.Fatal(err)
 	}
+	db.Close()
 }

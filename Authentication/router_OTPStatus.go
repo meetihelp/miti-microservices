@@ -3,6 +3,7 @@ package Authentication
 import(
 	"net/http"
 	util "miti-microservices/Util"
+	database "miti-microservices/Database"
 	"bytes"
 	"encoding/json"
 	"log"
@@ -12,7 +13,8 @@ func OTPStatus(w http.ResponseWriter,r *http.Request){
 	otpStatusHeader:=OTPStatusHeader{}
 	util.GetHeader(r,&otpStatusHeader)
 	sessionId:=otpStatusHeader.Cookie
-	_,code:=OTPHelper(sessionId)
+	db:=database.DBConnection()
+	_,code:=OTPHelper(db,sessionId)
 	content:=OTPStatusResponseContent{}
 	responseHeader:=OTPStatusResponseHeader{}
 	var data map[string]string
@@ -54,4 +56,5 @@ func OTPStatus(w http.ResponseWriter,r *http.Request){
 	if err != nil {
 		log.Fatal(err)
 	}
+	db.Close()
 }

@@ -4,6 +4,7 @@ import(
 	"net/http"
 	"fmt"
 	util "miti-microservices/Util"
+    database "miti-microservices/Database"
     "encoding/json"
     "io/ioutil"
 )
@@ -13,7 +14,9 @@ func VerifyOTP(w http.ResponseWriter,r *http.Request){
     verifyOtpHeader:=VerifyOTPHeader{}
     util.GetHeader(r,&verifyOtpHeader)
     sessionId:=verifyOtpHeader.Cookie
-    userId,sessionErr:=util.GetUserIdFromTemporarySession(sessionId)
+    db:=database.DBConnection()
+
+    userId,sessionErr:=util.GetUserIdFromTemporarySession2(db,sessionId)
     fmt.Print("Verify OTP Header")
     fmt.Println(verifyOtpHeader)
     if sessionErr=="Error"{
@@ -49,13 +52,13 @@ func VerifyOTP(w http.ResponseWriter,r *http.Request){
 
     fmt.Print("Verify otp Body:")
     fmt.Println(otpVerification)
-    otpVerify,_:=VerifyOTPDB(otpVerification.UserId,otpVerification.OTP)
+    otpVerify,_:=VerifyOTPDB(db,otpVerification.UserId,otpVerification.OTP)
     if otpVerify{
         //CHANGE STATUS OF USER TO VERIFIED
         // ChangeVerificationStatus(userId)
         // util.InsertSessionValue(sessionId,userId,ipAddress)
-        util.InsertSessionValue(sessionId,userId,ipAddress)
-        util.DeleteTemporarySession(sessionId)
+        util.InsertSessionValue(db,sessionId,userId,ipAddress)
+        util.DeleteTemporarySession(db,sessionId)
         profileCreationStatus:=IsProfileCreated(userId)
         if(profileCreationStatus=="Ok"){
             util.Message(w,200)
@@ -65,4 +68,6 @@ func VerifyOTP(w http.ResponseWriter,r *http.Request){
     } else{
         util.Message(w,1401)
     }
+
+    db.Close()
 }

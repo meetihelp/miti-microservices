@@ -4,6 +4,7 @@ package Image
 import(
 	"net/http"
 	util "miti-microservices/Util"
+	database "miti-microservices/Database"
 	"io/ioutil"
 	"fmt"
 	"encoding/json"
@@ -29,22 +30,26 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 	dimension:=uploadImageHeader.Dimension
 	requestId:=uploadImageHeader.RequestId
 	fmt.Println(uploadImageHeader)
-	userId,getChatStatus:=util.GetUserIdFromSession(sessionId)
+	db:=database.DBConnection()
+
+	userId,getChatStatus:=util.GetUserIdFromSession2(db,sessionId)
 	fmt.Println("Enter upload Image:"+userId)
 	// fmt.Println(userId)
 	if getChatStatus=="Error"{
 		util.Message(w,1003)
+		db.Close()
 		return
 	}
 
 	url:=""
-	userImageData,status:=GetUserImageByRequestId(userId,requestId)
+	userImageData,status:=GetUserImageByRequestId(db,userId,requestId)
 	fmt.Println("Status:"+status)
 	if(status=="Error"){
 		file, _, err := r.FormFile("myFile")
 	    if err != nil {
 	        fmt.Println("Error Retrieving the File")
 	        fmt.Println(err)
+	        db.Close()
 	        return
 	    }
 
@@ -55,6 +60,7 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 
 	    if(accessType!="private" && accessType!="public"){
 	    	util.Message(w,1002)
+	    	db.Close()
 	    	return
 	    }
 
@@ -66,8 +72,12 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 		if(accessType=="private"){
 			bucket=GetPrivateImageBucket()
 			fmt.Println("Bucket:"+bucket)
-		}else{
+		}else if(accessType=="public"){
 			bucket=GetPublicImageBucket()
+		}else{
+			util.Message(w,1002)
+			db.Close()
+			return
 		}
 		size,err:=UploadToS3(buffer,filename,bucket,format)
 		if(err!=nil){
@@ -89,7 +99,7 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 			userImageData.GeneratedName=generatedName
 			userImageData.RequestId=requestId
 			userImageData.CreatedAt=util.GetTime()
-			EnterUserImage(userImageData)
+			EnterUserImage(db,userImageData)
 
 			// signedURL:=""
 			// url:=""
@@ -119,4 +129,5 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 	if err != nil {
 		log.Fatal(err)
 	}
+	db.Close()
 }

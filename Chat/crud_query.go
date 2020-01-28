@@ -3,6 +3,7 @@ package Chat
 import(
 	util "miti-microservices/Util"
 	database "miti-microservices/Database"
+	"github.com/jinzhu/gorm"
 	// "time"
 	"fmt"
 )
@@ -21,12 +22,12 @@ func GetChatByRequestId(userId string,requestId string)Chat{
 	return chat
 }
 
-func ChatInsertDB(chatData Chat,lastUpdate string) (Chat,[]Chat,int) {
+func ChatInsertDB(db *gorm.DB,chatData Chat,lastUpdate string) (Chat,[]Chat,int) {
 	// index:=GetLastChatIndex(chatData.ChatId)
 	// index=index+1
 	// chatData.Index=index
 	chat:=Chat{}
-	db:=database.GetDB()
+	// db:=database.GetDB()
 	unSyncedChat:=[]Chat{}
 	chatId:=chatData.ChatId
 	err:=db.Order("created_at desc").Where("chat_id=? AND created_at>?",chatId,lastUpdate).Find(&unSyncedChat).Error
@@ -55,8 +56,8 @@ func ChatInsertDB(chatData Chat,lastUpdate string) (Chat,[]Chat,int) {
 	}
 	
 }
-func CheckCorrectChat(userId string,chatId string) string{
-	db:=database.GetDB()
+func CheckCorrectChat(db *gorm.DB,userId string,chatId string) string{
+	// db:=database.GetDB()
 	chatDetail:=ChatDetail{}
 	db.Where("actual_user_id=? AND chat_id=?",userId,chatId).First(&chatDetail)
 	if chatDetail.ChatId==""{
@@ -66,8 +67,8 @@ func CheckCorrectChat(userId string,chatId string) string{
 	return "Ok"
 }
 
-func GetChatDetail(userId string,date string,numOfChat int) ([]string,[]ChatDetail,string){
-	db:=database.GetDB()
+func GetChatDetail(db *gorm.DB,userId string,date string,numOfChat int) ([]string,[]ChatDetail,string){
+	// db:=database.GetDB()
 	chatDetail:=[]ChatDetail{}
 	db.Limit(numOfChat).Where("actual_user_id=? AND created_at>?",userId,date).Find(&chatDetail)
 	userId2:=make([]string,0)
@@ -155,8 +156,8 @@ func GetUserListFromChatId(chatId string)([]string){
 	return userList
 }
 
-func UpdateChatTime(chatId string, lastUpdate string) error{
-	db:=database.GetDB()
+func UpdateChatTime(db *gorm.DB,chatId string, lastUpdate string) error{
+	// db:=database.GetDB()
 	db.Table("chat_details").Where("chat_id=?",chatId).Update("last_update",lastUpdate)
 	return nil
 }
@@ -172,8 +173,8 @@ func UpdateChatTime(chatId string, lastUpdate string) error{
 // 	return chat.Index
 // }
 
-func GetChatAfterTimeMessages(chatId string, numOfChat int, createdAt string)([]Chat){
-	db:=database.GetDB()
+func GetChatAfterTimeMessages(db *gorm.DB,chatId string, numOfChat int, createdAt string)([]Chat){
+	// db:=database.GetDB()
 	chat:=[]Chat{}
 	db.Order("created_at desc").Limit(numOfChat).Where("chat_id=? AND created_at>?",chatId,createdAt).Find(&chat)
 	return chat

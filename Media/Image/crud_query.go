@@ -1,6 +1,7 @@
 package Image
 import(
 	"os"
+	"github.com/jinzhu/gorm"
 	database "miti-microservices/Database"
 )
 func DoesImageExist(path string) string{
@@ -12,8 +13,8 @@ func DoesImageExist(path string) string{
     return "Ok"
 }
 
-func GetUserImageListDB(userId string) ([]string){
-	db:=database.GetDB()
+func GetUserImageListDB(db *gorm.DB,userId string) ([]string){
+	// db:=database.GetDB()
 	userImage:=[]UserImage{}
 	db.Where("user_id=?",userId).Find(&userImage)
 	var imageList []string
@@ -61,21 +62,21 @@ func GetEventImageListDB(eventId string) ([]string){
 	return imageList
 }
 
-func InsertUserImage(userId string,imageId string){
-	db:=database.GetDB()
+func InsertUserImage(db *gorm.DB,userId string,imageId string){
+	// db:=database.GetDB()
 	userImage:=UserImage{}
 	userImage.UserId=userId
 	userImage.ImageId=imageId
 	db.Create(&userImage)
 }
 
-func EnterUserImage(userImageData UserImage){
-	db:=database.GetDB()
+func EnterUserImage(db *gorm.DB,userImageData UserImage){
+	// db:=database.GetDB()
 	db.Create(&userImageData)
 }
 
-func GetUserImageByRequestId(userId string,requestId string) (UserImage,string){
-	db:=database.GetDB()
+func GetUserImageByRequestId(db *gorm.DB,userId string,requestId string) (UserImage,string){
+	// db:=database.GetDB()
 	userImage:=UserImage{}
 	db.Where("user_id=? AND request_id=?",userId,requestId).Find(&userImage)
 	status:=""

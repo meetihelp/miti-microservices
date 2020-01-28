@@ -3,6 +3,7 @@ import (
 	"net/http"
 	"fmt"
 	util "miti-microservices/Util"
+	database "miti-microservices/Database"
 	// "io/ioutil"
 	"encoding/json"
 	"bytes"
@@ -22,8 +23,8 @@ func LoadingPage(w http.ResponseWriter,r *http.Request){
 	moveTo:=0
 	var data map[string]string
 	content:=LoadingResponse{}
-
-	userId,loginStatus:=util.GetUserIdFromSession(sessionId)
+	db:=database.DBConnection()
+	userId,loginStatus:=util.GetUserIdFromSession2(db,sessionId)
 
 	log.Println("session "+loginStatus)
 	if loginStatus=="Ok"{
@@ -45,7 +46,7 @@ func LoadingPage(w http.ResponseWriter,r *http.Request){
 		// util.Message(w,200)
 		// return
 	}else{
-		userId,loginStatus=util.GetUserIdFromTemporarySession(sessionId)
+		userId,loginStatus=util.GetUserIdFromTemporarySession2(db,sessionId)
 		if loginStatus=="Error"{
 			fmt.Println("Loading Page Session Error")
 			content,w:=util.GetSessionErrorContent(w)
@@ -74,7 +75,7 @@ func LoadingPage(w http.ResponseWriter,r *http.Request){
 			// w=util.GetResponseFormatHeader(w,data)
 		}else{
 			// w=temporarySessionCase(w,userId)
-			IsUserVerified,IsProfileCreated,Preference:=LoadingPageQuery(userId)
+			IsUserVerified,IsProfileCreated,Preference:=LoadingPageQuery(db,userId)
 			if !IsUserVerified{
 				// util.Message(w,1004)
 				fmt.Println("Loading Page user not verified")
@@ -154,6 +155,7 @@ func LoadingPage(w http.ResponseWriter,r *http.Request){
 	if err != nil {
 		log.Fatal(err)
 	}
+	db.Close()
 }
 
 func temporarySessionCase(w http.ResponseWriter,userId string){

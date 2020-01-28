@@ -5,6 +5,7 @@ import(
 	// "io/ioutil"
 	// "encoding/json"	
 	util "miti-microservices/Util"
+	"github.com/jinzhu/gorm"
 	// sms "miti-microservices/Notification/SMS"
 	// "log"
 	"time"
@@ -39,7 +40,7 @@ func SendOTP(phone string,otp string)(string){
 // 	return sms.SendSMS(phone,otp)
 // }
 
-func OTPHelper(sessionId string) (string,int){
+func OTPHelper(db *gorm.DB,sessionId string) (string,int){
 	userId,loginStatus:=util.GetUserIdFromTemporarySession(sessionId)
 	if loginStatus=="Ok"{
 		otp:=GetOTPDetails(userId)

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"fmt"
 	// redis "miti-microservices/Model/Redis"
-	// database "miti-microservices/Database"
+	database "miti-microservices/Database"
 	util "miti-microservices/Util"
 	// auth "miti-microservices/Authentication"
 	"io/ioutil"
@@ -17,7 +17,8 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 	chatHeader:=ChatHeader{}
 	util.GetHeader(r,&chatHeader)
 	sessionId:=chatHeader.Cookie
-	userId,loginStatus:=util.GetUserIdFromSession(sessionId)
+	db:=database.DBConnection()
+	userId,loginStatus:=util.GetUserIdFromSession2(db,sessionId)
 	fmt.Print("ChatInsertHeader")
 	fmt.Println(chatHeader)
 	if loginStatus=="Error"{
@@ -30,6 +31,7 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 		if err != nil {
 			log.Fatal(err)
 		}
+		db.Close()
 		return
 	}
 
@@ -45,6 +47,7 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 		if err != nil {
 			log.Fatal(err)
 		}
+		db.Close()
 		return
 	}
 
@@ -53,6 +56,7 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 	if errUserData!=nil{
 		fmt.Println("Could not Unmarshall user data")
 		util.Message(w,1001)
+		db.Close()
 		return 
 	}
 
@@ -82,11 +86,12 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 	// fmt.Println(chatData.CreatedAt)
 	// db:=database.GetDB()
 	if(chatData.MessageContent!=""){
-		chatResponse,unSyncedChat,code:=ChatInsertDB(chat,lastUpdate)
+		chatResponse,unSyncedChat,code:=ChatInsertDB(db,chat,lastUpdate)
 	// db.Create(&chatData)
 		if(chat.CreatedAt==chatResponse.CreatedAt){
-			e:=UpdateChatTime(chatData.ChatId,chatData.CreatedAt)
+			e:=UpdateChatTime(db,chatData.ChatId,chatData.CreatedAt)
 			if e!=nil{
+				db.Close()
 				return
 			}
 		}
@@ -100,4 +105,5 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 	}else{
 		util.Message(w,1002)
 	}
+	db.Close()
 }

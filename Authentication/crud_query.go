@@ -9,8 +9,8 @@ import(
     util "miti-microservices/Util"
 )
 
-func LoadingPageQuery(id string) (bool,bool,int){
-	db:=database.GetDB()
+func LoadingPageQuery(db *gorm.DB,id string) (bool,bool,int){
+	// db:=database.GetDB()
 	user:=User{}
 	db.Where("user_id=?",id).First(&user)
 	IsUserVerified:=false
@@ -224,8 +224,8 @@ func GetAllUser() ([]string){
 	return UserList
 }
 
-func VerifyOTPDB(userId string,otp string) (bool,OTPVerification){
-	db:=database.GetDB()
+func VerifyOTPDB(db *gorm.DB,userId string,otp string) (bool,OTPVerification){
+	// db:=database.GetDB()
 	otpVerification:=OTPVerification{}
 	db.Where("user_id=?",userId).First(&otpVerification)
 	if(otpVerification.UserId!="" && otpVerification.OTP==otp){
@@ -257,8 +257,8 @@ func GetOtpVerificationCount(id string)(int,string){
 	db.Where("user_id=?",id).Find(&otpVerification).Count(&count)
 	return count,otpVerification[count-1].CreatedAt
 }
-func ChangeVerificationStatus(userId string){
-	db:=database.GetDB()
+func ChangeVerificationStatus(db *gorm.DB,userId string){
+	// db:=database.GetDB()
 	user:=User{}
 	db.Model(&user).Where("user_id=?",userId).Update("status","V")
 }
@@ -303,8 +303,8 @@ func DeleteOTP(id string){
 	db.Where("user_id=?",id).Delete(&OTPVerification{})
 }
 
-func GetUserIdFromPhone(phone string) (string,string){
-	db:=database.GetDB()
+func GetUserIdFromPhone(db *gorm.DB,phone string) (string,string){
+	// db:=database.GetDB()
 	user:=User{}
 	db.Where("phone=?",phone).Find(&user)
 	if user.UserId!=""{
@@ -313,8 +313,8 @@ func GetUserIdFromPhone(phone string) (string,string){
 	return "","Error"
 }
 
-func GetPhoneFromUserId(userId string) (string,string){
-	db:=database.GetDB()
+func GetPhoneFromUserId(db *gorm.DB,userId string) (string,string){
+	// db:=database.GetDB()
 	user:=User{}
 	db.Where("user_id=?",userId).Find(&user)
 	if user.Phone!=""{
@@ -324,8 +324,8 @@ func GetPhoneFromUserId(userId string) (string,string){
 }
 
 
-func InsertOTP(userId string,sessionId string) string{
-	db:=database.GetDB()
+func InsertOTP(db *gorm.DB,userId string,sessionId string) string{
+	// db:=database.GetDB()
 	otp:=util.GenerateOTP()
 	otpVerification:=OTPVerification{}
 	db.Where("user_id=?",userId).Find(&otpVerification)
@@ -345,8 +345,8 @@ func InsertOTP(userId string,sessionId string) string{
 	return otp
 }
 
-func UpdateFailCount(userId string,failCount int){
-	db:=database.GetDB()
+func UpdateFailCount(db *gorm.DB,userId string,failCount int){
+	// db:=database.GetDB()
 	otp:=OTPVerification{}
 	db.Model(&otp).Where("user_id=?",userId).Update("fail_count",failCount+1)
 }

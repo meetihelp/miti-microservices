@@ -3,6 +3,7 @@ import (
 	"net/http"
 	// "fmt"
 	util "miti-microservices/Util"
+	database "miti-microservices/Database"
 	"io/ioutil"
 	"encoding/json"
 	"bytes"
@@ -22,6 +23,7 @@ func Login(w http.ResponseWriter,r *http.Request){
 	var data map[string]string
 	content:=LoginResponse{}
 	responseHeader:=LoginToOTPHeader{}
+	db:=database.DBConnection()
 	//Check if the user is already logged in? Using session value
 	// userId,loginStatus:=util.GetUserIdFromSession(sessionId)
 	// fmt.Println("session "+loginStatus)
@@ -61,6 +63,7 @@ func Login(w http.ResponseWriter,r *http.Request){
 		}
 		// fmt.Println("Could not read body")
 		// util.Message(w,1000)
+		db.Close()
 		return 
 	}
 
@@ -88,6 +91,7 @@ func Login(w http.ResponseWriter,r *http.Request){
 		}
 		// fmt.Println("Could not Unmarshall user data")
 		// util.Message(w,1001)
+		db.Close()
 		return 
 	}
 	// fmt.Println(userData);
@@ -112,6 +116,7 @@ func Login(w http.ResponseWriter,r *http.Request){
 		if err != nil {
 			log.Fatal(err)
 		}
+		db.Close()
 		return
 	}
 
@@ -130,9 +135,9 @@ func Login(w http.ResponseWriter,r *http.Request){
 		// 	// util.Message(w,1501)
 		// }
 		if(dbStatus==1){
-			userId,_=GetUserIdFromPhone(userData.Phone)
+			userId,_=GetUserIdFromPhone(db,userData.Phone)
 		}
-		cookie:=util.InsertTemporarySession(userId,ipAddress)
+		cookie:=util.InsertTemporarySession(db,userId,ipAddress)
 		statusCode=200
 		moveTo=3
 		content.Code=statusCode
@@ -152,6 +157,7 @@ func Login(w http.ResponseWriter,r *http.Request){
 		if err != nil {
 			log.Fatal(err)
 		}
+		db.Close()
 		return
 	}
 	// else if loginStatus=="Unverified"{
@@ -189,4 +195,6 @@ func Login(w http.ResponseWriter,r *http.Request){
 	// 	util.Message(w,200)
 	// 	return
 	// }
+
+
 }

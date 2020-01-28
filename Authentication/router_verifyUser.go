@@ -5,6 +5,7 @@ import(
 	"fmt"
     "log"
 	util "miti-microservices/Util"
+    database "miti-microservices/Database"
     "encoding/json"
     "bytes"
     // "encoding/json"
@@ -16,7 +17,8 @@ func VerifyUser(w http.ResponseWriter,r *http.Request){
     verifyOtpHeader:=VerifyOTPHeader{}
     util.GetHeader(r,&verifyOtpHeader)
     sessionId:=verifyOtpHeader.Cookie
-    userId,sessionErr:=util.GetUserIdFromTemporarySession(sessionId)
+    db:=database.DBConnection()
+    userId,sessionErr:=util.GetUserIdFromTemporarySession2(db,sessionId)
     // fmt.Println(sessionId)
     fmt.Print("Generate Otp Header:")
     fmt.Println(verifyOtpHeader)
@@ -53,6 +55,7 @@ func VerifyUser(w http.ResponseWriter,r *http.Request){
         if err != nil {
             log.Fatal(err)
         }
+        db.Close()
         return
     }
     //Read body data
@@ -81,12 +84,12 @@ func VerifyUser(w http.ResponseWriter,r *http.Request){
     //     return
     // }
 
-    phone,status:=GetPhoneFromUserId(userId)
-    _,code:=OTPHelper(sessionId)
+    phone,status:=GetPhoneFromUserId(db,userId)
+    _,code:=OTPHelper(db,sessionId)
     if status=="Ok"{
         // if(code==3003 || code ==3004 || code ==3005){
         if(code==200){
-            otpCode:=InsertOTP(userId,sessionId)
+            otpCode:=InsertOTP(db,userId,sessionId)
             err:=SendOTP(phone,otpCode)
             if err=="Ok"{
             // resp,err:=SendOTP(phone,otpCode)
@@ -153,5 +156,7 @@ func VerifyUser(w http.ResponseWriter,r *http.Request){
         //     // fmt.Println(err)
         // }
     }
+
+    db.Close()
     
 }

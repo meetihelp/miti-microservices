@@ -4,6 +4,7 @@ import(
 	"net/http"
 	"fmt"
 	util "miti-microservices/Util"
+    database "miti-microservices/Database"
     "io/ioutil"
     "encoding/json"
     "bytes"
@@ -23,8 +24,10 @@ func VerifyOTPUserverification(w http.ResponseWriter,r *http.Request){
     moveTo:=0
     var data map[string]string
     content:=VerifyOTPResponse{}
+
+    db:=database.DBConnection()
     responseHeader:=VerifyOTPResponseHeader{}
-    userId,sessionErr:=util.GetUserIdFromTemporarySession(sessionId)
+    userId,sessionErr:=util.GetUserIdFromTemporarySession2(db,sessionId)
     if sessionErr=="Error"{
         // fmt.Println("Session Does not exist")
         // util.Message(w,1003)
@@ -138,15 +141,15 @@ func VerifyOTPUserverification(w http.ResponseWriter,r *http.Request){
     fmt.Print("Verify otp Body:")
     fmt.Println(otpVerification)
 
-    otpVerify,otpVerificationDB:=VerifyOTPDB(otpVerification.UserId,otpVerification.OTP)
+    otpVerify,otpVerificationDB:=VerifyOTPDB(db,otpVerification.UserId,otpVerification.OTP)
     if otpVerify{
         //CHANGE STATUS OF USER TO VERIFIED
         // ChangeVerificationStatus(userId)
         // util.InsertSessionValue(sessionId,userId,ipAddress)
         // util.DeleteTemporarySession(sessionId)
-        IsUserVerified,IsProfileCreated,Preference:=LoadingPageQuery(userId)
+        IsUserVerified,IsProfileCreated,Preference:=LoadingPageQuery(db,userId)
         if(!IsUserVerified){
-            ChangeVerificationStatus(userId)
+            ChangeVerificationStatus(db,userId)
             statusCode=1005
             moveTo=4
             content.Code=statusCode
@@ -184,8 +187,8 @@ func VerifyOTPUserverification(w http.ResponseWriter,r *http.Request){
                 panic(err)
             }
         }else{
-            util.InsertSessionValue(sessionId,userId,ipAddress)
-            util.DeleteTemporarySession(sessionId)
+            util.InsertSessionValue(db,sessionId,userId,ipAddress)
+            util.DeleteTemporarySession(db,sessionId)
             statusCode=200
             moveTo=6
             content.Code=statusCode
@@ -200,7 +203,7 @@ func VerifyOTPUserverification(w http.ResponseWriter,r *http.Request){
         }
     } else{
         // fmt.Println(otpVerificationDB.FailCount)
-        UpdateFailCount(userId,otpVerificationDB.FailCount)
+        UpdateFailCount(db,userId,otpVerificationDB.FailCount)
         // util.Message(w,1401)
         statusCode=1401
         moveTo=0
@@ -223,4 +226,6 @@ func VerifyOTPUserverification(w http.ResponseWriter,r *http.Request){
     if err != nil {
         log.Fatal(err)
     }
+
+    db.Close()
 }

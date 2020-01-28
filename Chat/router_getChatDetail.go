@@ -4,6 +4,7 @@ import(
 	"fmt"
 	// CD "miti-microservices/Model/CreateDatabase"
 	util "miti-microservices/Util"
+	database "miti-microservices/Database"
 	"io/ioutil"
 	"encoding/json"
 )
@@ -13,10 +14,12 @@ func GetChatDetailroute(w http.ResponseWriter, r *http.Request){
 	fmt.Print("GetChatDetailHeader:")
 	fmt.Println(getChatDetailHeader)
 	sessionId:=getChatDetailHeader.Cookie
-	userId,getChatStatus:=util.GetUserIdFromSession(sessionId)
+	db:=database.DBConnection()
+	userId,getChatStatus:=util.GetUserIdFromSession2(db,sessionId)
 	fmt.Println(userId)
 	if getChatStatus=="Error"{
 		util.Message(w,1003)
+		db.Close()
 		return
 	}
 
@@ -26,6 +29,7 @@ func GetChatDetailroute(w http.ResponseWriter, r *http.Request){
 	if err!=nil{
 		fmt.Println("Could not read body for GetChatDetail")
 		util.Message(w,1000)
+		db.Close()
 		return 
 	}
 
@@ -34,6 +38,7 @@ func GetChatDetailroute(w http.ResponseWriter, r *http.Request){
 	if errUserData!=nil{
 		fmt.Println("Could not Unmarshall user data for GetChatDetail")
 		util.Message(w,1001)
+		db.Close()
 		return 
 	}
 
@@ -41,15 +46,18 @@ func GetChatDetailroute(w http.ResponseWriter, r *http.Request){
 	if sanatizationStatus =="Error"{
 		fmt.Println("User data invalid for GetChatDetail")
 		util.Message(w,1002)
+		db.Close()
 		return
 	}
 
-	userId2,chatDetail,chatDetailErr:=GetChatDetail(userId,chatDetailDs.CreatedAt,chatDetailDs.NumOfChat)
+	userId2,chatDetail,chatDetailErr:=GetChatDetail(db,userId,chatDetailDs.CreatedAt,chatDetailDs.NumOfChat)
 	if chatDetailErr=="Error"{
 		SendChatDetail(w,chatDetail,userId2,7000)
+		db.Close()
 		return
 	}else{
 		SendChatDetail(w,chatDetail,userId2,200)
+		db.Close()
 		return
 	}
 }

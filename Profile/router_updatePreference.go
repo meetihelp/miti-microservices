@@ -9,6 +9,7 @@ import(
 	"encoding/json"
    util "miti-microservices/Util"
    auth "miti-microservices/Authentication"
+   database "miti-microservices/Database"
 )
 
 func UpdatePreference(w http.ResponseWriter, r *http.Request){
@@ -18,15 +19,15 @@ func UpdatePreference(w http.ResponseWriter, r *http.Request){
 
 
 	sessionId:=header.Cookie
-
-	userId,dErr:=util.GetUserIdFromSession(sessionId)
+	db:=database.DBConnection()
+	userId,dErr:=util.GetUserIdFromSession2(db,sessionId)
 	// if dErr=="Error"{
 	// 	fmt.Println("Session Does not exist")
 	// 	util.Message(w,1003)
 	// 	return
 	// }
 	if dErr=="Error"{
-		userId,dErr=util.GetUserIdFromTemporarySession(sessionId)
+		userId,dErr=util.GetUserIdFromTemporarySession2(db,sessionId)
 		if dErr=="Error"{
 			util.Message(w,1003)
 			return
@@ -54,10 +55,11 @@ func UpdatePreference(w http.ResponseWriter, r *http.Request){
 	// auth.UpdatePreferencetatus(userId,preferenceStatus)
 	// // UpdateIPIPScore(userId)
 	if(preferenceStatus>=6){
-		util.InsertSessionValue(sessionId,userId,ipAddress)
-        util.DeleteTemporarySession(sessionId)
+		util.InsertSessionValue(db,sessionId,userId,ipAddress)
+        util.DeleteTemporarySession(db,sessionId)
 	}
 	util.Message(w,200)
+	db.Close()
 }
 
 func getDataInInterestForm(interest Interest,data PreferenceRequest) (int,Interest){

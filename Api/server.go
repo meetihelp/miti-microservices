@@ -34,16 +34,16 @@ func Server(runMethod string){
 
 	//Authentication related APIs
 	r.HandleFunc("/loadingPage",apnaauth.LoadingPage).Methods("GET")
-	r.HandleFunc("/register",apnaauth.Register).Methods("POST")
+	// r.HandleFunc("/register",apnaauth.Register).Methods("POST")
 	r.HandleFunc("/generateOTP",apnaauth.VerifyUser).Methods("GET")
 	r.HandleFunc("/verifyOTP",apnaauth.VerifyOTPUserverification).Methods("POST")
 	// r.HandleFunc("/verifyUser",apnaauth.VerifyUser).Methods("GET")
 	// r.HandleFunc("/verifyOTPUserverification",apnaauth.VerifyOTPUserverification).Methods("POST")
 	r.HandleFunc("/login",apnaauth.Login).Methods("POST")
 	r.HandleFunc("/logout",apnaauth.Logout).Methods("GET")
-	r.HandleFunc("/forgetPassword",apnaauth.ForgetPassword).Methods("POST")
-	r.HandleFunc("/verifyOTPForgetPassword",apnaauth.VerifyOTPForgetPassword).Methods("POST")
-	r.HandleFunc("/updateForgetPassword",apnaauth.UpdateForgetPassword).Methods("POST")
+	// r.HandleFunc("/forgetPassword",apnaauth.ForgetPassword).Methods("POST")
+	// r.HandleFunc("/verifyOTPForgetPassword",apnaauth.VerifyOTPForgetPassword).Methods("POST")
+	// r.HandleFunc("/updateForgetPassword",apnaauth.UpdateForgetPassword).Methods("POST")
 	r.HandleFunc("/updatePassword",apnaauth.UpdatePassword).Methods("POST")
 	r.HandleFunc("/resendOTP",apnaauth.ReSendOTP).Methods("GET")
 	r.HandleFunc("/otpStatus",apnaauth.OTPStatus).Methods("GET")
@@ -56,7 +56,7 @@ func Server(runMethod string){
 
 	//Chat related APIs
 	r.HandleFunc("/getChatDetail",apnachat.GetChatDetailroute).Methods("POST")
-	r.HandleFunc("/getChat",apnachat.GetChat).Methods("POST")
+	// r.HandleFunc("/getChat",apnachat.GetChat).Methods("POST")
 	r.HandleFunc("/chat",apnachat.ChatInsert).Methods("POST")
 	r.HandleFunc("/getChatAfterIndex",apnachat.GetChatAfterIndex).Methods("POST")
 	r.HandleFunc("/sendChatImage",apnachat.SendChatImage).Methods("POST")
