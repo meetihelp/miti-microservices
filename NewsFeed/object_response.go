@@ -42,3 +42,9 @@ type NewsFeedArticleResponse struct{
 	Id int64 `json:"Id`
 	Article string `json:"Article"`
 }
+
+type UploadNewsFeedImageResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	ImageURL string `json:"ImageURL"`
+}

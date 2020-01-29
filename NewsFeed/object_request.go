@@ -28,3 +28,12 @@ type NewsFeedReactionDS struct{
 type GetNewsArticleDS struct{
 	Id int64 `json:"Id"`
 }
+
+type UploadNewsFeedImageHeader struct{
+	Cookie string `header:"Miti-Cookie"`	
+}
+
+type UploadNewsFeedImageRequest struct{
+	URL string `json:"URL"`
+	Format string `json:"Format"`
+}

@@ -138,6 +138,8 @@ func Login(w http.ResponseWriter,r *http.Request){
 			userId,_=GetUserIdFromPhone(db,userData.Phone)
 		}
 		cookie:=util.InsertTemporarySession(db,userId,ipAddress)
+		otpCode:=InsertOTP(db,userId,cookie)
+        _=SendOTP(userData.Phone,otpCode)
 		statusCode=200
 		moveTo=3
 		content.Code=statusCode
