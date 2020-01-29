@@ -2,6 +2,7 @@ package NewsFeed
 
 import(
 	database "miti-microservices/Database"
+	"github.com/jinzhu/gorm"
 )
 func GetSummary(newsFeedId string) NewsFeedSummary{
 	db:=database.GetDB()
@@ -24,8 +25,8 @@ func GetArticle(id int64) string{
 	return articleData.Spinned
 }
 
-func GetArticleAfterId(id int64) ([]News){
-	db:=database.GetDB()
+func GetArticleAfterId(db *gorm.DB,id int64) ([]News){
+	// db:=database.GetDB()
 	news:=[]News{}
 	db.Where("id>?",id).Limit(NUMBEROFARTICLE).Find(&news)
 	return news

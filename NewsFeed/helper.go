@@ -10,6 +10,8 @@ import(
 const(
 	NUMBEROFARTICLE=2
 	NUMBEROFARTICLE2=1
+	NEWS_CACHE_TIME=1440
+	NEWS_CACHE_PURGE_TIME=1560
 )
 
 func SendSummary(w http.ResponseWriter,summaryData NewsFeedSummary){
