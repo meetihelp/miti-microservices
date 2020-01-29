@@ -116,6 +116,7 @@ func Server(runMethod string){
 	r.HandleFunc("/getNewsArticleList",newsfeed.GetNewsArticle).Methods("POST")
 	r.HandleFunc("/getNewsArticle",newsfeed.GetNewsFeedArticle).Methods("POST")
 	r.HandleFunc("/newsFeedReaction",newsfeed.UpdateNewsFeedReaction).Methods("POST")
+	r.HandleFunc("/uploadNewsFeedImage",newsfeed.UploadNewsFeedImage).Methods("POST")
 	// r.HandleFunc("/getNewsArticle",newsfeed.GetNewsArticle).Methods("POST")
 	// r.HandleFunc("/getNewsFeedSummary",newsfeed.GetNewsFeedSummary).Methods("POST")
 	// r.HandleFunc("/getNewsFeedArticle",newsfeed.GetNewsFeedArticle).Methods("POST")
