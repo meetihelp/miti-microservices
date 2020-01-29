@@ -4,10 +4,10 @@ import(
 	"net/http"
 	// "log"
 	"fmt"
-	"time"
+	// "time"
 	util "miti-microservices/Util"
 	database "miti-microservices/Database"
-	gocache "github.com/patrickmn/go-cache"
+	getNewsArticleCache "miti-microservices/Database/Cache/NewsFeedCache"
 	"io/ioutil"
 	"strconv"
 	"encoding/json"
@@ -43,14 +43,14 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 		db.Close()
 		return 
 	}
-	cache:=gocache.New(NEWS_CACHE_TIME*time.Minute,NEWS_CACHE_PURGE_TIME*time.Minute)
+	cache:=getNewsArticleCache.GetNewsArticleCache()
 	string_news_id:=strconv.FormatInt(getNewsFeedArticleData.Id,10)
 	articleData:=[]News{}
 	x,found:=cache.Get(string_news_id)
 	if(!found){
 		fmt.Println("Cache miss for "+string_news_id)
 		articleData=GetArticleAfterId(db,getNewsFeedArticleData.Id)
-		cache.Set(string_news_id,&articleData,gocache.DefaultExpiration)
+		cache.Set(string_news_id,&articleData,0)
 	}else{
 		fmt.Println("Cache hit for "+string_news_id)
 		articleData=x.([]News)
