@@ -61,6 +61,7 @@ func EnterUserData(db *gorm.DB,userData LoginRequest) (string,bool){
 	if(gorm.IsRecordNotFoundError(err)){
 		user.UserId =util.GenerateToken()
 		user.Status="U"
+		user.Phone=userData.Phone
 		user.ProfileCreationStatus="N"
 		user.IPIPStatus=0
 		user.PreferenceCreationStatus=0
@@ -125,7 +126,7 @@ func GetPhoneFromUserId(db *gorm.DB,userId string) (string,string,bool){
 func GetOTPDetails(db *gorm.DB,userId string) (OTPVerification,bool){
 	otp:=OTPVerification{}
 	err:=db.Where("user_id=?",userId).Find(&otp).Error
-	if(err!=nil){
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
 		return otp,true
 	}
 	return otp,false
@@ -134,6 +135,8 @@ func GetOTPDetails(db *gorm.DB,userId string) (OTPVerification,bool){
 func DeleteOTP(db *gorm.DB,id string) bool{
 	err:=db.Where("user_id=?",id).Delete(&OTPVerification{}).Error
 	if(err!=nil){
+		fmt.Print("DeleteOTP Error:")
+		fmt.Println(err)
 		return true
 	}
 	return false
