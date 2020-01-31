@@ -88,7 +88,10 @@ func SendMessageRequest(w http.ResponseWriter,r *http.Request){
 		availability,dbError:=IsPhoneNumberExist(db,phone)
 		errorList.DatabaseError=dbError
 		if(availability=="No"){
-			sms.MessageRequestNotificaton(senderName,senderPhone,phone)
+			_,err:=sms.MessageRequestNotificaton(senderName,senderPhone,phone)
+			if(err!=nil){
+				statusCode=1007
+			}
 		}	
 	}
 	
