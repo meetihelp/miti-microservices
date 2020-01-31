@@ -1,14 +1,50 @@
 package Profile
 
+//Profile Creation
 type ProfileCreationHeader struct{
 	Method1 string `header:"method"`
 	Agent1 string `header:"agent"`
 	Cookie string `header:"Miti-Cookie"`
 }
 
+//Update IPIP Response
+type UpdateIPIPResponseHeader struct{
+	Method1 string `header:"method"`
+	Agent1 string `header:"agent"`
+	Cookie string `header:"Miti-Cookie"`
+}
+
+type UpdateIPIPRequest struct{
+	Page int `json:"Page"`
+	IPIP1 int `json:"IPIP1"`
+	IPIP2 int `json:"IPIP2"`
+	IPIP3 int `json:"IPIP3"`
+	IPIP4 int `json:"IPIP4"`
+	IPIP5 int `json:"IPIP5"`
+}
+
+//Update Preference
+type UpdatePreferenceHeader struct{
+	Cookie string `header:"Miti-Cookie"`
+}
+type UpdatePreferenceRequest struct{
+	Page int `json:"Page"`
+	I1 string `json:"I1"`
+	I2 string `json:"I2"`
+}
+
+//Get Profile
 type GetProfileHeader struct{
 	Cookie string `header:"Miti-Cookie"`	
 }
+
+type GetProfileRequest struct{
+	UserId string `json:"UserId"`
+}
+
+//Last
+
+
 
 type InsertQuestionHeader struct{
 	Method1 string `header:"method"`
@@ -22,19 +58,7 @@ type UpdateQuestionResponseHeader struct{
 	Cookie string `header:"Miti-Cookie"`	
 }
 
-type UpdateIPIPRequest struct{
-	Page int `json:"Page"`
-	IPIP1 int `json:"IPIP1"`
-	IPIP2 int `json:"IPIP2"`
-	IPIP3 int `json:"IPIP3"`
-	IPIP4 int `json:"IPIP4"`
-	IPIP5 int `json:"IPIP5"`
-}
-type UpdatePreferenceResponseHeader struct{
-	Method1 string `header:"method"`
-	Agent1 string `header:"agent"`
-	Cookie string `header:"Miti-Cookie"`	
-}
+
 type QuestionRequest struct{
 	Offset int `json:"Offset"`
 	NumOfQuestion int `json:"NumOfQuestion"`
@@ -49,9 +73,7 @@ type ResponseWrapper struct{
 	IPIP []Response `json:"IPIP"`
 }
 
-type ProfileRequest struct{
-	UserId string `json:"UserId"`
-}
+
 
 type PreferenceRequest struct{
 	Page int `json:"Page"`

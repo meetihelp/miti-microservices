@@ -50,7 +50,7 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 	if(!found){
 		fmt.Println("Cache miss for "+string_news_id)
 		articleData=GetArticleAfterId(db,getNewsFeedArticleData.Id)
-		cache.Set(string_news_id,&articleData,0)
+		cache.Set(string_news_id,articleData,0)
 	}else{
 		fmt.Println("Cache hit for "+string_news_id)
 		articleData=x.([]News)

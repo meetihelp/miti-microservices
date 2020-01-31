@@ -1,64 +1,96 @@
 package Profile
 
 import(
-	"fmt"
 	"net/http"
-	// "log"
 	"io/ioutil"
-	// "strings"
 	"encoding/json"
    util "miti-microservices/Util"
    auth "miti-microservices/Authentication"
+   database "miti-microservices/Database"
+   "bytes"
+   "log"
 )
 
 
 func ProfileCreation(w http.ResponseWriter, r *http.Request){
+	ipAddress:=util.GetIPAddress(r)
 	header:=ProfileCreationHeader{}
+
+	content:=ProfileCreationResponse{}
+	statusCode:=0
+
+	responseHeader:=ProfileCreationResponseHeader{}
+	var data map[string]string
+
+	db:=database.DBConnection()
+	list:=[]bool{false,false,false,false,false,false}
+	errorList:=util.GetErrorList(list)
+
 	util.GetHeader(r,&header)
-
-
 	sessionId:=header.Cookie
 
-	userId,dErr:=util.GetUserIdFromSession(sessionId)
-	// if dErr=="Error"{
-	// 	fmt.Println("Session Does not exist")
-	// 	util.Message(w,1003)
-	// 	return
-	// }
+	userId,dErr,dbError:=util.GetUserIdFromTemporarySession3(db,sessionId)
+	errorList.DatabaseError=dbError
+	util.APIHitLog("ProfileCreation",ipAddress,sessionId)
 
 	if dErr=="Error"{
-		userId,dErr=util.GetUserIdFromTemporarySession(sessionId)
-		if dErr=="Error"{
-			util.Message(w,1003)
-			return
-		}
+		errorList.TemporarySessionError=true
 	}
 
 
 	requestBody,err:=ioutil.ReadAll(r.Body)
-	if err!=nil{
-		fmt.Println("Could not read body")
-		util.Message(w,1000)
-		return 
+	if (err!=nil && !util.ErrorListStatus(errorList)){
+		errorList.BodyReadError=true
 	}
+
 	profileData:=Profile{}
-	errProfileData:=json.Unmarshal(requestBody,&profileData)
-	if errProfileData!=nil{
-		fmt.Println("Could not Unmarshall profile data")
-		util.Message(w,1001)
-		return
+	if(!util.ErrorListStatus(errorList)){
+		errProfileData:=json.Unmarshal(requestBody,&profileData)
+		if errProfileData!=nil{
+			errorList.UnmarshallingError=true
+		}
 	}
-	fmt.Println(profileData.Name)
+
 	profileData.UserId=userId
-	sanatizationStatus:=Sanatize(profileData)
-	if sanatizationStatus =="Error"{
-		fmt.Println("profile creation data invalid")
-		util.Message(w,1002)
-		return
+	if(!util.ErrorListStatus(errorList)){
+		sanatizationStatus:=Sanatize(profileData)
+		if sanatizationStatus =="Error"{
+			errorList.SanatizationError=true
+		}
 	}
-	// profile_data_handle(w,profile_data)
-	auth.UpdateProfileCreationStatus(userId)
-	EnterProfileData(profileData)
-	util.Message(w,200)
+	
+	if(!util.ErrorListStatus(errorList)){
+		dbError:=auth.UpdateProfileCreationStatus(db,userId)
+		errorList.DatabaseError=dbError	
+	}
+
+	if(!util.ErrorListStatus(errorList)){
+		dbError:=EnterProfileData(db,profileData)
+		errorList.DatabaseError=dbError
+	}
+	
+	
+	code:=util.GetCode(errorList)
+	if(code==200){
+		content.Code=statusCode
+	}else{
+		content.Code=code
+	}
+	responseHeader.ContentType="application/json"
+    headerBytes:=new(bytes.Buffer)
+    json.NewEncoder(headerBytes).Encode(responseHeader)
+    responseHeaderBytes:=headerBytes.Bytes()
+    if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+        panic(err)
+    }
+    w=util.GetResponseFormatHeader(w,data)
+	p:=&content
+	util.ResponseLog("ProfileCreation",ipAddress,sessionId,content.Code,*p)
+	enc := json.NewEncoder(w)
+	err= enc.Encode(p)
+	if err != nil {
+		log.Fatal(err)
+	}
+	db.Close()
 
 }

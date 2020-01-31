@@ -1,79 +1,125 @@
 package Chat
 
 import(
-	"fmt"
 	"net/http"
 	"log"
 	"io/ioutil"
 	"strings"
 	"encoding/json"
    util "miti-microservices/Util"
+   database "miti-microservices/Database"
+   profile "miti-microservices/Profile"
+   "bytes"
 )
 
 func ActionMessageRequest(w http.ResponseWriter,r *http.Request){
-	header:=AcceptMessageRequestHeader{}
+	ipAddress:=util.GetIPAddress(r)
+	header:=ActionMessageRequestHeader{}
 	util.GetHeader(r,&header)
-	sessionId:=header.Cookie
-	userId,dErr:=util.GetUserIdFromSession(sessionId)
 
-	fmt.Print("AcceptMessageRequest Header->")
-	fmt.Println(header)
+	content:=ActionMessageRequestResponse{}
+	statusCode:=0
+
+	actionMessageRequestResponseHeader:=ActionMessageRequestResponseHeader{}
+	var data map[string]string
+
+	db:=database.DBConnection()
+	//Session,TemporarySession,Body,Unmarshal,Sanatize,Database
+	list:=[]bool{true,false,false,false,false,false}
+	errorList:=util.GetErrorList(list)
+
+	sessionId:=header.Cookie
+	userId,dErr,dbError:=util.GetUserIdFromSession3(db,sessionId)
+	errorList.DatabaseError=dbError
+	util.APIHitLog("ActionMessageRequest",ipAddress,sessionId)
 	if dErr=="Error"{
-		fmt.Println("Session Does not exist")
-		util.Message(w,1003)
-		return
+		errorList.SessionError=true
 	}
 
 	requestBody,err:=ioutil.ReadAll(r.Body)
-	if err!=nil{
-		fmt.Println("Could not read body")
-		util.Message(w,1000)
-		return 
+	if (err!=nil && !util.ErrorListStatus(errorList)){
+		errorList.BodyReadError=true
 	}
 	
-	acceptMessageRequestData:=AcceptMessageRequestDS{}
-	profileRequestErr:=json.Unmarshal(requestBody,&acceptMessageRequestData)
-	if profileRequestErr!=nil{
-		fmt.Println("Could not Unmarshall profile data")
-		util.Message(w,1001)
-		return
+	actionMessageRequestData:=ActionMessageRequestDS{}
+	if(!util.ErrorListStatus(errorList)){
+		profileRequestErr:=json.Unmarshal(requestBody,&actionMessageRequestData)
+		if profileRequestErr!=nil{
+			errorList.UnmarshallingError=true
+		}
 	}
 
-	fmt.Print("ActionMessageRequest Body:->")
-	fmt.Println(acceptMessageRequestData)
+	if(!util.ErrorListStatus(errorList)){
+		util.BodyLog("ActionMessageRequest",ipAddress,sessionId,actionMessageRequestData)
+		sanatizationStatus :=Sanatize(actionMessageRequestData)
+		if(sanatizationStatus=="Error"){
+			errorList.SanatizationError=true
+		}
+	}
 
-	code:=200
-	actionRequestId:=acceptMessageRequestData.RequestId
-	action:=acceptMessageRequestData.Action
+	actionRequestId:=actionMessageRequestData.RequestId
+	action:=actionMessageRequestData.Action
 	action=strings.ToLower(action)
-	senderPhone:=acceptMessageRequestData.Phone
-	if(senderPhone==""){
-		util.Message(w,1002)
-		return
+	senderPhone:=actionMessageRequestData.Phone
+
+	var phone string
+	if(!util.ErrorListStatus(errorList)){
+		phone,dbError=GetUserPhone(db,userId)
+		errorList.DatabaseError=dbError
 	}
-	phone:=GetUserPhone(userId)
+	
 	updatedAt:=util.GetTime()
-	if(action=="accept"){
-		userId2,updatedAtTemp,messageRequest:=UpdateMessageRequestDB(phone,senderPhone,action,actionRequestId,updatedAt)
+	if(action=="accept" && !util.ErrorListStatus(errorList)){
+		userId2,updatedAtTemp,messageRequest,dbError:=UpdateMessageRequestDB(db,phone,senderPhone,action,actionRequestId,updatedAt)
+		errorList.DatabaseError=dbError
 		updatedAt=updatedAtTemp
-		codeTemp,chatId:=InsertChatDetail(userId,userId2,actionRequestId)
-		code=codeTemp
-		code=InsertIntoChatFromMessageRequest(chatId,actionRequestId,messageRequest)
-	}else if(action=="reject"){
-		_,updatedAt,_=UpdateMessageRequestDB(phone,senderPhone,action,actionRequestId,updatedAt)
+		var chatId string
+		if(!util.ErrorListStatus(errorList)){
+			chatId,dbError=InsertChatDetail(db,userId,userId2,actionRequestId)
+			errorList.DatabaseError=dbError
+		}
+		if(!util.ErrorListStatus(errorList)){
+			dbError=InsertIntoChatFromMessageRequest(db,chatId,actionRequestId,messageRequest)	
+			errorList.DatabaseError=dbError
+		}
+
+		if(!util.ErrorListStatus(errorList)){
+			dbError=profile.InsertIntoMatch(db,userId,userId2)
+			errorList.DatabaseError=dbError
+		}
+		
+	}else if(action=="reject" && !util.ErrorListStatus(errorList)){
+		_,updatedAt,_,dbError=UpdateMessageRequestDB(db,phone,senderPhone,action,actionRequestId,updatedAt)
+		errorList.DatabaseError=dbError
 	}else{
-		util.Message(w,1002)
-		return
+		statusCode=1002
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	msg:=util.GetMessageDecode(code)
-	p:=&ActionMessageRequestResponse{Code:code,Message:msg,RequestId:actionRequestId,CreatedAt:updatedAt}
-	fmt.Print("ActionMessageRequest Response:->")
-	fmt.Println(*p)
+
+	code:=util.GetCode(errorList)
+	if(code==200){
+		content.Code=statusCode
+	}else{
+		content.Code=code
+	}
+	content.Message=util.GetMessageDecode(code)
+	content.RequestId=actionRequestId
+	content.CreatedAt=updatedAt
+
+	actionMessageRequestResponseHeader.ContentType="application/json"
+    headerBytes:=new(bytes.Buffer)
+    json.NewEncoder(headerBytes).Encode(actionMessageRequestResponseHeader)
+    responseHeaderBytes:=headerBytes.Bytes()
+    if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+        panic(err)
+    }
+    w=util.GetResponseFormatHeader(w,data)
+	p:=&content
+	util.ResponseLog("ActionMessageRequest",ipAddress,sessionId,content.Code,*p)
 	enc := json.NewEncoder(w)
 	err= enc.Encode(p)
 	if err != nil {
 		log.Fatal(err)
 	}
+	db.Close()
 }

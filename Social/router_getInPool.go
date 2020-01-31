@@ -1,77 +1,95 @@
 package Social
 
 import(
-	"fmt"
 	"net/http"
 	"log"
-	// "io/ioutil"
-	// "strings"
 	"encoding/json"
 	gps "miti-microservices/GPS"
 	profile "miti-microservices/Profile"
-   util "miti-microservices/Util"
+   	util "miti-microservices/Util"
+   	database "miti-microservices/Database"
+   	"bytes"
 )
 
 func GetInPool(w http.ResponseWriter, r *http.Request){
+	ipAddress:=util.GetIPAddress(r)
 	header:=GetInPoolHeader{}
+
+	content:=GetInPoolResponse{}
+	statusCode:=0
+
+	responseHeader:=GetInPoolResponseHeader{}
+	var data map[string]string
+
+	db:=database.DBConnection()
+	//Session,TemporarySession,Body,Unmarshal,Sanatize,Database
+	list:=[]bool{false,false,false,false,false,false}
+	errorList:=util.GetErrorList(list)
+
 	util.GetHeader(r,&header)
-
-
 	sessionId:=header.Cookie
-	userId,dErr:=util.GetUserIdFromSession(sessionId)
-	fmt.Print("GetInPoolHeader")
-	fmt.Println(header)
+	userId,dErr,dbError:=util.GetUserIdFromSession3(db,sessionId)
+	errorList.DatabaseError=dbError
+	util.APIHitLog("GetInPool",ipAddress,sessionId)
 	if dErr=="Error"{
-		fmt.Println("Session Does not exist GetInPool")
-		util.Message(w,1003)
-		return
+		errorList.SessionError=true
 	}
 
-	// requestBody,err:=ioutil.ReadAll(r.Body)
-	// if err!=nil{
-	// 	fmt.Println("Could not read body")
-	// 	util.Message(w,1000)
-	// 	return 
-	// }
+	var pincode string
+	if(!util.ErrorListStatus(errorList)){
+		pincode,dbError=gps.GetUserCurrentPincode(db,userId)	
+		errorList.DatabaseError=dbError
+	}
 
-	// getInPoolRequest:=GetInPoolRequest{}
-	// errQuestionData:=json.Unmarshal(requestBody,&getInPoolRequest)
-	// if errQuestionData!=nil{
-	// 	fmt.Println("Could not Unmarshall profile data")
-	// 	util.Message(w,1001)
-	// 	return
-	// }
-
-	// fmt.Print("GetInPoolBody:")
-	// fmt.Println(getInPoolRequest)
-
-	// requestId:=getInPoolRequest.RequestId
-	pincode:=gps.GetUserCurrentPincode(userId)
-	profileData:=profile.GetProfileDB(userId)
+	var profileData profile.Profile
+	if(!util.ErrorListStatus(errorList)){
+		profileData,dbError=profile.GetProfileDB(db,userId)	
+		errorList.DatabaseError=dbError
+	}
+	
+	
 	createdAt:=util.GetTime()
 	gender:=profileData.Gender
 	sex:=profileData.Sex
-	ipip:=profile.CheckIPIPStatus(userId)
-	code:=200
-	poolStatus:=PoolStatusHelper{}
-	if(ipip<5){
-		code=2003
-	}else{
-		poolStatus=EnterInPooL(userId,pincode,createdAt,gender,sex)
-		code=200
+	var ipip int
+	if(!util.ErrorListStatus(errorList)){
+		ipip,dbError=profile.CheckIPIPStatus(db,userId)
+		errorList.DatabaseError=dbError
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	msg:=util.GetMessageDecode(code)
-	p:=&GetInPoolResponse{Code:code,Message:msg,IPIP:ipip,PoolStatus:poolStatus}
-	fmt.Print("GetInPoolResponse:")
-	fmt.Println(*p)
+	poolStatus:=PoolStatusHelper{}
+	if(ipip<5){
+		statusCode=2003
+	}else{
+		poolStatus,dbError=EnterInPooL(db,userId,pincode,createdAt,gender,sex)
+		errorList.DatabaseError=dbError
+	}
+
+	code:=util.GetCode(errorList)
+	if(code==200){
+		content.Code=statusCode
+	}else{
+		content.Code=code
+	}
+	content.Message=util.GetMessageDecode(code)
+	content.PoolStatus=poolStatus
+	content.IPIP=ipip
+
+	responseHeader.ContentType="application/json"
+    headerBytes:=new(bytes.Buffer)
+    json.NewEncoder(headerBytes).Encode(responseHeader)
+    responseHeaderBytes:=headerBytes.Bytes()
+    if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+        panic(err)
+    }
+    w=util.GetResponseFormatHeader(w,data)
+	p:=&content
+	util.ResponseLog("GetInPool",ipAddress,sessionId,content.Code,*p)
 	enc := json.NewEncoder(w)
 	err:= enc.Encode(p)
 	if err != nil {
 		log.Fatal(err)
 	}
-	
-	// util.Message(w,200)
+	db.Close()
 
 }

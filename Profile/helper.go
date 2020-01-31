@@ -31,16 +31,6 @@ func SendQuestion(w http.ResponseWriter,question []Question){
 	}
 }
 
-func SendProfile(w http.ResponseWriter,code int,profileResponse ProfileResponse){
-	w.Header().Set("Content-Type", "application/json")
-	msg:=util.GetMessageDecode(code)
-	p:=ProfileResponseContent{Code:code,Message:msg,ProfileResponse:profileResponse}
-	enc := json.NewEncoder(w)
-	err:= enc.Encode(p)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
 
 func ConvertQuestionResponseToArray(questionResponse QuestionResponse) ([]int){
 	response:=make([]int,51)

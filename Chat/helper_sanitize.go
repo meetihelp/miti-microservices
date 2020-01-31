@@ -11,8 +11,9 @@ type SanatizeData interface{
 	doSanitization() string
 }
 
+
 func(sendChatImageHeader SendChatImageHeader) doSanitization() string{
-	if(sendChatImageHeader.AccessType!="Public" && sendChatImageHeader.AccessType!="Private"){
+	if(sendChatImageHeader.AccessType!="public" && sendChatImageHeader.AccessType!="private"){
 		return "Error"
 	}
 	return "Ok"
@@ -51,7 +52,7 @@ func(chatAfterTimeData ChatAfterTime) doSanitization() string {
 	return "Ok"
 }
 
-func(chatDetailDsData ChatDetailDs) doSanitization() string {
+func(chatDetailDsData GetChatRequest) doSanitization() string {
 	validate :=validator.New()
 	err:= validate.Struct(chatDetailDsData)
 	if err!=nil{
@@ -59,6 +60,40 @@ func(chatDetailDsData ChatDetailDs) doSanitization() string {
 		return "Error"
 	}
 	return "Ok"
+}
+
+func(chatDetailData ChatDetailRequest) doSanitization() string{
+	validate :=validator.New()
+	err:= validate.Struct(chatDetailData)
+	if err!=nil{
+		fmt.Println(err.Error())
+		return "Error"
+	}
+	return "Ok"	
+}
+
+func(sendMessageRequestData SendMessageRequestDS) doSanitization() string{
+	validate :=validator.New()
+	err:= validate.Struct(sendMessageRequestData)
+	if err!=nil{
+		fmt.Println(err.Error())
+		return "Error"
+	}
+	return "Ok"	
+}
+
+func(actionMessageRequestData ActionMessageRequestDS) doSanitization() string{
+	validate :=validator.New()
+	err:= validate.Struct(actionMessageRequestData)
+	if err!=nil{
+		fmt.Println(err.Error())
+		return "Error"
+	}
+
+	if(actionMessageRequestData.Phone==""){
+		return "Error"
+	}
+	return "Ok"	
 }
 
 func Sanatize(s SanatizeData) string{

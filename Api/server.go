@@ -10,7 +10,7 @@ import (
 	apnachat "miti-microservices/Chat"
 	util "miti-microservices/Util"
 	gps "miti-microservices/GPS"
-	event "miti-microservices/Event"
+	// event "miti-microservices/Event"
 	newsfeed "miti-microservices/NewsFeed"
 	image "miti-microservices/Media/Image"
 	social "miti-microservices/Social"
@@ -34,21 +34,26 @@ func Server(runMethod string){
 
 	//Authentication related APIs
 	r.HandleFunc("/loadingPage",apnaauth.LoadingPage).Methods("GET")
-	// r.HandleFunc("/register",apnaauth.Register).Methods("POST")
+	r.HandleFunc("/login",apnaauth.Login).Methods("POST")
+	r.HandleFunc("/otpStatus",apnaauth.OTPStatus).Methods("GET")
 	r.HandleFunc("/generateOTP",apnaauth.VerifyUser).Methods("GET")
 	r.HandleFunc("/verifyOTP",apnaauth.VerifyOTPUserverification).Methods("POST")
-	// r.HandleFunc("/verifyUser",apnaauth.VerifyUser).Methods("GET")
+	r.HandleFunc("/resendOTP",apnaauth.ReSendOTP).Methods("GET")
+	// r.HandleFunc("/register",apnaauth.Register).Methods("POST")
+	// r.HandleFunc("/generateOTP",apnaauth.VerifyUser).Methods("GET")
+	
+	
 	// r.HandleFunc("/verifyOTPUserverification",apnaauth.VerifyOTPUserverification).Methods("POST")
-	r.HandleFunc("/login",apnaauth.Login).Methods("POST")
-	r.HandleFunc("/logout",apnaauth.Logout).Methods("GET")
+	
+	// r.HandleFunc("/logout",apnaauth.Logout).Methods("GET")
 	// r.HandleFunc("/forgetPassword",apnaauth.ForgetPassword).Methods("POST")
 	// r.HandleFunc("/verifyOTPForgetPassword",apnaauth.VerifyOTPForgetPassword).Methods("POST")
 	// r.HandleFunc("/updateForgetPassword",apnaauth.UpdateForgetPassword).Methods("POST")
-	r.HandleFunc("/updatePassword",apnaauth.UpdatePassword).Methods("POST")
-	r.HandleFunc("/resendOTP",apnaauth.ReSendOTP).Methods("GET")
-	r.HandleFunc("/otpStatus",apnaauth.OTPStatus).Methods("GET")
-	r.HandleFunc("/getTemporaryUserId",apnaauth.GetTemporaryUserId).Methods("GET")
-	r.HandleFunc("/getPhoneStatus",apnaauth.GetPhoneStatus).Methods("POST")
+	// r.HandleFunc("/updatePassword",apnaauth.UpdatePassword).Methods("POST")
+	
+	
+	// r.HandleFunc("/getTemporaryUserId",apnaauth.GetTemporaryUserId).Methods("GET")
+	// r.HandleFunc("/getPhoneStatus",apnaauth.GetPhoneStatus).Methods("POST")
 	
 	
 	
@@ -96,13 +101,13 @@ func Server(runMethod string){
 	
 	//GPS related APIs
 	r.HandleFunc("/updateUserLocation",gps.UpdateUserLocation).Methods("POST")
-	r.HandleFunc("/getUserListByLocation",gps.GetUserListByLocation).Methods("POST")
-	r.HandleFunc("/getEventListByLocation",gps.GetEventListByLocation).Methods("POST")
+	// r.HandleFunc("/getUserListByLocation",gps.GetUserListByLocation).Methods("POST")
+	// r.HandleFunc("/getEventListByLocation",gps.GetEventListByLocation).Methods("POST")
 	r.HandleFunc("/updateUserLocation",gps.UpdateUserLocation).Methods("POST")
 
 	//Event related APIs
-	r.HandleFunc("/createEvent",event.CreateEvent).Methods("POST")
-	r.HandleFunc("/getEventById",event.GetEventById).Methods("POST")
+	// r.HandleFunc("/createEvent",event.CreateEvent).Methods("POST")
+	// r.HandleFunc("/getEventById",event.GetEventById).Methods("POST")
 
 	// //Image related APIs
 	r.HandleFunc("/uploadImage",image.UploadImage).Methods("POST")
@@ -126,9 +131,9 @@ func Server(runMethod string){
 	r.HandleFunc("/getPoolStatus",social.PoolStatusRouter).Methods("POST")
 	r.HandleFunc("/getInPool",social.GetInPool).Methods("GET")
 	// r.HandleFunc("/cancelPool",social.CancelPoolRouter).Methods("GET")
-	r.HandleFunc("/getInGroupPool",social.GetInGroupPool).Methods("POST")
-	r.HandleFunc("/groupPoolStatus",social.GroupPoolStatusRouter).Methods("POST")
-	r.HandleFunc("/cancelGroupPool",social.CancelGroupPoolRouter).Methods("POST")
+	// r.HandleFunc("/getInGroupPool",social.GetInGroupPool).Methods("POST")
+	// r.HandleFunc("/groupPoolStatus",social.GroupPoolStatusRouter).Methods("POST")
+	// r.HandleFunc("/cancelGroupPool",social.CancelGroupPoolRouter).Methods("POST")
 	
 	http.Handle("/", r)
 	certificates:=os.Getenv("SSLCertificatePath")

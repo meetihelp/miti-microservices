@@ -1,11 +1,6 @@
 package Image
 
-type SendImageListContent struct{
-	ImageList []string `json:"ImageList"`
-	Code int `json:"Code"`
-	Message string `json:"Message"`
-}
-
+//Upload Image
 type UploadImageResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
@@ -15,8 +10,28 @@ type UploadImageResponse struct{
 	CreatedAt string `json:"CreatedAt"`
 }
 
+type UploadImageResponseHeader struct{
+	ContentType string `json:"Content-Type"`
+}
+
+//Get image by id
 type GetImageByIdResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
 	ImageURL string `json:"ImageURL"`
 }
+
+type GetImageByIdResponseHeader struct{
+	ContentType string `json:"Content-Type"`	
+}
+
+//Last
+
+type SendImageListContent struct{
+	ImageList []string `json:"ImageList"`
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+}
+
+
+

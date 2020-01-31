@@ -4,17 +4,21 @@ import(
 	"github.com/jinzhu/gorm"
  _ 	"github.com/jinzhu/gorm/dialects/postgres"
    	database "miti-microservices/Database"
-   	// sms "miti-microservices/Notification/SMS"
-   	// chat "miti-microservices/Chat"
     util "miti-microservices/Util"
 )
 
-func LoadingPageQuery(db *gorm.DB,id string) (bool,bool,int){
-	// db:=database.GetDB()
+func LoadingPageQuery(db *gorm.DB,id string) (bool,bool,int,bool){
 	user:=User{}
-	db.Where("user_id=?",id).First(&user)
 	IsUserVerified:=false
 	IsProfileCreated:=false
+	Preferece:=0
+	err:=db.Where("user_id=?",id).First(&user).Error
+	if(gorm.IsRecordNotFoundError(err)){
+		return IsUserVerified,IsProfileCreated,Preferece,false
+	}
+	if(err!=nil){
+		return IsUserVerified,IsProfileCreated,Preferece,true	
+	}
 	if user.Status=="U"{
 		IsUserVerified=false
 	} else{
@@ -27,21 +31,190 @@ func LoadingPageQuery(db *gorm.DB,id string) (bool,bool,int){
 		IsProfileCreated=false
 	}
 
-	Preferece:=user.PreferenceCreationStatus
-	return IsUserVerified,IsProfileCreated,Preferece
+	Preferece=user.PreferenceCreationStatus
+	return IsUserVerified,IsProfileCreated,Preferece,false
 }
 
-func UpdateProfileCreationStatus(userId string){
-	db:=database.GetDB()
-	user:=User{}
-	db.Model(&user).Where("user_id = ?", userId).Update("profile_creation_status", "Y")
+func IsUserExist(db *gorm.DB,userData User) (bool,bool){
+	tempUser:=User{}
+	if userData.Phone!=""{
+		db.Where("phone=?",userData.Phone).First(&tempUser)
+		if tempUser.UserId!=""{
+			return true,false
+		}
+	}
+
+	if userData.Email!=""{
+		db.Where("email=?",userData.Email).First(&tempUser)
+		if tempUser.UserId!=""{
+			return true,false
+		}
+	}
+
+	return false,false
 }
 
-func UpdatePreferencetatus(userId string,preferenceStatus int){
-	db:=database.GetDB()
-	user:=User{}
-	db.Model(&user).Where("user_id=?",userId).Update("preference_creation_status",preferenceStatus)
+func EnterUserData(db *gorm.DB,userData LoginRequest) (string,bool){
+	// userData.Password = util.GenerateEncryptedPassword(userData.Password)
+	user:=User{}	
+	err:=db.Where("phone=?",userData.Phone).First(&user).Error
+	if(gorm.IsRecordNotFoundError(err)){
+		user.UserId =util.GenerateToken()
+		user.Status="U"
+		user.ProfileCreationStatus="N"
+		user.IPIPStatus=0
+		user.PreferenceCreationStatus=0
+		user.CreatedAt =util.GetTime()
+		err=db.Create(&userData).Error
+		if(err!=nil){
+			return "",true
+		}
+		return user.UserId,false
+	}
+	if(err!=nil){
+		return "",true
+	}
+	return user.UserId,false
 }
+
+func InsertOTP(db *gorm.DB,userId string,sessionId string) (string,bool){
+	otp:=util.GenerateOTP()
+	otpVerification:=OTPVerification{}
+	err:=db.Where("user_id=?",userId).Find(&otpVerification).Error
+	if(otpVerification.UserId!=""){
+		resendCount:=otpVerification.ResendCount+1
+		err=db.Model(&otpVerification).Where("user_id = ?", userId).Update("resend_count", resendCount).Error
+		if(err!=nil){
+			return "",true	
+		}
+		return otp,false
+	}
+	if(err!=nil){
+		return "",true
+	}
+	otpVerification.UserId=userId
+	otpVerification.SessionId=sessionId
+	otpVerification.OTP=otp
+	otpVerification.ResendCount=0
+	otpVerification.DeliverCount=0
+	otpVerification.FailCount=0
+	otpVerification.CreatedAt=util.GetTime()
+	err=db.Create(&otpVerification).Error
+	if(err!=nil){
+		return "",true
+	}
+	return otp,false
+}
+
+func GetPhoneFromUserId(db *gorm.DB,userId string) (string,string,bool){
+	// db:=database.GetDB()
+	user:=User{}
+	err:=db.Where("user_id=?",userId).Find(&user).Error
+	if(err!=nil){
+		return "","Error",true
+	}
+	if user.Phone!=""{
+		return user.Phone,"Ok",false
+	}
+	return "","Error",false
+}
+
+
+func GetOTPDetails(db *gorm.DB,userId string) (OTPVerification,bool){
+	otp:=OTPVerification{}
+	err:=db.Where("user_id=?",userId).Find(&otp).Error
+	if(err!=nil){
+		return otp,true
+	}
+	return otp,false
+}
+
+func DeleteOTP(db *gorm.DB,id string) bool{
+	err:=db.Where("user_id=?",id).Delete(&OTPVerification{}).Error
+	if(err!=nil){
+		return true
+	}
+	return false
+}
+
+
+func VerifyOTPDB(db *gorm.DB,userId string,otp string) (bool,int,bool){
+	// db:=database.GetDB()
+	otpVerification:=OTPVerification{}
+	err:=db.Where("user_id=?",userId).First(&otpVerification).Error
+	if(err!=nil){
+		return false,otpVerification.FailCount,true
+	}
+	if(otpVerification.UserId!="" && otpVerification.OTP==otp){
+		return true,otpVerification.FailCount,false
+	}
+	return false,otpVerification.FailCount,false
+}
+
+
+func ChangeVerificationStatus(db *gorm.DB,userId string)(bool){
+	user:=User{}
+	err:=db.Model(&user).Where("user_id=?",userId).Update("status","V").Error
+	if(err!=nil){
+		return true
+	}
+
+	return false
+}
+
+
+func UpdateFailCount(db *gorm.DB,userId string,failCount int) bool{
+	// db:=database.GetDB()
+	otp:=OTPVerification{}
+	err:=db.Model(&otp).Where("user_id=?",userId).Update("fail_count",failCount+1).Error
+	if(err!=nil){
+		return true
+	}
+	return false
+}
+
+func UpdateProfileCreationStatus(db *gorm.DB,userId string) bool{
+	user:=User{}
+	err:=db.Model(&user).Where("user_id = ?", userId).Update("profile_creation_status", "Y").Error
+	if(err!=nil){
+		return true
+	}
+	return false
+}
+
+func UpdateIPIPStatus(db *gorm.DB,userId string,ipipStatus int) bool{
+	user:=User{}
+	err:=db.Where("user_id=?",userId).Find(&user).Error
+	if(err!=nil){
+		return true
+	}
+	if(ipipStatus>user.IPIPStatus){
+		err=db.Model(&user).Where("user_id=?",userId).Update("ip_ip_status",ipipStatus).Error
+		if(err!=nil){
+			return true
+		}
+	}
+	return false
+	
+}
+
+func UpdatePreferencetatus(db *gorm.DB,userId string,preferenceStatus int) bool{
+	user:=User{}
+	err:=db.Model(&user).Where("user_id=?",userId).Update("preference_creation_status",preferenceStatus).Error
+	if(err!=nil){
+		return true
+	}
+	return false
+}
+
+//Last
+
+
+
+
+
+
+
 
 // func EnterMatchUser(userId1 string,userId2 string){	
 
@@ -85,47 +258,9 @@ func UpdatePreferencetatus(userId string,preferenceStatus int){
 
 // }
 
-func EnterUserData(userData User) (string,int){
-	// userData.Password = util.GenerateEncryptedPassword(userData.Password)
-	
-	db:=database.GetDB()
-	//CHECK IF USER EMAIL ID OR PHONE ALREADY EXISTS
-	checkingStatus:=IsUserExist(db,userData)
-	if checkingStatus == true{
-		return "",1
-	}
-	//GENERATE USER ID
-	userData.UserId =util.GenerateToken()
-	userData.Status="U"
-	userData.ProfileCreationStatus="N"
-	userData.IPIPStatus=0
-	userData.PreferenceCreationStatus=0
-	
-	// userData.CreatedAt =time.Now()
-	userData.CreatedAt =util.GetTime()
-	//INSERT IN DATABASE
-	db.Create(&userData)
-	return userData.UserId,2
-}
 
-func IsUserExist(db *gorm.DB,userData User) bool{
-	tempUser:=User{}
-	if userData.Phone!=""{
-		db.Where("phone=?",userData.Phone).First(&tempUser)
-		if tempUser.UserId!=""{
-			return true
-		}
-	}
 
-	if userData.Email!=""{
-		db.Where("email=?",userData.Email).First(&tempUser)
-		if tempUser.UserId!=""{
-			return true
-		}
-	}
 
-	return false
-}
 func CheckUserCredentials(userData User)(string,string){
 	db:=database.GetDB()
 	email:=userData.Email
@@ -224,15 +359,7 @@ func GetAllUser() ([]string){
 	return UserList
 }
 
-func VerifyOTPDB(db *gorm.DB,userId string,otp string) (bool,OTPVerification){
-	// db:=database.GetDB()
-	otpVerification:=OTPVerification{}
-	db.Where("user_id=?",userId).First(&otpVerification)
-	if(otpVerification.UserId!="" && otpVerification.OTP==otp){
-		return true,otpVerification
-	}
-	return false,otpVerification
-}
+
 
 func EnterVerificationOtp(id string,otp string){
 	db:=database.GetDB()
@@ -243,12 +370,7 @@ func EnterVerificationOtp(id string,otp string){
 	db.Create(&otpVerification)
 }
 
-func GetOTPDetails(userId string) OTPVerification{
-	db:=database.GetDB()
-	otp:=OTPVerification{}
-	db.Where("user_id=?",userId).Find(&otp)
-	return otp
-}
+
 
 func GetOtpVerificationCount(id string)(int,string){
 	count:=0
@@ -257,11 +379,7 @@ func GetOtpVerificationCount(id string)(int,string){
 	db.Where("user_id=?",id).Find(&otpVerification).Count(&count)
 	return count,otpVerification[count-1].CreatedAt
 }
-func ChangeVerificationStatus(db *gorm.DB,userId string){
-	// db:=database.GetDB()
-	user:=User{}
-	db.Model(&user).Where("user_id=?",userId).Update("status","V")
-}
+
 func EnterEmailVerification(id string,token string){
 	db:=database.GetDB()
 	emailVerification:=EmailVerification{}
@@ -298,10 +416,7 @@ func VerifyEmailFunc(token string) (string,bool){
 	return emailVerification.UserId,true
 }
 
-func DeleteOTP(id string){
-	db:=database.GetDB()
-	db.Where("user_id=?",id).Delete(&OTPVerification{})
-}
+
 
 func GetUserIdFromPhone(db *gorm.DB,phone string) (string,string){
 	// db:=database.GetDB()
@@ -313,43 +428,12 @@ func GetUserIdFromPhone(db *gorm.DB,phone string) (string,string){
 	return "","Error"
 }
 
-func GetPhoneFromUserId(db *gorm.DB,userId string) (string,string){
-	// db:=database.GetDB()
-	user:=User{}
-	db.Where("user_id=?",userId).Find(&user)
-	if user.Phone!=""{
-		return user.Phone,"Ok"
-	}
-	return "","Error"
-}
 
 
-func InsertOTP(db *gorm.DB,userId string,sessionId string) string{
-	// db:=database.GetDB()
-	otp:=util.GenerateOTP()
-	otpVerification:=OTPVerification{}
-	db.Where("user_id=?",userId).Find(&otpVerification)
-	if(otpVerification.UserId!=""){
-		resendCount:=otpVerification.ResendCount+1
-		db.Model(&otpVerification).Where("user_id = ?", userId).Update("resend_count", resendCount)
-		return otp
-	}
-	otpVerification.UserId=userId
-	otpVerification.SessionId=sessionId
-	otpVerification.OTP=otp
-	otpVerification.ResendCount=0
-	otpVerification.DeliverCount=0
-	otpVerification.FailCount=0
-	otpVerification.CreatedAt=util.GetTime()
-	db.Create(&otpVerification)
-	return otp
-}
 
-func UpdateFailCount(db *gorm.DB,userId string,failCount int){
-	// db:=database.GetDB()
-	otp:=OTPVerification{}
-	db.Model(&otp).Where("user_id=?",userId).Update("fail_count",failCount+1)
-}
+
+
+
 func UpdateDeliverCount(userId string,deliverCount int){
 	db:=database.GetDB()
 	otp:=OTPVerification{}
@@ -393,15 +477,7 @@ func IsProfileCreated(userId string) string{
 	return "Error"
 }
 
-func UpdateIPIPStatus(userId string,ipipStatus int){
-	db:=database.GetDB()
-	user:=User{}
-	db.Where("user_id=?",userId).Find(&user)
-	if(ipipStatus>user.IPIPStatus){
-		db.Model(&user).Where("user_id=?",userId).Update("ip_ip_status",ipipStatus)
-	}
-	
-}
+
 
 // func GetTemporaryIdList(userId string) TempUserList{
 // 	db:=database.GetDB()

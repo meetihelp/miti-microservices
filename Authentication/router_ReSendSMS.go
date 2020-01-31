@@ -2,44 +2,95 @@ package Authentication
 
 import(
 	"net/http"
+    "log"
 	util "miti-microservices/Util"
+    database "miti-microservices/Database"
+    "encoding/json"
+    "bytes"
 	sms "miti-microservices/Notification/SMS"
-	database "miti-microservices/Database"
-	// "log"
 )
 func ReSendOTP(w http.ResponseWriter,r *http.Request){
-	smsHeader:=SMSHeader{}
-	util.GetHeader(r,&smsHeader)
-	sessionId:=smsHeader.Cookie
-	db:=database.DBConnection()
-	userId,code:=OTPHelper(db,sessionId)
-	if(code==3003){
-		phone,_:=GetPhoneFromUserId(db,userId)
+	ipAddress:=util.GetIPAddress(r)
+	resendOTPHeader:=ResendOTPHeader{}
+
+    content:=ResendOTPResponse{}
+	statusCode:=0
+    moveTo:=0
+
+    resendOTPResponseHeader:=ResendOTPResponseHeader{}
+    var data map[string]string
+    
+    db:=database.DBConnection()
+    list:=[]bool{false,false,false,false,false,false}
+    errorList:=util.GetErrorList(list)
+    
+
+    util.GetHeader(r,&resendOTPHeader)
+	sessionId:=resendOTPHeader.Cookie
+
+    userId,sessionErr,dbError:=util.GetUserIdFromTemporarySession3(db,sessionId)
+    errorList.DatabaseError=dbError
+    util.APIHitLog("ReSendOTP",ipAddress,sessionId)
+    if (sessionErr=="Error" && !errorList.DatabaseError){
+        errorList.TemporarySessionError=true
+    }
+
+    var phone string
+    // var status string
+    code:=0
+    if(!errorList.TemporarySessionError && !errorList.DatabaseError){
+    	phone,_,dbError=GetPhoneFromUserId(db,userId)
+        errorList.DatabaseError=dbError
+        if(!errorList.DatabaseError){
+            code,dbError=OTPHelper(db,userId)
+            errorList.DatabaseError=dbError
+        }
+    }
+
+	if(!errorList.TemporarySessionError && !errorList.DatabaseError && (code==3003 ||code ==3005)){
 		sms.ReSendSMSHelper(phone)
-		util.Message(w,200)
-		return
-	}else if(code==3005){
-		// DeleteOtp(userId)
-		phone,_:=GetPhoneFromUserId(db,userId)
-		sms.ReSendSMSHelper(phone)
-		util.Message(w,200)
-		return
-	}else if(code==3004){
-		phone,_:=GetPhoneFromUserId(db,userId)
-		otpCode:=InsertOTP(db,userId,sessionId)
-		err:=SendOTP(phone,otpCode)
-		if(err=="Ok"){
-        // resp,err:=SendOTP(phone,otpCode)
-        // if(err==nil && resp.StatusCode==http.StatusOK){
-            util.Message(w,200)
-        } else{
-            // log.Println(err)
-            util.Message(w,200)
+		statusCode=200
+		moveTo=0
+	}else if(!errorList.TemporarySessionError && !errorList.DatabaseError && code==3004){
+		otpCode,dbError:=InsertOTP(db,userId,sessionId)
+        errorList.DatabaseError=dbError
+        if(!errorList.DatabaseError){
+            err:=SendOTP(phone,otpCode)
+            if(err=="Ok"){
+                statusCode=200
+                moveTo=0
+            }else{
+                //Error in sending otp
+            }
         }
 	} else {
-		util.Message(w,code)
+		statusCode=code
+		moveTo=0
 	} 
 
-	db.Close()
+	code=util.GetCode(errorList)
+    if(code==200){
+        content.Code=statusCode
+    }else{
+        content.Code=code
+    }
+    content.Message=util.GetMessageDecode(content.Code)
+    content.MoveTo=moveTo
+    resendOTPResponseHeader.ContentType="application/json"
+    headerBytes:=new(bytes.Buffer)
+    json.NewEncoder(headerBytes).Encode(resendOTPResponseHeader)
+    responseHeaderBytes:=headerBytes.Bytes()
+    if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+        panic(err)
+    }
+    w=util.GetResponseFormatHeader(w,data)
+    p:=&content
+    util.ResponseLog("ReSendOTP",ipAddress,sessionId,content.Code,*p)
+    enc := json.NewEncoder(w)
+    err:= enc.Encode(p)
+    if err != nil {
+        log.Fatal(err)
+    }
+    db.Close()
 	
 }

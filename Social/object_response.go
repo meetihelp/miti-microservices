@@ -1,5 +1,6 @@
 package Social
 
+//Pool Status
 type PoolStatusResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
@@ -10,6 +11,24 @@ type PoolStatusResponse struct{
 	MatchTime string `json:"MatchTime"`
 	IPIP int `json:"IPIP"`
 }
+
+type PoolStatusResponseHeader struct{
+	ContentType string `json:"Content-Type"`
+}
+
+type GetInPoolResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	IPIP int `json:"IPIP"`
+	PoolStatus PoolStatusHelper `json:"PoolStatus"`
+}
+
+type GetInPoolResponseHeader struct{
+	ContentType string `json:"Content-Type"`
+}
+
+
+//Last
 
 type GroupPoolStatusResponse struct{
 	Code int `json:"Code"`
@@ -22,13 +41,7 @@ type GroupPoolStatusResponse struct{
 	IPIP int `json:"IPIP"`
 }
 
-type GetInPoolResponse struct{
-	Code int `json:"Code"`
-	Message string `json:"Message"`
-	IPIP int `json:"IPIP"`
-	// RequestId string `json:"RequestId"`
-	PoolStatus PoolStatusHelper `json:"PoolStatus"`
-}
+
 
 type PoolStatusHelper struct{
 	ChatId string `json:"ChatId"`

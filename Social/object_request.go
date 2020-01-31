@@ -1,6 +1,6 @@
 package Social
 
-
+//Pool Status
 type PoolStatusHeader struct{
 	Cookie string `header:"Miti-Cookie"`
 }
@@ -10,9 +10,21 @@ type PoolStatusRequest struct{
 	Longitude string `json:"Longitude"`
 }
 
+
+//Get In Pool
 type GetInPoolHeader struct{
 	Cookie string `header:"Miti-Cookie"`	
 }
+
+//Last
+
+
+
+
+
+
+
+
 // type GetInPoolRequest struct{
 // 	RequestId string `json:"RequestId"`
 // }

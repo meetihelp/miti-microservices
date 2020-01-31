@@ -1,6 +1,6 @@
 package Authentication
 
-
+//Loading Page
 type LoadingResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
@@ -8,33 +8,24 @@ type LoadingResponse struct{
 	Preference int `json:"Preference"`
 }
 
-type LoadingToLoginHeader struct{
-	ContentType string `json:"Content-Type"`
-}
-type LoadingToOTPHeader struct{
-	ContentType string `json:"Content-Type"`
-}
-type LoadingToProfileHeader struct{
-	ContentType string `json:"Content-Type"`
-}
-type LoadingToPreferenceHeader struct{
-	ContentType string `json:"Content-Type"`
-}
-type LoadingToFeedHeader struct{
+type LoadingPageResponseHeader struct{
 	ContentType string `json:"Content-Type"`
 }
 
+//Login Page
 type LoginResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
 	MoveTo int `json:"MoveTo"`
 }
 
-type LoginToOTPHeader struct{
+type LoginResponseHeader struct{
 	MitiCookie string `json:"Miti-Cookie"`
+	ContentType string `json:"Content-Type"`
 }
 
-type OTPStatusResponseContent struct{
+//OTPStatus
+type OTPStatusResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
 	MoveTo int `json:"MoveTo"`
@@ -43,6 +34,54 @@ type OTPStatusResponseContent struct{
 type OTPStatusResponseHeader struct{
 	ContentType string `json:"Content-Type"`
 }
+
+
+//Verify User
+type VerifyUserResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	MoveTo int `json:"MoveTo"`
+}
+
+type VerifyUserResponseHeader struct{
+	ContentType string `json:"Content-Type"`
+}
+
+//VerifyOTP
+type VerifyOTPResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	MoveTo int `json:"MoveTo"`
+	Preference int `json:"Preference"`
+}
+
+type VerifyOTPResponseHeader struct{
+	MitiCookie string `json:"Miti-Cookie"`
+	ContentType string `json:"Content-Type"`
+}
+
+//ResendOTP
+type ResendOTPResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	MoveTo int `json:"MoveTo"`	
+}
+
+type ResendOTPResponseHeader struct{
+	ContentType string `json:"Content-Type"`
+}
+
+//Last
+
+
+
+
+
+
+
+
+
+
 
 type OTPResponse struct{
 	Code int `json:"Code"`
@@ -54,16 +93,7 @@ type OTPResponseHeader struct{
 	MitiCookie string `json:"Miti-Cookie"`
 }
 
-type VerifyOTPResponse struct{
-	Code int `json:"Code"`
-	Message string `json:"Message"`
-	MoveTo int `json:"MoveTo"`
-	Preference int `json:"Preference"`
-}
 
-type VerifyOTPResponseHeader struct{
-	MitiCookie string `json:"Miti-Cookie"`
-}
 
 type TempUserResponse struct{
 	Code int `json:"Code"`

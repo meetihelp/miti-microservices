@@ -1,63 +1,95 @@
 package Chat 
 import(
 	"net/http"
-	"fmt"
-	// redis "miti-microservices/Model/Redis"
 	util "miti-microservices/Util"
 	database "miti-microservices/Database"
 	"io/ioutil"
 	"encoding/json"
+	"bytes"
+	"log"
 )
 
 func GetChatAfterIndex(w http.ResponseWriter,r *http.Request){
+	ipAddress:=util.GetIPAddress(r)
+
 	getChatAfterIndexHeader:=GetChatAfterIndexHeader{}
+
+	content:=GetChatResponse{}
+	statusCode:=0
+
+	responseHeader:=GetChatResponseHeader{}
+	var data map[string]string
+
+	db:=database.DBConnection()
+	//Session,TemporarySession,Body,Unmarshal,Sanatize,Database
+	list:=[]bool{true,false,false,false,false,false}
+	errorList:=util.GetErrorList(list)
+
 	util.GetHeader(r,&getChatAfterIndexHeader)
 	sessionId:=getChatAfterIndexHeader.Cookie
-	db:=database.DBConnection()
-	userId,getChatStatus:=util.GetUserIdFromSession2(db,sessionId)
-	fmt.Println(userId)
-	fmt.Print("GetChatAfterIndexHeader:")
-	fmt.Println(getChatAfterIndexHeader)
-	if getChatStatus=="Error"{
-		fmt.Println("Session Error for GetChatAfterIndex")
-		util.Message(w,1003)
-		db.Close()
-		return
+
+	userId,getChatStatus,dbError:=util.GetUserIdFromSession3(db,sessionId)
+	errorList.DatabaseError=dbError
+	util.APIHitLog("GetChatAfterIndex",ipAddress,sessionId)
+	if (getChatStatus=="Error"){
+		errorList.SessionError=true
 	}
 
 	requestBody,err:=ioutil.ReadAll(r.Body)
-	if err!=nil{
-		fmt.Println("Could not read body for GetChatAfterIndex")
-		util.Message(w,1000)
-		db.Close()
-		return 
+	if (err!=nil && !errorList.SessionError){
+		errorList.BodyReadError=true
 	}
 
-	chatData:=ChatAfterTime{}
-	errUserData:=json.Unmarshal(requestBody,&chatData)
-	if errUserData!=nil{
-		fmt.Println("Could not Unmarshall user data for GetChatAfterIndex")
-		util.Message(w,1001)
-		db.Close()
-		return 
-	}
-	sanatizationStatus :=Sanatize(chatData)
-	if sanatizationStatus =="Error"{
-		fmt.Println("User data invalid for GetChatAfterIndex")
-		util.Message(w,1002)
-		db.Close()
-		return
+	chatData:=GetChatRequest{}
+	if(!errorList.BodyReadError){
+		errUserData:=json.Unmarshal(requestBody,&chatData)
+		if errUserData!=nil{
+			errorList.UnmarshallingError=true		
+		}
 	}
 
-	status:=CheckCorrectChat(db,userId,chatData.ChatId)
-	if status=="Error"{
-		util.Message(w,1002)
-		db.Close()
-		return
+	if(!errorList.UnmarshallingError){
+		util.BodyLog("GetChatAfterIndex",ipAddress,sessionId,chatData)	
+		sanatizationStatus :=Sanatize(chatData)
+		if(sanatizationStatus=="Error"){
+			errorList.SanatizationError=true
+		}
+	}
+	
+	var chat []Chat
+	if(!errorList.SanatizationError){
+		status,dbError:=CheckCorrectChat(db,userId,chatData.ChatId)
+		errorList.DatabaseError=dbError
+		if(status=="Error"){
+			statusCode=1002
+		}else if(status=="Ok" && !errorList.DatabaseError){
+			chat,dbError=GetChatAfterTimeMessages(db,chatData.ChatId,chatData.NumOfChat,chatData.CreatedAt)
+			errorList.DatabaseError=dbError
+		}
 	}
 
-	chat:=GetChatAfterTimeMessages(db,chatData.ChatId,chatData.NumOfChat,chatData.CreatedAt)
-
-	SendChat(w,chat)
+	code:=util.GetCode(errorList)
+	if(code==200){
+		content.Code=statusCode
+	}else{
+		content.Code=code
+	}
+	content.Message=util.GetMessageDecode(code)
+	content.Chat=chat
+	responseHeader.ContentType="application/json"
+    headerBytes:=new(bytes.Buffer)
+    json.NewEncoder(headerBytes).Encode(responseHeader)
+    responseHeaderBytes:=headerBytes.Bytes()
+    if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+        panic(err)
+    }
+    w=util.GetResponseFormatHeader(w,data)
+	p:=&content
+	util.ResponseLog("GetChatAfterIndex",ipAddress,sessionId,content.Code,*p)
+	enc := json.NewEncoder(w)
+	err= enc.Encode(p)
+	if err != nil {
+		log.Fatal(err)
+	}
 	db.Close()
 }

@@ -10,19 +10,30 @@ import(
 	"encoding/json"
 	"os"
 	"log"
+	"bytes"
 	"strings"
 
 )
 
 func SendChatImage(w http.ResponseWriter, r *http.Request){
-	//get buffer of image from user
+	ipAddress:=util.GetIPAddress(r)
 	sendChatImageHeader:=SendChatImageHeader{}
+
+	content:=SendChatImageResponse{}
+	statusCode:=0
+
+	sendChatImageResponseHeader:=SendChatImageResponseHeader{}
+	var data map[string]string
+
+	db:=database.DBConnection()
+	//Session,TemporarySession,Body,Unmarshal,Sanatize,Database
+	list:=[]bool{true,false,false,false,false,false}
+	errorList:=util.GetErrorList(list)
+
 	util.GetHeader(r,&sendChatImageHeader)
 	sessionId:=sendChatImageHeader.Cookie
-	log.Println("upload Image Cookie:"+sessionId)
 	accessType:=sendChatImageHeader.AccessType
 	accessType=strings.ToLower(accessType)
-	log.Println("upload Image AccessType:"+accessType)
 	actualFileName:=sendChatImageHeader.ActualFileName
 	format:=sendChatImageHeader.Format
 	latitude:=sendChatImageHeader.Latitude
@@ -31,60 +42,48 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 	requestId:=sendChatImageHeader.RequestId
 	chatId:=sendChatImageHeader.ChatId
 	lastUpdate:=sendChatImageHeader.CreatedAt
-	fmt.Print("SendChatImageHeader")
-	fmt.Println(sendChatImageHeader)
-	db:=database.DBConnection()
 
-	userId,getChatStatus:=util.GetUserIdFromSession2(db,sessionId)
-	// fmt.Println(userId)
-	if getChatStatus=="Error"{
-		fmt.Println("Session Error for SendChatImage")
-		util.Message(w,1003)
-		db.Close()
-		return
+	userId,getChatStatus,dbError:=util.GetUserIdFromSession3(db,sessionId)
+	errorList.DatabaseError=dbError
+	util.APIHitLog("SendChatImage",ipAddress,sessionId)
+	if (getChatStatus=="Error"){
+		errorList.SessionError=true
 	}
 
 	file, _, err := r.FormFile("myFile")
-    if err != nil {
-        fmt.Println("Error Retrieving the File for SendChatImage")
-        fmt.Println(err)
-        util.Message(w,1002)
-        db.Close()
-        return
+	errorStatus:=util.ErrorListStatus(errorList)
+    if(err!=nil && !errorStatus){
+        errorList.BodyReadError=true
     }
 
 	buffer, err := ioutil.ReadAll(file)
-    if err != nil {
-        fmt.Println(err)
-        util.Message(w,1002)
-        db.Close()
-        return
+	errorStatus=util.ErrorListStatus(errorList)
+    if(err!=nil && !errorStatus){
+        errorList.BodyReadError=true
     }
-    sanatize:=Sanatize(sendChatImageHeader)
-	if(sanatize=="Error"){
-		util.Message(w,1002)
-		db.Close()
-		return
-	}
+
+    errorStatus=util.ErrorListStatus(errorList)
+    if(!errorStatus){
+    	sanatize:=Sanatize(sendChatImageHeader)
+		if(sanatize=="Error"){
+			errorList.SanatizationError=true
+		}
+    }
+    
 
 	url:=""
 	chatResponse:=Chat{}
 	imageUploadStatus:="Yes"
-	userImageData,status:=image.GetUserImageByRequestId(db,userId,requestId)
-	if(status=="Error"){
-		// file, _, err := r.FormFile("myFile")
-	 //    if err != nil {
-	 //        fmt.Println("Error Retrieving the File")
-	 //        fmt.Println(err)
-	 //        return
-	 //    }
+	errorStatus=util.ErrorListStatus(errorList)
+	status:="Error"
+	userImageData:=image.UserImage{}
+	if(!errorStatus){
+		userImageData,status,dbError=image.GetUserImageByRequestId(db,userId,requestId)	
+		errorList.DatabaseError=dbError
+	}
 
-		// buffer, err := ioutil.ReadAll(file)
-	 //    if err != nil {
-	 //        fmt.Println(err)
-	 //    }
-
-
+	errorStatus=util.ErrorListStatus(errorList)
+	if(status=="Error" && !errorStatus){
 		imageId:=util.GenerateToken()
 		generatedName:=util.GenerateToken()
 		filename:=generatedName+"."+format
@@ -96,48 +95,41 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 		}else if(accessType=="public"){
 			bucket=image.GetPublicImageBucket()
 		}else{
-			util.Message(w,1002)
-			db.Close()
-			return
+			statusCode=1002
+			errorList.LogicError=true
 		}
-		size,err:=image.UploadToS3(buffer,filename,bucket,format)
-		if(err!=nil){
-			//Could Not Upload Image
-			fmt.Println(err)
-			util.Message(w,3001)
-			imageUploadStatus="No"
-		}else{
-			//Uploaded image Successfully
-			// userImageData=image.UserImage{}
-			userImageData.UserId=userId
-			userImageData.ImageId=imageId
-			// fmt.Println("Send Chat ImageID:"+userImageData.ImageId)
-			userImageData.AccessType=accessType
-			userImageData.ActualFileName=actualFileName
-			userImageData.Size=size
-			userImageData.Format=format
-			userImageData.Bucket=bucket
-			userImageData.Dimension=dimension
-			userImageData.Latitude=latitude
-			userImageData.Longitude=longitude
-			userImageData.GeneratedName=generatedName
-			userImageData.RequestId=requestId
-			userImageData.CreatedAt=util.GetTime()
-			image.EnterUserImage(db,userImageData)
-			imageUploadStatus="Yes"
-		}
-	
 
-		// signedURL:=""
-		// url:=""
+		errorStatus=util.ErrorListStatus(errorList)
+		if(!errorStatus){
+			size,err:=image.UploadToS3(buffer,filename,bucket,format)	
+			if(err!=nil){
+				statusCode=3001
+			}else{
+				userImageData.UserId=userId
+				userImageData.ImageId=imageId
+				userImageData.AccessType=accessType
+				userImageData.ActualFileName=actualFileName
+				userImageData.Size=size
+				userImageData.Format=format
+				userImageData.Bucket=bucket
+				userImageData.Dimension=dimension
+				userImageData.Latitude=latitude
+				userImageData.Longitude=longitude
+				userImageData.GeneratedName=generatedName
+				userImageData.RequestId=requestId
+				userImageData.CreatedAt=util.GetTime()
+				dbError:=image.EnterUserImage(db,userImageData)
+				errorList.DatabaseError=dbError
+				imageUploadStatus="Yes"	
+			}
+		}
+
 		if(accessType=="public"){
 			PublicCloudFront:=os.Getenv("publicImageCloudFront")
 			url=PublicCloudFront+"/"+filename
 		}
 
 	}else{
-		// chatResponse=GetChatByRequestId(userId,requestId)
-		fmt.Println("Already with this request id")
 		if(accessType=="public"){
 			PublicCloudFront:=os.Getenv("publicImageCloudFront")
 			filename:=userImageData.GeneratedName+"."+userImageData.Format
@@ -146,10 +138,8 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 	}
 
 
-	code:=200
 	unSyncedChat:=[]Chat{}
 	if(imageUploadStatus=="Yes"){
-		fmt.Println("Image uploaded")
 		chat:=Chat{}
 		chat.UserId=userId
 		chat.ChatId=chatId
@@ -160,35 +150,47 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 		chat.MessageId=messageId
 		createdAt:=util.GetTime()
 		chat.CreatedAt=createdAt
-		chatResponse,unSyncedChat,code=ChatInsertDB(db,chat,lastUpdate)
-		// db.Create(&chatData)
+		chatResponse,unSyncedChat,dbError=ChatInsertDB(db,chat,lastUpdate)
+		errorList.DatabaseError=dbError
 		if(chat.CreatedAt==chatResponse.CreatedAt){
-			e:=UpdateChatTime(db,chat.ChatId,chat.CreatedAt)
-			if e!=nil{
-				db.Close()
-				return
-			}
+			dbError:=UpdateChatTime(db,chat.ChatId,chat.CreatedAt)
+			errorList.DatabaseError=dbError
 		}
+		statusCode=200
 	}else{
-		fmt.Println("Image not uploaded")
-		code=3001
+		statusCode=3001
 	}
 	
 
 
 	
-	msg:=util.GetMessageDecode(code)
-	w.Header().Set("Content-Type", "application/json")
-	// p:=&UploadImageResponse{Code:code,Message:msg,ImageId:imageId,URL:url}
-	p:=&SendChatImageResponse{Code:code,Message:msg,ImageId:userImageData.ImageId,
-				RequestId:requestId,MessageId:chatResponse.MessageId,
-				CreatedAt:chatResponse.CreatedAt,MessageType:"image",URL:url,Chat:unSyncedChat}
-	fmt.Print("SendChatImageResponse:")
-	fmt.Println(*p)
+	code:=util.GetCode(errorList)
+	if(code==200){
+		content.Code=statusCode
+	}else{
+		content.Code=code
+	}
+	content.Message=util.GetMessageDecode(code)
+	content.ImageId=userImageData.ImageId
+	content.RequestId=requestId
+	content.MessageId=chatResponse.MessageId
+	content.CreatedAt=chatResponse.CreatedAt
+	content.MessageType="image"
+	content.URL=url
+	content.Chat=unSyncedChat
+
+	sendChatImageResponseHeader.ContentType="application/json"
+    headerBytes:=new(bytes.Buffer)
+    json.NewEncoder(headerBytes).Encode(sendChatImageResponseHeader)
+    responseHeaderBytes:=headerBytes.Bytes()
+    if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+        panic(err)
+    }
+    w=util.GetResponseFormatHeader(w,data)
+	p:=&content
+	util.ResponseLog("SendChatImage",ipAddress,sessionId,content.Code,*p)
 	enc := json.NewEncoder(w)
 	err= enc.Encode(p)
-	fmt.Print("Send Chat image response Error:")
-	fmt.Println(err)
 	if err != nil {
 		log.Fatal(err)
 	}

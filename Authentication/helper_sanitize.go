@@ -9,6 +9,19 @@ type SanatizeData interface{
 	doSanitization() string
 }
 
+func (userData LoginRequest) doSanitization() string{
+	validate :=validator.New()
+	err:= validate.Struct(userData)
+	if err!=nil{
+		fmt.Println(err.Error())
+		return "Error"
+	}
+	if (userData.Phone!="") && (len(userData.Phone)!=10){
+		return "Error"
+	}
+	return "Ok"
+}
+
 func (userData User) doSanitization() string {
 	validate :=validator.New()
 	err:= validate.Struct(userData)
@@ -26,6 +39,20 @@ func (userData User) doSanitization() string {
 	}
 
 
+	return "Ok"
+}
+
+func (verifyOTPData VerifyOTPRequest) doSanitization() string{
+	validate :=validator.New()
+	err:= validate.Struct(verifyOTPData)
+	if err!=nil{
+		fmt.Println(err.Error())
+		return "Error"
+	}
+
+	if(len(verifyOTPData.OTP)!=5){
+		return "Error"
+	}
 	return "Ok"
 }
 

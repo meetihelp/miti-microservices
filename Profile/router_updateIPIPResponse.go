@@ -1,62 +1,110 @@
 package Profile
 
 import(
-	"fmt"
 	"net/http"
-	// "log"
+	"log"
 	"io/ioutil"
-	// "strings"
 	"strconv"
 	"encoding/json"
    util "miti-microservices/Util"
    auth "miti-microservices/Authentication"
+   database "miti-microservices/Database"
+   "bytes"
 )
 
 func UpdateIPIPResponse(w http.ResponseWriter, r *http.Request){
-	header:=UpdateQuestionResponseHeader{}
+	ipAddress:=util.GetIPAddress(r)
+	header:=UpdateIPIPResponseHeader{}
+
+	content:=UpdateIPIPResponseContent{}
+	statusCode:=0
+
+	responseHeader:=UpdateIPIPResponseContentHeader{}
+	var data map[string]string
+
+
+	db:=database.DBConnection()
+	list:=[]bool{false,false,false,false,false,false}
+	errorList:=util.GetErrorList(list)
+
 	util.GetHeader(r,&header)
-
-
 	sessionId:=header.Cookie
 
-	userId,dErr:=util.GetUserIdFromSession(sessionId)
-	fmt.Print("UpdateIPIP Header:")
-	fmt.Println(header)
+	userId,dErr,dbError:=util.GetUserIdFromSession3(db,sessionId)
+	errorList.DatabaseError=dbError
+	util.APIHitLog("UpdateIPIP",ipAddress,sessionId)
 	if dErr=="Error"{
-		fmt.Println("Session Does not exist")
-		util.Message(w,1003)
-		return
+		errorList.SessionError=true
 	}
 
 	requestBody,err:=ioutil.ReadAll(r.Body)
-	if err!=nil{
-		fmt.Println("Could not read body")
-		util.Message(w,1000)
-		return 
+	if (err!=nil && !util.ErrorListStatus(errorList)){
+		errorList.BodyReadError=true
 	}
 
 	updateIPIPRequest:=UpdateIPIPRequest{}
-	errQuestionData:=json.Unmarshal(requestBody,&updateIPIPRequest)
-	if errQuestionData!=nil{
-		fmt.Println("Could not Unmarshall profile data")
-		util.Message(w,1001)
-		return
+	if(!util.ErrorListStatus(errorList)){
+		errQuestionData:=json.Unmarshal(requestBody,&updateIPIPRequest)
+		if errQuestionData!=nil{
+			errorList.UnmarshallingError=true
+		}
 	}
 
-	fmt.Print("UpdateIPIP Body:")
-	fmt.Println(updateIPIPRequest)
+	if(!util.ErrorListStatus(errorList)){
+		sanatizationStatus:=Sanatize(updateIPIPRequest)
+		if sanatizationStatus =="Error"{
+			errorList.SanatizationError=true
+		}
+	}
+
 	
-    data:=make(map[string]int)
-    data["IPIP1"]=updateIPIPRequest.IPIP1
-    data["IPIP2"]=updateIPIPRequest.IPIP2
-    data["IPIP3"]=updateIPIPRequest.IPIP3
-    data["IPIP4"]=updateIPIPRequest.IPIP4
-    data["IPIP5"]=updateIPIPRequest.IPIP5
-	UpdateIPIPResponseDB(userId,data,updateIPIPRequest.Page)
+    ipipData:=make(map[string]int)
+    ipipData["IPIP1"]=updateIPIPRequest.IPIP1
+    ipipData["IPIP2"]=updateIPIPRequest.IPIP2
+    ipipData["IPIP3"]=updateIPIPRequest.IPIP3
+    ipipData["IPIP4"]=updateIPIPRequest.IPIP4
+    ipipData["IPIP5"]=updateIPIPRequest.IPIP5
+
+    if(!util.ErrorListStatus(errorList)){
+    	dbError:=UpdateIPIPResponseDB(db,userId,ipipData,updateIPIPRequest.Page)
+    	errorList.DatabaseError	=dbError
+    }
+	
 	ipipStatus:=updateIPIPRequest.Page+1
-	auth.UpdateIPIPStatus(userId,ipipStatus)
-	UpdateIPIPScore(userId)
-	util.Message(w,200)
+	if(!util.ErrorListStatus(errorList)){
+		dbError:=auth.UpdateIPIPStatus(db,userId,ipipStatus)
+		errorList.DatabaseError=dbError
+	}
+
+	if(!util.ErrorListStatus(errorList)){
+		dbError:=UpdateIPIPScore(db,userId)
+		errorList.DatabaseError=dbError
+	}
+	
+	
+	code:=util.GetCode(errorList)
+	if(code==200){
+		content.Code=statusCode
+	}else{
+		content.Code=code
+	}
+	content.Message=util.GetMessageDecode(content.Code)
+	responseHeader.ContentType="application/json"
+    headerBytes:=new(bytes.Buffer)
+    json.NewEncoder(headerBytes).Encode(responseHeader)
+    responseHeaderBytes:=headerBytes.Bytes()
+    if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+        panic(err)
+    }
+    w=util.GetResponseFormatHeader(w,data)
+	p:=&content
+	util.ResponseLog("UpdateIPIP",ipAddress,sessionId,content.Code,*p)
+	enc := json.NewEncoder(w)
+	err= enc.Encode(p)
+	if err != nil {
+		log.Fatal(err)
+	}
+	db.Close()
 }
 
 func getDataInQuestionResponseForm(questionResponse QuestionResponse,data map[string]int,page int) (QuestionResponse){

@@ -1,56 +1,82 @@
 package Chat
 
 import(
-	"fmt"
 	"net/http"
 	"log"
 	"io/ioutil"
-	// "strings"
 	"encoding/json"
    util "miti-microservices/Util"
+   database "miti-microservices/Database"
+   "bytes"
 )
 
 func GetMessageRequest(w http.ResponseWriter,r *http.Request){
+	ipAddress:=util.GetIPAddress(r)
 	header:=GetMessageRequestHeader{}
 	util.GetHeader(r,&header)
 
+	content:=GetMessageRequestResponse{}
+	statusCode:=0
+
+	getMessageRequestResponseHeader:=GetMessageRequestResponseHeader{}
+	var data map[string]string
+
+	db:=database.DBConnection()
+	//Session,TemporarySession,Body,Unmarshal,Sanatize,Database
+	list:=[]bool{true,false,false,false,false,false}
+	errorList:=util.GetErrorList(list)
 
 	sessionId:=header.Cookie
-	userId,dErr:=util.GetUserIdFromSession(sessionId)
+	userId,dErr,dbError:=util.GetUserIdFromSession3(db,sessionId)
+	errorList.DatabaseError=dbError
+	util.APIHitLog("GetMessageRequest",ipAddress,sessionId)
 	if dErr=="Error"{
-		fmt.Println("Session Does not exist")
-		util.Message(w,1003)
-		return
+		errorList.SessionError=true
 	}
 
 	requestBody,err:=ioutil.ReadAll(r.Body)
-	if err!=nil{
-		fmt.Println("Could not read body")
-		util.Message(w,1000)
-		return 
+	if(err!=nil && !util.ErrorListStatus(errorList)){
+		errorList.BodyReadError=true 
 	}
 	
 	getMessageRequestData:=GetMessageRequestDS{}
-	profileRequestErr:=json.Unmarshal(requestBody,&getMessageRequestData)
-	if profileRequestErr!=nil{
-		fmt.Println("Could not Unmarshall profile data")
-		util.Message(w,1001)
-		return
+	if(!util.ErrorListStatus(errorList)){
+		profileRequestErr:=json.Unmarshal(requestBody,&getMessageRequestData)
+		if(profileRequestErr!=nil){
+			errorList.UnmarshallingError=true
+		}
 	}
 
-	fmt.Print("GetMessageRequest Body:->")
-	fmt.Println(getMessageRequestData)
 	createdAt:=getMessageRequestData.CreatedAt
+	var requestList []MessageRequestDS
+	if(!util.ErrorListStatus(errorList)){
+		requestList,dbError=GetMessageRequestDB(db,userId,createdAt)
+		errorList.DatabaseError=dbError
+	}
 
-	requestList:=GetMessageRequestDB(userId,createdAt)
-	w.Header().Set("Content-Type", "application/json")
-	msg:=util.GetMessageDecode(200)
-	p:=&GetMessageRequestResponse{Code:200,Message:msg,RequestList:requestList}
-	fmt.Print("GetMessageRequestResponse:")
-	fmt.Println(*p)
+	code:=util.GetCode(errorList)
+	if(code==200){
+		content.Code=statusCode
+	}else{
+		content.Code=code
+	}
+	content.Message=util.GetMessageDecode(code)
+	content.RequestList=requestList
+
+	getMessageRequestResponseHeader.ContentType="application/json"
+    headerBytes:=new(bytes.Buffer)
+    json.NewEncoder(headerBytes).Encode(getMessageRequestResponseHeader)
+    responseHeaderBytes:=headerBytes.Bytes()
+    if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+        panic(err)
+    }
+    w=util.GetResponseFormatHeader(w,data)
+	p:=&content
+	util.ResponseLog("GetMessageRequest",ipAddress,sessionId,content.Code,*p)
 	enc := json.NewEncoder(w)
 	err= enc.Encode(p)
 	if err != nil {
 		log.Fatal(err)
 	}
+	db.Close()
 }

@@ -1,11 +1,35 @@
 package Profile
 
-type SendQuestionContent struct{
+//Profile Creation
+type ProfileCreationResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
-	Question []Question `json:"Question"`
 }
 
+type ProfileCreationResponseHeader struct{
+	ContentType string `json:"Content-Type"`
+}
+
+//Update IPIP 
+type UpdateIPIPResponseContent struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+}
+
+type UpdateIPIPResponseContentHeader struct{
+	ContentType string `json:"Content-Type"`	
+}
+
+//Update Preference
+type UpdatePreferenceResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+}
+type UpdatePreferenceResponseHeader struct{
+	ContentType string `json:"Content-Type"`		
+}
+
+//Get Profile
 type ProfileResponse struct{
 	UserId string `son:"UserId"`
 	Name string `json:"Name"`
@@ -33,11 +57,24 @@ type ProfileResponse struct{
 	// ParentsAddress string `gorm:"type:varchar(10)"  json:"ParentsAddress"`
 }
 
-type ProfileResponseContent struct{
+type GetProfileResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
 	ProfileResponse ProfileResponse `json:"ProfileResponse"` 
 }
+
+type GetProfileResponseHeader struct{
+	ContentType string `json:"Content-Type"`
+}
+
+//Last
+
+type SendQuestionContent struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	Question []Question `json:"Question"`
+}
+
 
 type CreateStatusResponse struct{
 	Code int `json:"Code"`

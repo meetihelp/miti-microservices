@@ -1,36 +1,28 @@
 package Profile
 import(
-	"fmt"
    database "miti-microservices/Database"
    security "miti-microservices/Security"
-   // util "miti-microservices/Util"
-   // "reflect"
+   "github.com/jinzhu/gorm"
    
 )
 
-func GetProfileDB(userId string) Profile{
-	db:=database.GetDB()
-	profile:=Profile{}
-	db.Where("user_id=?",userId).Find(&profile)
-	return profile
-}
-
-func CheckIPIPStatus(userId string) int{
-	db:=database.GetDB()
-	user:=User{}
-	db.Table("users").Where("user_id=?",userId).Find(&user)
-	return user.IPIPStatus
-}
-func EnterProfileData(profileData Profile){
-	fmt.Println("Enter_profile_data")
-	db:=database.GetDB()
+func EnterProfileData(db *gorm.DB,profileData Profile) bool{
 	tempProfile:=Profile{}
-	db.Where("user_id=?",profileData.UserId).Find(&tempProfile)
+	err:=db.Where("user_id=?",profileData.UserId).Find(&tempProfile).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return true
+	}
 	if(tempProfile.UserId==""){
-		db.Create(&profileData)
+		err=db.Create(&profileData).Error
+		if(err!=nil){
+			return true
+		}
 		questionResponse:=QuestionResponse{}
 		questionResponse.UserId=profileData.UserId
-		db.Create(&questionResponse)
+		err=db.Create(&questionResponse).Error
+		if(err!=nil){
+			return true
+		}
 	}else{
 		if(profileData.Name!=""){
 			tempProfile.Name=profileData.Name
@@ -59,20 +51,163 @@ func EnterProfileData(profileData Profile){
 		if(profileData.ParentsAddress!=""){
 			tempProfile.ParentsAddress=profileData.ParentsAddress
 		}
+
+		err=db.Save(&tempProfile).Error
+		if(err!=nil){
+			return true
+		}
 	}
+
+	return false
 }
 
-// func GetProfile(userId string) Profile{
-// 	db:=database.GetDB()
-// 	profile:=Profile{}
-// 	db.Where("UserId=?",userId).First(&profile)
-// 	return profile
-// }
-func GetAuthorizedProfileDB(userId string) ProfileResponse{
-	db:=database.GetDB()
+func UpdateIPIPResponseDB(db *gorm.DB,userId string,response map[string]int,page int) bool {
+	questionResponse:=QuestionResponse{}
+	err:=db.Where("user_id=?",userId).Find(&questionResponse).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return true
+	}
+	flag:=1
+	if(questionResponse.UserId==""){
+		flag=0
+	}
+	questionResponse=getDataInQuestionResponseForm(questionResponse,response,page)
+	if(flag==0){
+		err=db.Create(&questionResponse).Error
+		if(err!=nil){
+			return true
+		}
+	}else{
+		err=db.Model(&questionResponse).Where("user_id=?",userId).Update(questionResponse).Error
+		if(err!=nil){
+			return true
+		}
+	}
+
+	return false
+	
+}
+
+func CalculateIPIPScore(db *gorm.DB,questionResponse QuestionResponse) ([] int,bool){
+	response:=ConvertQuestionResponseToArray(questionResponse)
+	score:=make([]int,5)
+	question:=[]Question{}
+	err:=db.Find(&question).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return score,true
+	}
+	for _,q:=range question{
+		score[q.Type]=score[q.Type]+q.Factor*response[q.Id]
+	}
+	return score,false
+}
+
+func UpdateScore(db *gorm.DB,userId string,score []int) bool{
 	profile:=Profile{}
-	db.Where("user_id=?",userId).First(&profile)
+	err:=db.Where("user_id=?",userId).Find(&profile).Error
+	if(err!=nil){
+		return true
+	}
+	score[0]=profile.Extraversion+score[0]
+	score[1]=profile.Agreeableness+score[1]
+	score[2]=profile.Conscientiousness+score[2]
+	score[3]=profile.EmotionalStability+score[3]
+	score[4]=profile.Intellect+score[4]
+	err=db.Table("profiles").Where("user_id=?",userId).Updates(Profile{Extraversion:score[0],
+		Agreeableness:score[1],Conscientiousness:score[2],EmotionalStability:score[3],Intellect:score[4]}).Error
+	if(err!=nil){
+		return true
+	}
+	return false
+}
+
+
+func UpdateIPIPScore(db *gorm.DB,userId string) bool{
+	questionResponse:=QuestionResponse{}
+	err:=db.Where("user_id=?",userId).Find(&questionResponse).Error
+	if(err!=nil){
+		return true
+	}
+	score,dbError:=CalculateIPIPScore(db,questionResponse)
+	if(dbError){
+		return true
+	}
+	dbError=UpdateScore(db,userId,score)
+	return dbError
+}
+
+func UpdatePreferecePResponseDB(db *gorm.DB,userId string,response UpdatePreferenceRequest) (int,bool){
+	interest:=Interest{}
+	err:=db.Where("user_id=?",userId).Find(&interest).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return 0,true
+	}
+	if(interest.UserId==""){
+		interest.UserId=userId
+		err:=db.Create(&interest).Error
+		if(err!=nil){
+			return 0,true
+		}
+
+	}
+	preferenceStatus,interest:=getDataInInterestForm(interest,response)
+	err=db.Model(&interest).Where("user_id=?",userId).Update(interest).Error
+	if(err!=nil){
+		return 0,true
+	}
+	return preferenceStatus,false
+}
+
+func ProfileViewAuthorization(db *gorm.DB,userId1 string,userId2 string) (string,bool){
+	match:=Match{}
+	err:=db.Where("user_id1=? AND user_id2=?",userId1,userId2).First(&match).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return "Error",true
+	}
+	if (match.UserId1!="" && match.Like1=="Like" && match.Like2=="Like"){
+		return "Authorized",false
+	}
+	err=db.Where("user_id1=? AND user_id2=?",userId2,userId1).First(&match).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return "Error",true
+	}
+	if (match.UserId1!="" && match.Like1=="Like" && match.Like2=="Like"){
+		return "Authorized",false
+	}
+
+	//Check for UnAuthorized profile
+	return "UnAuthorized",false
+}
+
+func GetUnAuthorizedProfileDB(db *gorm.DB,userId string) (ProfileResponse,bool){
 	profileResponse:=ProfileResponse{}
+	interest:=Interest{}
+	err:=db.Where("user_id=?",userId).Find(&interest).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return profileResponse,true
+	}
+	profileResponse.InterestIndoorPassive1=interest.InterestIndoorPassive1
+	profileResponse.InterestIndoorPassive2=interest.InterestIndoorPassive2
+	profileResponse.InterestOutdoorPassive1=interest.InterestOutdoorPassive1
+	profileResponse.InterestOutdoorPassive2=interest.InterestOutdoorPassive2
+	profileResponse.InterestIndoorActive1=interest.InterestIndoorActive1
+	profileResponse.InterestIndoorActive2=interest.InterestIndoorActive2
+	profileResponse.InterestOutdoorActive1=interest.InterestOutdoorActive1
+	profileResponse.InterestOutdoorActive2=interest.InterestOutdoorActive2
+	profileResponse.InterestOthers1=interest.InterestOthers1
+	profileResponse.InterestOthers2=interest.InterestOthers2
+	profileResponse.InterestIdeology1=interest.InterestIdeology1
+	profileResponse.InterestIdeology2=interest.InterestIdeology2
+	return profileResponse,false
+}
+
+func GetAuthorizedProfileDB(db *gorm.DB,userId string) (ProfileResponse,bool){
+	profile:=Profile{}
+	profileResponse:=ProfileResponse{}
+	err:=db.Where("user_id=?",userId).First(&profile).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return profileResponse,true
+	}
 	profileResponse.UserId=profile.UserId
 	profileResponse.Name=profile.Name
 	profileResponse.DateOfBirth=profile.DateOfBirth
@@ -87,7 +222,10 @@ func GetAuthorizedProfileDB(userId string) ProfileResponse{
 
 
 	interest:=Interest{}
-	db.Where("user_id=?",userId).Find(&interest)
+	err=db.Where("user_id=?",userId).Find(&interest).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return profileResponse,true
+	}
 	profileResponse.InterestIndoorPassive1=interest.InterestIndoorPassive1
 	profileResponse.InterestIndoorPassive2=interest.InterestIndoorPassive2
 	profileResponse.InterestOutdoorPassive1=interest.InterestOutdoorPassive1
@@ -104,33 +242,56 @@ func GetAuthorizedProfileDB(userId string) ProfileResponse{
 
 	// profileResponse.ParentsAddress=profile.ParentsAddress
 	// _=reflect.Copy(profileResponse,profile)
-	return profileResponse
+	return profileResponse,false
 }
 
-func GetUnAuthorizedProfileDB(userId string) ProfileResponse{
-	db:=database.GetDB()
-
-	profileResponse:=ProfileResponse{}
-	interest:=Interest{}
-	db.Where("user_id=?",userId).Find(&interest)
-	profileResponse.InterestIndoorPassive1=interest.InterestIndoorPassive1
-	profileResponse.InterestIndoorPassive2=interest.InterestIndoorPassive2
-	profileResponse.InterestOutdoorPassive1=interest.InterestOutdoorPassive1
-	profileResponse.InterestOutdoorPassive2=interest.InterestOutdoorPassive2
-	profileResponse.InterestIndoorActive1=interest.InterestIndoorActive1
-	profileResponse.InterestIndoorActive2=interest.InterestIndoorActive2
-	profileResponse.InterestOutdoorActive1=interest.InterestOutdoorActive1
-	profileResponse.InterestOutdoorActive2=interest.InterestOutdoorActive2
-	profileResponse.InterestOthers1=interest.InterestOthers1
-	profileResponse.InterestOthers2=interest.InterestOthers2
-	profileResponse.InterestIdeology1=interest.InterestIdeology1
-	profileResponse.InterestIdeology2=interest.InterestIdeology2
-
-
-	// profileResponse.ParentsAddress=profile.ParentsAddress
-	// _=reflect.Copy(profileResponse,profile)
-	return profileResponse
+func InsertIntoMatch(db *gorm.DB,userId1 string,userId2 string) bool{
+	match:=Match{}
+	match.UserId1=userId1
+	match.UserId2=userId2
+	match.Like1="Like"
+	match.Like2="Like"
+	err:=db.Create(&match).Error
+	if(err!=nil){
+		return true
+	}
+	return false
 }
+
+func CheckIPIPStatus(db *gorm.DB,userId string) (int,bool){
+	user:=User{}
+	err:=db.Table("users").Where("user_id=?",userId).Find(&user).Error
+	if(err!=nil){
+		return 0,true
+	}
+	return user.IPIPStatus,false
+}
+
+func GetProfileDB(db *gorm.DB,userId string) (Profile,bool){
+	profile:=Profile{}
+	err:=db.Where("user_id=?",userId).Find(&profile).Error
+	if(err!=nil){
+		return profile,true
+	}
+	return profile,false
+}
+//LAST
+
+
+
+
+
+
+
+// func GetProfile(userId string) Profile{
+// 	db:=database.GetDB()
+// 	profile:=Profile{}
+// 	db.Where("UserId=?",userId).First(&profile)
+// 	return profile
+// }
+
+
+
 
 func GetUserIdByName(Offset int,numOfProfile int,name string) ([]string){
 	db:=database.GetDB()
@@ -158,36 +319,9 @@ func InsertQuestionInDB(content string,TypeofQuestion int,factor int){
 }
 
 
-func UpdateIPIPResponseDB(userId string,response map[string]int,page int) {
-	db:=database.GetDB()
-	questionResponse:=QuestionResponse{}
-	db.Where("user_id=?",userId).Find(&questionResponse)
-	flag:=1
-	if(questionResponse.UserId==""){
-		flag=0
-	}
-	questionResponse=getDataInQuestionResponseForm(questionResponse,response,page)
-	if(flag==0){
-		db.Create(&questionResponse)
-	}else{
-		db.Model(&questionResponse).Where("user_id=?",userId).Update(questionResponse)	
-	}
-	
-}
 
-func UpdatePreferecePResponseDB(userId string,response PreferenceRequest) int{
-	db:=database.GetDB()
-	interest:=Interest{}
-	db.Where("user_id=?",userId).Find(&interest)
-	if(interest.UserId==""){
-		interest.UserId=userId
-		db.Create(&interest)
 
-	}
-	preferenceStatus,interest:=getDataInInterestForm(interest,response)
-	db.Model(&interest).Where("user_id=?",userId).Update(interest)
-	return preferenceStatus
-}
+
 
 // func UpdatePreferecePResponseDB(userId string,response map[string]string) int{
 // 	db:=database.GetDB()
@@ -244,51 +378,11 @@ func GetScore(response []Response) ([]int){
 	return score
 }
 
-func ProfileViewAuthorization(userId1 string,userId2 string) string{
-	db:=database.GetDB()
-	match:=Match{}
-	db.Where("user_id1=? AND user_id2=?",userId1,userId2).First(&match)
-	if (match.UserId1!="" && match.Like1=="Like" && match.Like2=="Like"){
-		return "Ok"
-	}
-	db.Where("user_id1=? AND user_id2=?",userId2,userId1).First(&match)
-	if (match.UserId1!="" && match.Like1=="Like" && match.Like2=="Like"){
-		return "Ok"
-	}
-	return "Error"
-}
 
-func UpdateIPIPScore(userId string){
-	db:=database.GetDB()
-	questionResponse:=QuestionResponse{}
-	db.Where("user_id=?",userId).Find(&questionResponse)
-	score:=CalculateIPIPScore(questionResponse)
-	UpdateScore(userId,score)
-}
 
-func CalculateIPIPScore(questionResponse QuestionResponse) ([] int){
-	db:=database.GetDB()
-	response:=ConvertQuestionResponseToArray(questionResponse)
-	score:=make([]int,5)
-	question:=[]Question{}
-	db.Find(&question)
-	for _,q:=range question{
-		score[q.Type]=score[q.Type]+q.Factor*response[q.Id]
-	}
-	return score
-}
-func UpdateScore(userId string,score []int){
-	db:=database.GetDB()
-	profile:=Profile{}
-	db.Where("user_id=?",userId).Find(&profile)
-	score[0]=profile.Extraversion+score[0]
-	score[1]=profile.Agreeableness+score[1]
-	score[2]=profile.Conscientiousness+score[2]
-	score[3]=profile.EmotionalStability+score[3]
-	score[4]=profile.Intellect+score[4]
-	db.Table("profiles").Where("user_id=?",userId).Updates(Profile{Extraversion:score[0],
-		Agreeableness:score[1],Conscientiousness:score[2],EmotionalStability:score[3],Intellect:score[4]})
-}
+
+
+
 
 func UpdateExtraversionScore(userId string,score int){
 	db:=database.GetDB()
@@ -433,9 +527,14 @@ func GetUserInterest(userId string) []string{
 	return interestList
 }
 
-func GetUserName(userId string) string{
-	db:=database.GetDB()
+func GetUserName(db *gorm.DB,userId string) (string,bool){
 	profile:=Profile{}
-	db.Table("profiles").Where("user_id=?",userId).Find(&profile)
-	return profile.Name
+	err:=db.Table("profiles").Where("user_id=?",userId).Find(&profile).Error
+	if(gorm.IsRecordNotFoundError(err)){
+		return profile.Name,false
+	}
+	if(err!=nil){
+		return profile.Name,true
+	}
+	return profile.Name,false
 }

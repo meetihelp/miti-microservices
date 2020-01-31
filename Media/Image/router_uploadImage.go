@@ -11,60 +11,73 @@ import(
 	"os"
 	"log"
 	"strings"
+	"bytes"
 
 )
 
 func UploadImage(w http.ResponseWriter, r *http.Request){
 	//get buffer of image from user
+	ipAddress:=util.GetIPAddress(r)
 	uploadImageHeader:=UploadImageHeader{}
+
+	content:=UploadImageResponse{}
+	statusCode:=0
+
+	responseHeader:=UploadImageResponseHeader{}
+	var data map[string]string
+
+	db:=database.DBConnection()
+	list:=[]bool{false,false,false,false,false,false}
+	errorList:=util.GetErrorList(list)
+
 	util.GetHeader(r,&uploadImageHeader)
 	sessionId:=uploadImageHeader.Cookie
-	log.Println("upload Image Cookie:"+sessionId)
 	accessType:=uploadImageHeader.AccessType
 	accessType=strings.ToLower(accessType)
-	log.Println("upload Image AccessType:"+accessType)
 	actualFileName:=uploadImageHeader.ActualFileName
 	format:=uploadImageHeader.Format
 	latitude:=uploadImageHeader.Latitude
 	longitude:=uploadImageHeader.Longitude
 	dimension:=uploadImageHeader.Dimension
 	requestId:=uploadImageHeader.RequestId
-	fmt.Println(uploadImageHeader)
-	db:=database.DBConnection()
 
-	userId,getChatStatus:=util.GetUserIdFromSession2(db,sessionId)
-	fmt.Println("Enter upload Image:"+userId)
-	// fmt.Println(userId)
+	userId,getChatStatus,dbError:=util.GetUserIdFromSession3(db,sessionId)
+	errorList.DatabaseError=dbError
+	util.APIHitLog("UploadImage",ipAddress,sessionId)
 	if getChatStatus=="Error"{
-		util.Message(w,1003)
-		db.Close()
-		return
+		errorList.SessionError=true
 	}
 
-	url:=""
-	userImageData,status:=GetUserImageByRequestId(db,userId,requestId)
-	fmt.Println("Status:"+status)
-	if(status=="Error"){
-		file, _, err := r.FormFile("myFile")
-	    if err != nil {
-	        fmt.Println("Error Retrieving the File")
-	        fmt.Println(err)
-	        db.Close()
-	        return
-	    }
+	file, _, err := r.FormFile("myFile")
+    if(err!=nil && !util.ErrorListStatus(errorList)){
+        errorList.BodyReadError=true
+    }
 
-		buffer, err := ioutil.ReadAll(file)
-	    if err != nil {
-	        fmt.Println(err)
-	    }
+	buffer, err := ioutil.ReadAll(file)
+    if(err!=nil && !util.ErrorListStatus(errorList)){
+        errorList.BodyReadError=true
+    }
 
-	    if(accessType!="private" && accessType!="public"){
-	    	util.Message(w,1002)
-	    	db.Close()
-	    	return
-	    }
+    if(!util.ErrorListStatus(errorList)){
+    	sanatize:=Sanatize(uploadImageHeader)
+		if(sanatize=="Error"){
+			errorList.SanatizationError=true
+		}
+    }
 
-		imageId:=util.GenerateToken()
+    url:=""
+	// imageUploadStatus:="Yes"
+	status:="Error"
+	userImageData:=UserImage{}
+	if(!util.ErrorListStatus(errorList)){
+		userImageData,status,dbError=GetUserImageByRequestId(db,userId,requestId)	
+		errorList.DatabaseError=dbError
+	}
+
+	var imageId string
+	createdAt:=util.GetTime()
+	if(status=="Error" && !util.ErrorListStatus(errorList)){
+		imageId=util.GenerateToken()
 		generatedName:=util.GenerateToken()
 		filename:=generatedName+"."+format
 		bucket:=""
@@ -75,44 +88,40 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 		}else if(accessType=="public"){
 			bucket=GetPublicImageBucket()
 		}else{
-			util.Message(w,1002)
-			db.Close()
-			return
+			statusCode=1002
+			errorList.LogicError=true
 		}
-		size,err:=UploadToS3(buffer,filename,bucket,format)
-		if(err!=nil){
-			//Could Not Upload Image
-			fmt.Println(err)
-			util.Message(w,3001)
-		}else{
-			//Uploaded image Successfully
-			userImageData.UserId=userId
-			userImageData.ImageId=imageId
-			userImageData.AccessType=accessType
-			userImageData.ActualFileName=actualFileName
-			userImageData.Size=size
-			userImageData.Format=format
-			userImageData.Bucket=bucket
-			userImageData.Dimension=dimension
-			userImageData.Latitude=latitude
-			userImageData.Longitude=longitude
-			userImageData.GeneratedName=generatedName
-			userImageData.RequestId=requestId
-			userImageData.CreatedAt=util.GetTime()
-			EnterUserImage(db,userImageData)
 
-			// signedURL:=""
-			// url:=""
-			if(accessType=="public"){
-				PublicCloudFront:=os.Getenv("publicImageCloudFront")
-				url=PublicCloudFront+"/"+filename
+		
+		if(!util.ErrorListStatus(errorList)){
+			size,err:=UploadToS3(buffer,filename,bucket,format)	
+			if(err!=nil){
+				statusCode=3001
+			}else{
+				userImageData.UserId=userId
+				userImageData.ImageId=imageId
+				userImageData.AccessType=accessType
+				userImageData.ActualFileName=actualFileName
+				userImageData.Size=size
+				userImageData.Format=format
+				userImageData.Bucket=bucket
+				userImageData.Dimension=dimension
+				userImageData.Latitude=latitude
+				userImageData.Longitude=longitude
+				userImageData.GeneratedName=generatedName
+				userImageData.RequestId=requestId
+				userImageData.CreatedAt=createdAt
+				dbError:=EnterUserImage(db,userImageData)
+				errorList.DatabaseError=dbError
+				// imageUploadStatus="Yes"	
 			}
-	
 		}
-		// uploadImageResponse.Code=200
-		// uploadImageResponse.Message=util.GetMessageDecode(200)
-		// uploadImageResponse.URL=signedURL
-		// util.Message(w,200)
+
+		if(accessType=="public"){
+			PublicCloudFront:=os.Getenv("publicImageCloudFront")
+			url=PublicCloudFront+"/"+filename
+		}
+
 	}else{
 		if(accessType=="public"){
 			PublicCloudFront:=os.Getenv("publicImageCloudFront")
@@ -120,12 +129,31 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 			url=PublicCloudFront+"/"+filename
 		}
 	}
-	code:=200
-	msg:=util.GetMessageDecode(code)
-	w.Header().Set("Content-Type", "application/json")
-	p:=&UploadImageResponse{Code:code,Message:msg,ImageId:userImageData.ImageId,URL:url,RequestId:userImageData.RequestId,CreatedAt:userImageData.CreatedAt}
+
+	
+	code:=util.GetCode(errorList)
+	if(code==200){
+		content.Code=statusCode
+	}else{
+		content.Code=code
+	}
+	content.Message=util.GetMessageDecode(content.Code)
+	content.ImageId=imageId
+	content.URL=url
+	content.RequestId=requestId
+	content.CreatedAt=createdAt
+	responseHeader.ContentType="application/json"
+    headerBytes:=new(bytes.Buffer)
+    json.NewEncoder(headerBytes).Encode(responseHeader)
+    responseHeaderBytes:=headerBytes.Bytes()
+    if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+        panic(err)
+    }
+    w=util.GetResponseFormatHeader(w,data)
+	p:=&content
+	util.ResponseLog("UploadImage",ipAddress,sessionId,content.Code,*p)
 	enc := json.NewEncoder(w)
-	err:= enc.Encode(p)
+	err= enc.Encode(p)
 	if err != nil {
 		log.Fatal(err)
 	}

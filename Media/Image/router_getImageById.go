@@ -2,75 +2,99 @@ package Image
 
 import(
 	"net/http"
-	"fmt"
-	// CD "miti-microservices/Model/CreateDatabase"
 	util "miti-microservices/Util"
+	database "miti-microservices/Database"
 	"io/ioutil"
 	"encoding/json"
 	"log"
+	"bytes"
 )
 
 func GetImageById(w http.ResponseWriter, r *http.Request){
+	ipAddress:=util.GetIPAddress(r)
 	getImageByIdHeader:=GetImageByIdHeader{}
+
+	content:=GetImageByIdResponse{}
+	statusCode:=0
+
+	responseHeader:=GetImageByIdResponseHeader{}
+	var data map[string]string
+
+	db:=database.DBConnection()
+	list:=[]bool{false,false,false,false,false,false}
+	errorList:=util.GetErrorList(list)
+
 	util.GetHeader(r,&getImageByIdHeader)
 	sessionId:=getImageByIdHeader.Cookie
-	fmt.Print("GetImageByIdHeader:")
-	fmt.Println(getImageByIdHeader)
-	userId,getChatStatus:=util.GetUserIdFromSession(sessionId)
-	// fmt.Println(userId)
+	userId,getChatStatus,dbError:=util.GetUserIdFromSession3(db,sessionId)
+	errorList.DatabaseError=dbError
+	util.APIHitLog("GetImageById",ipAddress,sessionId)
 	if getChatStatus=="Error"{
-		util.Message(w,1003)
-		return
+		errorList.SessionError=true
 	}
 
 	//Read body data
 	requestBody,err:=ioutil.ReadAll(r.Body)
-	if err!=nil{
-		fmt.Println("Could not read body")
-		util.Message(w,1000)
-		return 
+	if (err!=nil && !util.ErrorListStatus(errorList)){
+		errorList.BodyReadError=true 
 	}
 
-	getImageByIdData :=GetImageByIdDS{}
-	errUserData:=json.Unmarshal(requestBody,&getImageByIdData)
-	if errUserData!=nil{
-		fmt.Println("Could not Unmarshall user data")
-		util.Message(w,1001)
-		return 
+	getImageByIdData :=GetImageByIdRequest{}
+	if(!util.ErrorListStatus(errorList)){
+		errUserData:=json.Unmarshal(requestBody,&getImageByIdData)
+		if(errUserData!=nil){
+			errorList.UnmarshallingError=true	
+		}
+		
 	}
 
-	fmt.Print("GetImageByIdBody:")
-	fmt.Println(getImageByIdData)
-	// imageId:=GetImageIdFromId(getImageByIdData.Id)
+	if(!util.ErrorListStatus(errorList)){
+		sanatize:=Sanatize(getImageByIdData)
+		if(sanatize=="Error"){
+			errorList.SanatizationError=true
+		}
+	}
 	imageId:=getImageByIdData.ImageId
 	//Check If user has permission to access this image
-	userId2,access:=IsUserPermittedToSeeImage(userId,imageId)
-	fmt.Println("Get Image by id->Userid2:"+userId2)
-	if(access=="Error"){
-		util.Message(w,5000)
-		return
+	var userId2 string
+	var access string
+	if(!util.ErrorListStatus(errorList)){
+		userId2,access,dbError=IsUserPermittedToSeeImage(db,userId,imageId)	
+		errorList.DatabaseError=dbError
+		if(access=="Error"){
+			errorList.LogicError=true
+		}
 	}
-	imageURL:=GetImageURL(userId2,imageId)
-	code:=200
-	msg:=util.GetMessageDecode(code)
-	w.Header().Set("Content-Type", "application/json")
-	p:=&GetImageByIdResponse{Code:code,Message:msg,ImageURL:imageURL}
-	fmt.Print("GetImageByIdResponse:")
-	fmt.Println(*p)
+
+	var imageURL string
+	if(!util.ErrorListStatus(errorList)){
+		imageURL,dbError=GetImageURL(db,userId2,imageId)
+		errorList.DatabaseError=dbError
+	}
+	
+	code:=util.GetCode(errorList)
+	if(code==200){
+		content.Code=statusCode
+	}else{
+		content.Code=code
+	}
+	content.Message=util.GetMessageDecode(content.Code)
+	content.ImageURL=imageURL
+	responseHeader.ContentType="application/json"
+    headerBytes:=new(bytes.Buffer)
+    json.NewEncoder(headerBytes).Encode(responseHeader)
+    responseHeaderBytes:=headerBytes.Bytes()
+    if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+        panic(err)
+    }
+    w=util.GetResponseFormatHeader(w,data)
+	p:=&content
+	util.ResponseLog("GetImageById",ipAddress,sessionId,content.Code,*p)
 	enc := json.NewEncoder(w)
 	err= enc.Encode(p)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-
-
-	// path:=GetImagePath(imageId)
-	// status:=DoesImageExist(path)
-	// if status=="Ok"{
-	// 	SendImage(w,path)	
-	// }else {
-	// 	util.Message(w,1007)
-	// }
+	db.Close()
 	
 }

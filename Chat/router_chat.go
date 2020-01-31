@@ -2,72 +2,63 @@ package Chat
 
 import (
 	"net/http"
-	"fmt"
-	// redis "miti-microservices/Model/Redis"
 	database "miti-microservices/Database"
 	util "miti-microservices/Util"
-	// auth "miti-microservices/Authentication"
 	"io/ioutil"
 	"encoding/json"
+	"bytes"
 	"log"
-	// "time"
 )
 
 func ChatInsert(w http.ResponseWriter,r *http.Request){
+	ipAddress:=util.GetIPAddress(r)
 	chatHeader:=ChatHeader{}
+
+	content:=ChatResponse{}
+	statusCode:=0
+
+	responseHeader:=ChatResponseHeader{}
+	var data map[string]string
+
+	db:=database.DBConnection()
+	//Session,TemporarySession,Body,Unmarshal,Sanatize,Database
+	list:=[]bool{false,false,false,false,false,false}
+	errorList:=util.GetErrorList(list)
+
 	util.GetHeader(r,&chatHeader)
 	sessionId:=chatHeader.Cookie
-	db:=database.DBConnection()
-	userId,loginStatus:=util.GetUserIdFromSession2(db,sessionId)
-	fmt.Print("ChatInsertHeader")
-	fmt.Println(chatHeader)
-	if loginStatus=="Error"{
-		// util.Message(w,1003)
-		// return
-		content,w:=util.GetSessionErrorContent(w)
-		p:=&content
-		enc := json.NewEncoder(w)
-		err:= enc.Encode(p)
-		if err != nil {
-			log.Fatal(err)
-		}
-		db.Close()
-		return
+	userId,loginStatus,dbError:=util.GetUserIdFromSession3(db,sessionId)
+	errorList.DatabaseError=dbError
+	util.APIHitLog("ChatInsert",ipAddress,sessionId)
+
+	if (loginStatus=="Error"){
+		errorList.SessionError=true
 	}
 
 	requestBody,err:=ioutil.ReadAll(r.Body)
-	if err!=nil{
-		// fmt.Println("Could not read body")
-		// util.Message(w,1000)
-		// return 
-		content,w:=util.GetBodyReadErrorContent(w)
-		p:=&content
-		enc := json.NewEncoder(w)
-		err:= enc.Encode(p)
-		if err != nil {
-			log.Fatal(err)
-		}
-		db.Close()
-		return
+	// errorStatus:=util.ErrorListStatus(errorList)
+	if (err!=nil && !util.ErrorListStatus(errorList)){
+		errorList.BodyReadError=true
 	}
 
-	chatData :=SendChatRequest{}
-	errUserData:=json.Unmarshal(requestBody,&chatData)
-	if errUserData!=nil{
-		fmt.Println("Could not Unmarshall user data")
-		util.Message(w,1001)
-		db.Close()
-		return 
+	chatData :=ChatRequest{}
+	errorStatus:=util.ErrorListStatus(errorList)
+	if(!errorStatus){
+		errUserData:=json.Unmarshal(requestBody,&chatData)
+		if(errUserData!=nil){
+			errorList.UnmarshallingError=true
+		}	
 	}
 
-	// sanatizationStatus :=Sanatize(chatData)
-	// if sanatizationStatus =="Error"{
-	// 	fmt.Println("User data invalid")
-	// 	util.Message(w,1002)
-	// 	return
-	// }
-	// tempUserId:=GetTempUserIdFromChatId(userId,chatData.ChatId)
-	// chatData.UserId=tempUserId
+	errorStatus=util.ErrorListStatus(errorList)
+	if(!errorStatus){
+		util.BodyLog("ChatInsert",ipAddress,sessionId,chatData)
+		sanatizationStatus :=Sanatize(chatData)
+		if(sanatizationStatus=="Error"){
+			errorList.SanatizationError=true
+		}		
+	}
+
 	chat:=Chat{}
 	chat.UserId=userId
 	chat.MessageId=util.GenerateToken()
@@ -77,33 +68,48 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 	chat.MessageContent=chatData.MessageContent
 	chat.RequestId=chatData.RequestId
 	lastUpdate:=chatData.CreatedAt
-	// tempTime:=time.Now()
-	// chatData.CreatedAt=tempTime.Format("2006-01-02 15:04:05")
-	// index:=GetLastChatIndex(chatData.ChatId)
-	// index=util.GetNextLexString(index)
-	// index=index+1
-	// chatData.Index=index
-	// fmt.Println(chatData.CreatedAt)
-	// db:=database.GetDB()
-	if(chatData.MessageContent!=""){
-		chatResponse,unSyncedChat,code:=ChatInsertDB(db,chat,lastUpdate)
-	// db.Create(&chatData)
-		if(chat.CreatedAt==chatResponse.CreatedAt){
-			e:=UpdateChatTime(db,chatData.ChatId,chatData.CreatedAt)
-			if e!=nil{
-				db.Close()
-				return
-			}
+
+	errorStatus=util.ErrorListStatus(errorList)
+	var unSyncedChat []Chat
+	var chatResponse Chat
+	if(!errorStatus){
+		chatResponse,unSyncedChat,dbError=ChatInsertDB(db,chat,lastUpdate)
+		errorList.DatabaseError=dbError
+		if(chat.CreatedAt==chatResponse.CreatedAt && !dbError){
+			dbError:=UpdateChatTime(db,chatData.ChatId,chatData.CreatedAt)
+			errorList.DatabaseError=dbError
 		}
-		
-		// userList:=GetUserListFromChatId(chatData.ChatId)
-		// EnterReadBy(userList,chatData.MessageId)
-		// util.Message(w,200)
-		// fmt.Print("Unsynced Chat:")
-		// fmt.Println(unSyncedChat)
-		SendMessageResponse(w,code,chatResponse.RequestId,chatResponse.MessageId,chatResponse.CreatedAt,chatResponse.MessageType,unSyncedChat)
 	}else{
-		util.Message(w,1002)
+		statusCode=1002
+	}
+	
+	code:=util.GetCode(errorList)
+	if(code==200){
+		content.Code=statusCode
+	}else{
+		content.Code=code
+	}
+	content.Message=util.GetMessageDecode(code)
+	content.MessageId=chatResponse.MessageId
+	content.RequestId=chatResponse.RequestId
+	content.CreatedAt=chatResponse.CreatedAt
+	content.MessageType=chatResponse.MessageType
+	content.Chat=unSyncedChat
+
+	responseHeader.ContentType="application/json"
+    headerBytes:=new(bytes.Buffer)
+    json.NewEncoder(headerBytes).Encode(responseHeader)
+    responseHeaderBytes:=headerBytes.Bytes()
+    if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+        panic(err)
+    }
+    w=util.GetResponseFormatHeader(w,data)
+	p:=&content
+	util.ResponseLog("ChatInsert",ipAddress,sessionId,content.Code,*p)
+	enc := json.NewEncoder(w)
+	err= enc.Encode(p)
+	if err != nil {
+		log.Fatal(err)
 	}
 	db.Close()
 }

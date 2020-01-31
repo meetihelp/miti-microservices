@@ -2,161 +2,93 @@ package Authentication
 
 import(
 	"net/http"
-	"fmt"
     "log"
 	util "miti-microservices/Util"
     database "miti-microservices/Database"
     "encoding/json"
     "bytes"
-    // "encoding/json"
-    // "io/ioutil"
 )
 
 func VerifyUser(w http.ResponseWriter,r *http.Request){
-    // ipAddress:=util.GetIPAddress(r)
-    verifyOtpHeader:=VerifyOTPHeader{}
-    util.GetHeader(r,&verifyOtpHeader)
-    sessionId:=verifyOtpHeader.Cookie
-    db:=database.DBConnection()
-    userId,sessionErr:=util.GetUserIdFromTemporarySession2(db,sessionId)
-    // fmt.Println(sessionId)
-    fmt.Print("Generate Otp Header:")
-    fmt.Println(verifyOtpHeader)
+    ipAddress:=util.GetIPAddress(r)
+    verifyUserHeader:=VerifyUserHeader{}
+
+    content:=VerifyUserResponse{}
     statusCode:=0
     moveTo:=0
+
+    verifyUserResponseHeader:=VerifyUserResponseHeader{}
     var data map[string]string
-    content:=OTPResponse{}
-    responseHeader:=OTPResponseHeader{}
-    if sessionErr=="Error"{
-        // statusCode=1003
-        // moveTo=0
-        // content.Code=statusCode
-        // content.MoveTo=moveTo
-        // content.Message=util.GetMessageDecode(statusCode)
-        // headerBytes:=new(bytes.Buffer)
-        // json.NewEncoder(headerBytes).Encode(responseHeader)
-        // responseHeaderBytes:=headerBytes.Bytes()
-        // if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
-        //     panic(err)
-        // }
-        // w=util.GetResponseFormatHeader(w,data)
-        // p:=&content
-        // enc := json.NewEncoder(w)
-        // err:= enc.Encode(p)
-        // if err != nil {
-        //     log.Fatal(err)
-        // }
-        // fmt.Println("Session Does not exist")
-        // util.Message(w,1003)
-        content,w:=util.GetSessionErrorContent(w)
-        p:=&content
-        enc := json.NewEncoder(w)
-        err:= enc.Encode(p)
-        if err != nil {
-            log.Fatal(err)
-        }
-        db.Close()
-        return
-    }
-    //Read body data
-    // requestBody,err:=ioutil.ReadAll(r.Body)
-    // if err!=nil{
-    //     fmt.Println("Could not read body")
-    //     util.Message(w,1000)
-    //     return 
-    // }
 
-    // otpVerification:=OTPVerification{}
-    // errUserData:=json.Unmarshal(requestBody,&otpVerification)
-    // if errUserData!=nil{
-    //     fmt.Println("Could not Unmarshall user data")
-    //     util.Message(w,1001)
-    //     return 
-    // }
+    db:=database.DBConnection()
+    list:=[]bool{false,false,false,false,false,false}
+    errorList:=util.GetErrorList(list)
 
-    // otpVerification.UserId=userId
-    // otpVerification.SessionId=sessionId
-    // //SANITIZE USER AND PROFILE DATA
-    // sanatizationStatus :=Sanatize(otpVerification)
-    // if sanatizationStatus =="Error"{
-    //     fmt.Println("User data invalid")
-    //     util.Message(w,1002)
-    //     return
-    // }
-
-    phone,status:=GetPhoneFromUserId(db,userId)
-    _,code:=OTPHelper(db,sessionId)
-    if status=="Ok"{
-        // if(code==3003 || code ==3004 || code ==3005){
-        if(code==200){
-            otpCode:=InsertOTP(db,userId,sessionId)
-            err:=SendOTP(phone,otpCode)
-            if err=="Ok"{
-            // resp,err:=SendOTP(phone,otpCode)
-            // if(err==nil && resp.StatusCode==http.StatusOK){
-                // util.Message(w,200)
-                statusCode=200
-                moveTo=0
-                content.Code=statusCode
-                content.MoveTo=moveTo
-                content.Message=util.GetMessageDecode(statusCode)
-                headerBytes:=new(bytes.Buffer)
-                json.NewEncoder(headerBytes).Encode(responseHeader)
-                responseHeaderBytes:=headerBytes.Bytes()
-                if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
-                    // panic(err)
-                    log.Println(err)
-                }
-            } else{
-                // util.Message(w,200)
-                // fmt.Println(err)
-                statusCode=200
-                moveTo=0
-                content.Code=statusCode
-                content.MoveTo=moveTo
-                content.Message=util.GetMessageDecode(statusCode)
-                headerBytes:=new(bytes.Buffer)
-                json.NewEncoder(headerBytes).Encode(responseHeader)
-                responseHeaderBytes:=headerBytes.Bytes()
-                if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
-                    // panic(err)
-                    log.Println(err)
-                }
-            }
-        } else {
-            // util.Message(w,code)
-            statusCode=code
-            moveTo=0
-            content.Code=statusCode
-            content.MoveTo=moveTo
-            content.Message=util.GetMessageDecode(statusCode)
-            headerBytes:=new(bytes.Buffer)
-            json.NewEncoder(headerBytes).Encode(responseHeader)
-            responseHeaderBytes:=headerBytes.Bytes()
-            if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
-                // panic(err)
-                log.Println(err)
-            }
-        } 
-        w=util.GetResponseFormatHeader(w,data)
-        p:=&content
-        fmt.Print("Generate OTP Response:")
-        fmt.Println(*p)
-        enc := json.NewEncoder(w)
-        err:= enc.Encode(p)
-        if err != nil {
-            log.Fatal(err)
-        }
-        // otpCode:=InsertOTP(userId,sessionId)
-        // resp,err:=SendOTP(phone,otpCode)
-        // if(err==nil && resp.StatusCode==http.StatusOK){
-        //     util.Message(w,200)
-        // } else{
-        //     util.Message(w,200)
-        //     // fmt.Println(err)
-        // }
+    util.GetHeader(r,&verifyUserHeader)
+    sessionId:=verifyUserHeader.Cookie
+    
+    userId,sessionErr,dbError:=util.GetUserIdFromTemporarySession3(db,sessionId)
+    errorList.DatabaseError=dbError
+    util.APIHitLog("VerifyUser",ipAddress,sessionId)
+    if (sessionErr=="Error" && !errorList.DatabaseError){
+        errorList.TemporarySessionError=true
     }
 
+    var phone string
+    var status string
+    code:=0
+    if(!errorList.TemporarySessionError && !errorList.DatabaseError){
+        phone,status,dbError=GetPhoneFromUserId(db,userId)
+        errorList.DatabaseError=dbError
+        if(!errorList.DatabaseError){
+            code,dbError=OTPHelper(db,userId)
+            errorList.DatabaseError=dbError
+        }
+
+        if(status=="Ok" && !errorList.DatabaseError){
+            if(code==200){
+                otpCode,dbError:=InsertOTP(db,userId,sessionId)
+                errorList.DatabaseError=dbError
+                if(!errorList.DatabaseError){
+                    err:=SendOTP(phone,otpCode)
+                    if(err=="Ok"){
+                        statusCode=200
+                        moveTo=0
+                    }else{
+                        //Error in sending otp
+                    }
+                }
+            }else{
+                statusCode=code
+                moveTo=0
+            }
+
+        }
+    }
+
+    code=util.GetCode(errorList)
+    if(code==200){
+        content.Code=statusCode
+    }else{
+        content.Code=code
+    }
+    content.Message=util.GetMessageDecode(content.Code)
+    content.MoveTo=moveTo
+    verifyUserResponseHeader.ContentType="application/json"
+    headerBytes:=new(bytes.Buffer)
+    json.NewEncoder(headerBytes).Encode(verifyUserResponseHeader)
+    responseHeaderBytes:=headerBytes.Bytes()
+    if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
+        panic(err)
+    }
+    w=util.GetResponseFormatHeader(w,data)
+    p:=&content
+    util.ResponseLog("VerifyUser",ipAddress,sessionId,content.Code,*p)
+    enc := json.NewEncoder(w)
+    err:= enc.Encode(p)
+    if err != nil {
+        log.Fatal(err)
+    }
     db.Close()
     
 }

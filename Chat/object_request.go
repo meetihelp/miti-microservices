@@ -1,34 +1,48 @@
 package Chat
 
-
-type SendChatRequest struct{
-	ChatId string `json:"ChatId"`
-	MessageType string `json:"MessageType"`
-	MessageContent string `json:"MessageContent"`
-	CreatedAt string `json:"CreatedAt"`
-	RequestId string `json:"RequestId"`
-}
-type GetChatDetailHeader struct{
+type ChatDetailHeader struct{
 	Cookie string `header:"Miti-Cookie"`
 }
 
-type ChatDetailDs struct{
+type ChatDetailRequest struct{
 	CreatedAt string `json:"CreatedAt"`
 	NumOfChat int `json:"NumOfChat"`
 }
+
 type GetChatHeader struct{
 	Cookie string `header:"Miti-Cookie"`
 }
+
+type GetChatRequest struct{
+	ChatId string `json:"ChatId"`
+	NumOfChat int `json:"NumOfChat"`
+	CreatedAt string `json:"CreatedAt"`
+}
+
 type ChatHeader struct{
 	Cookie string `header:"Miti-Cookie"`
 }
 
 type ChatRequest struct{
 	ChatId string `json:"ChatId"`
-	Offset int `json:"Offset"`
-	NumOfChat int `json:"NumOfChat"`
+	MessageType string `json:"MessageType"`
+	MessageContent string `json:"MessageContent"`
 	CreatedAt string `json:"CreatedAt"`
+	RequestId string `json:"RequestId"`
 }
+
+
+
+
+
+
+
+// type ChatRequest struct{
+// 	ChatId string `json:"ChatId"`
+// 	Offset int `json:"Offset"`
+// 	NumOfChat int `json:"NumOfChat"`
+// 	CreatedAt string `json:"CreatedAt"`
+// }
 
 type GetChatAfterIndexHeader struct{
 	Cookie string `header:"Miti-Cookie"`
@@ -72,11 +86,11 @@ type GetMessageRequestDS struct{
 	CreatedAt string `json:"CreatedAt"`
 }
 
-type AcceptMessageRequestHeader struct{
+type ActionMessageRequestHeader struct{
 	Cookie string `header:"Miti-Cookie"`	
 }
 
-type AcceptMessageRequestDS struct{
+type ActionMessageRequestDS struct{
 	RequestId string `json:"RequestId"`
 	Phone string `json:"Phone"`
 	Action string `json:"Action"`

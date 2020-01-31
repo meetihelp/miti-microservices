@@ -5,23 +5,28 @@ import(
 	profile "miti-microservices/Profile"
 	"fmt"
 	util "miti-microservices/Util"
+	"github.com/jinzhu/gorm"
 )
 
-func PoolStatusDB(userId string) PoolStatus{
-	db:=database.GetDB()
+func PoolStatusDB(db *gorm.DB,userId string) (PoolStatus,bool){
 	poolStatus:=PoolStatus{}
 	err:=db.Where("user_id=?",userId).Find(&poolStatus).Error
-	fmt.Print("PoolStatusDB:")
-	fmt.Println(err)
-	return poolStatus
+	if(err!=nil && gorm.IsRecordNotFoundError(err)){
+		return poolStatus,true
+	}
+	return poolStatus,false
 }
 
 
-func EnterInPooL(userId string,pincode string,createdAt string,gender string,sex string) PoolStatusHelper{
-	db:=database.GetDB()
+func EnterInPooL(db *gorm.DB,userId string,pincode string,createdAt string,gender string,sex string) (PoolStatusHelper,bool){
 	poolWait:=PoolWaiting{}
+	poolStatus:=PoolStatus{}
+	poolStatusResponse:=PoolStatusHelper{}
 
-	db.Where("user_id=?",userId).Find(&poolWait)
+	err:=db.Where("user_id=?",userId).Find(&poolWait).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return poolStatusResponse,true
+	}
 	if(poolWait.UserId==""){
 		poolWait.UserId=userId
 		poolWait.Pincode=pincode
@@ -29,28 +34,30 @@ func EnterInPooL(userId string,pincode string,createdAt string,gender string,sex
 		poolWait.Gender=gender
 		poolWait.Sex=sex
 		err:=db.Create(&poolWait).Error
-		fmt.Print("EnterInPooL DB1:")
-		fmt.Println(err)
+		if(err!=nil){
+			return poolStatusResponse,true
+		}
 	}
 
-	poolStatus:=PoolStatus{}
-	poolStatusResponse:=PoolStatusHelper{}
-	db.Where("user_id=?",userId).Find(&poolStatus)
+	err=db.Where("user_id=?",userId).Find(&poolStatus).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return poolStatusResponse,true
+	}
 	if(poolStatus.UserId==""){
 		poolStatus.UserId=userId
 		poolStatus.Status="Waiting"
 		poolStatus.CreatedAt=util.GetTime()
 		err:=db.Create(&poolStatus).Error
-		fmt.Print("EnterInPooL DB2:")
-		fmt.Println(err)
-
+		if(err!=nil){
+			return poolStatusResponse,true
+		}
 
 	}
 	
 	poolStatusResponse.ChatId=poolStatus.ChatId
 	poolStatusResponse.MatchUserId=poolStatus.MatchUserId
 	poolStatusResponse.Status=poolStatus.Status
-	return poolStatusResponse
+	return poolStatusResponse,false
 }
 
 func EnterInGroupPooL(userId string,pincode string,interest string,createdAt string,gender string,sex string) GroupPoolStatusHelper{

@@ -4,7 +4,7 @@ import(
 	// "net/http"
 	// "io/ioutil"
 	// "encoding/json"	
-	util "miti-microservices/Util"
+	// util "miti-microservices/Util"
 	"github.com/jinzhu/gorm"
 	// sms "miti-microservices/Notification/SMS"
 	// "log"
@@ -40,50 +40,30 @@ func SendOTP(phone string,otp string)(string){
 // 	return sms.SendSMS(phone,otp)
 // }
 
-func OTPHelper(db *gorm.DB,sessionId string) (string,int){
-	userId,loginStatus:=util.GetUserIdFromTemporarySession(sessionId)
-	if loginStatus=="Ok"{
-		otp:=GetOTPDetails(userId)
-		duration:=CalculateDuration(otp.CreatedAt)
-		if(duration>ONEDAY){
-			DeleteOTP(userId)
-			return userId,200
-			// return userId,3005
-		}
-		if(otp.FailCount>=MAXFAILCOUNT){
-			// util.Message(w,3000)
-			return userId,3000
-		}
-		if(otp.ResendCount>MAXRESENDCOUNT){
-			// util.Message(w,3001)
-			return userId,3001
-		}
-		
-		deliveryCount:=otp.DeliverCount
-		// if(duration<MAXMINUTE && deliveryCount!=0){
-		// 	// util.Message(w,3002)
-		// 	return userId,3002
-		// }
-		if(duration<MAXMINUTE || deliveryCount==0){
-			// phone,_:=GetPhoneFromUserId(userId)
-			// sms.ReSendSMSHelper(phone)
-			// util.Message(w,200)
-			return userId,200
-			// return userId,3003
-		}
-		if(duration>MAXMINUTE){
-			// otpCode:=InsertOTP(userId,sessionId)
-	  //       resp,err:=SendOTP(phone,otpCode)
-	  //       if(err==nil && resp.StatusCode==http.StatusOK){
-	  //           util.Message(w,200)
-	  //       } else{
-	  //           log.Println(err)
-	  //       }
-	  		return userId,200
-	  		// return userId,3004
+func OTPHelper(db *gorm.DB,userId string) (int,bool){
+	otp,dbError:=GetOTPDetails(db,userId)
+	duration:=CalculateDuration(otp.CreatedAt)
+	if(duration>ONEDAY && !dbError){
+		dbError=DeleteOTP(db,userId)
+		if(!dbError){
+			return 200,dbError	
 		}
 	}
-	return userId,1003
+	if(otp.FailCount>=MAXFAILCOUNT && !dbError){
+		return 3000,dbError
+	}
+	if(otp.ResendCount>MAXRESENDCOUNT && !dbError){
+		return 3001,dbError
+	}
+	
+	deliveryCount:=otp.DeliverCount
+	if((duration<MAXMINUTE || deliveryCount==0) && !dbError){
+		return 200,dbError
+	}
+	if(duration>MAXMINUTE && !dbError){
+  		return 200,dbError
+	}
+	return 1003,dbError
 }
 
 func CalculateDuration(lastModified string) int{

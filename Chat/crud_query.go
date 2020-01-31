@@ -4,9 +4,41 @@ import(
 	util "miti-microservices/Util"
 	database "miti-microservices/Database"
 	"github.com/jinzhu/gorm"
-	// "time"
-	"fmt"
 )
+
+func GetChatDetail(db *gorm.DB,userId string,date string,numOfChat int) ([]string,[]ChatDetail,string,bool){
+	// db:=database.GetDB()
+	chatDetail:=[]ChatDetail{}
+	userId2:=make([]string,0)
+	err:=db.Limit(numOfChat).Where("actual_user_id=? AND created_at>?",userId,date).Find(&chatDetail).Error
+	if(gorm.IsRecordNotFoundError(err)){
+		return userId2,chatDetail,"Ok",false
+	}else if(err!=nil){
+		return userId2,chatDetail,"Error",true
+	}
+	
+	for _,c:=range chatDetail{
+		user:=[]ChatDetail{}
+		err:=db.Where("chat_id=?",c.ChatId).Find(&user).Error
+		if(gorm.IsRecordNotFoundError(err)){
+
+		}else if(err!=nil){
+			return userId2,chatDetail,"Error",true
+		}
+		flag:=0
+		for _,u:=range user{
+			if(u.ActualUserId!=userId && flag==0){
+				userId2=append(userId2,u.ActualUserId)
+				flag=1
+			}
+		}
+		if(flag==0){
+			userId2=append(userId2,"")
+		}
+		
+	}
+	return userId2,chatDetail,"Ok",false
+}
 
 func GetChatMessages(chatId string,offset int,numOfRows int)([]Chat){
 	chat:=[]Chat{}
@@ -22,74 +54,44 @@ func GetChatByRequestId(userId string,requestId string)Chat{
 	return chat
 }
 
-func ChatInsertDB(db *gorm.DB,chatData Chat,lastUpdate string) (Chat,[]Chat,int) {
-	// index:=GetLastChatIndex(chatData.ChatId)
-	// index=index+1
-	// chatData.Index=index
+func ChatInsertDB(db *gorm.DB,chatData Chat,lastUpdate string) (Chat,[]Chat,bool) {
 	chat:=Chat{}
-	// db:=database.GetDB()
 	unSyncedChat:=[]Chat{}
 	chatId:=chatData.ChatId
 	err:=db.Order("created_at desc").Where("chat_id=? AND created_at>?",chatId,lastUpdate).Find(&unSyncedChat).Error
-	code:=200
-	if(err!=nil){
-		fmt.Print("ChatInsertDB Error 1")
-		fmt.Println(err)
-		code=1006
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return chat,unSyncedChat,true
 	}
 	err=db.Where("user_id=? AND request_id=?",chatData.UserId,chatData.RequestId).Find(&chat).Error
-	if(err!=nil){
-		fmt.Print("ChatInsertDB Error 2")
-		fmt.Println(err)
-		// code=1006
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return chat,unSyncedChat,true
 	}
-	fmt.Println("ChatInsertDB")
-	fmt.Println(chat)
-	fmt.Println(chatData)
 	if(chat.UserId==""){
-		code=200
-		db.Create(&chatData)
-		return chatData,unSyncedChat,code
+		err=db.Create(&chatData).Error
+		if(err!=nil){
+			return chatData,unSyncedChat,true
+		}else{
+			return chatData,unSyncedChat,false
+		}
+		
 	}else{
-		code=200
-		return chat,unSyncedChat,code
+		return chatData,unSyncedChat,false
 	}
 	
 }
-func CheckCorrectChat(db *gorm.DB,userId string,chatId string) string{
+func CheckCorrectChat(db *gorm.DB,userId string,chatId string) (string,bool){
 	// db:=database.GetDB()
 	chatDetail:=ChatDetail{}
-	db.Where("actual_user_id=? AND chat_id=?",userId,chatId).First(&chatDetail)
-	if chatDetail.ChatId==""{
-		return "Error"
+	err:=db.Where("actual_user_id=? AND chat_id=?",userId,chatId).First(&chatDetail).Error
+	if(gorm.IsRecordNotFoundError(err)){
+		return "Error",false
+	}else if(err!=nil){
+		return "Error",true
 	}
-
-	return "Ok"
+	return "Ok",false
 }
 
-func GetChatDetail(db *gorm.DB,userId string,date string,numOfChat int) ([]string,[]ChatDetail,string){
-	// db:=database.GetDB()
-	chatDetail:=[]ChatDetail{}
-	db.Limit(numOfChat).Where("actual_user_id=? AND created_at>?",userId,date).Find(&chatDetail)
-	userId2:=make([]string,0)
-	for _,c:=range chatDetail{
-		user:=[]ChatDetail{}
-		db.Where("chat_id=?",c.ChatId).Find(&user)
-		// fmt.Println(u)
-		flag:=0
-		for _,u:=range user{
-			if(u.ActualUserId!=userId && flag==0){
-				userId2=append(userId2,u.ActualUserId)
-				flag=1
-			}
-		}
-		if(flag==0){
-			userId2=append(userId2,"")
-		}
-		
-	}
-	return userId2,chatDetail,"Ok"
-}
+
 
 func GetChatByMessageId(messageId []string)([]Chat){
 	chat:=[]Chat{}
@@ -156,10 +158,14 @@ func GetUserListFromChatId(chatId string)([]string){
 	return userList
 }
 
-func UpdateChatTime(db *gorm.DB,chatId string, lastUpdate string) error{
+func UpdateChatTime(db *gorm.DB,chatId string, lastUpdate string) bool{
 	// db:=database.GetDB()
-	db.Table("chat_details").Where("chat_id=?",chatId).Update("last_update",lastUpdate)
-	return nil
+	err:=db.Table("chat_details").Where("chat_id=?",chatId).Update("last_update",lastUpdate).Error
+	if(err!=nil){
+		return true
+	}
+
+	return false
 }
 
 // func GetLastChatIndex(chatId string) int{
@@ -173,11 +179,16 @@ func UpdateChatTime(db *gorm.DB,chatId string, lastUpdate string) error{
 // 	return chat.Index
 // }
 
-func GetChatAfterTimeMessages(db *gorm.DB,chatId string, numOfChat int, createdAt string)([]Chat){
+func GetChatAfterTimeMessages(db *gorm.DB,chatId string, numOfChat int, createdAt string)([]Chat,bool){
 	// db:=database.GetDB()
 	chat:=[]Chat{}
-	db.Order("created_at desc").Limit(numOfChat).Where("chat_id=? AND created_at>?",chatId,createdAt).Find(&chat)
-	return chat
+	err:=db.Order("created_at desc").Limit(numOfChat).Where("chat_id=? AND created_at>?",chatId,createdAt).Find(&chat).Error
+	if(gorm.IsRecordNotFoundError(err)){
+		return chat,false
+	}else if(err!=nil){
+		return chat,true
+	}
+	return chat,false
 }
 
 func GetTempUserIdFromChatId(userId string,chatId string) string{
@@ -187,10 +198,15 @@ func GetTempUserIdFromChatId(userId string,chatId string) string{
 	return anonymousUser.AnonymousId
 }
 
-func InsertMessageRequestDB(userId string,senderName string,senderPhone string,phone string,requestId string,messageType string,messageContent string,createdAt string) string{
-	db:=database.GetDB()
+func InsertMessageRequestDB(db *gorm.DB,userId string,senderName string,senderPhone string,phone string,requestId string,messageType string,messageContent string,createdAt string) (string,bool){
 	messageRequest:=MessageRequest{}
-	db.Where("sender_user_id=? AND phone=?",userId,phone).Find(&messageRequest)
+	err:=db.Where("sender_user_id=? AND phone=?",userId,phone).Find(&messageRequest).Error
+	if(gorm.IsRecordNotFoundError(err)){
+		return "",false
+	}
+	if(err!=nil){
+		return "",true
+	}
 	if(messageRequest.SenderUserId==""){
 		messageRequest.SenderUserId=userId
 		messageRequest.SenderName=senderName
@@ -203,18 +219,28 @@ func InsertMessageRequestDB(userId string,senderName string,senderPhone string,p
 		messageRequest.CreatedAt=createdAt
 		messageRequest.Status="Wait"
 		db.Create(&messageRequest)
-		return createdAt
+		return createdAt,false
 	}else{
-		return messageRequest.CreatedAt
+		return messageRequest.CreatedAt,false
 	}
 }
 
-func GetMessageRequestDB(userId string,createdAt string) []MessageRequestDS{
-	db:=database.GetDB()
-	phone:=GetUserPhone(userId)
+func GetMessageRequestDB(db *gorm.DB,userId string,createdAt string) ([]MessageRequestDS,bool){
 	messageRequest:=make([]MessageRequest,0)
-	db.Where("phone=? AND created_at>?",phone,createdAt).Find(&messageRequest)
 	messageRequestDS:=make([]MessageRequestDS,0)
+	phone,dbError:=GetUserPhone(db,userId)
+	if(dbError==true){
+		return messageRequestDS,true
+	}
+	
+	err:=db.Where("phone=? AND created_at>?",phone,createdAt).Find(&messageRequest).Error
+	if(gorm.IsRecordNotFoundError(err)){
+		return messageRequestDS,false
+	}
+	if(err!=nil){
+		return messageRequestDS,true
+	}
+	
 	for _,mr:=range messageRequest{
 		MRTemp:=MessageRequestDS{}
 		MRTemp.Phone=mr.SenderPhone
@@ -223,47 +249,62 @@ func GetMessageRequestDB(userId string,createdAt string) []MessageRequestDS{
 		MRTemp.CreatedAt=mr.CreatedAt
 		messageRequestDS=append(messageRequestDS,MRTemp)
 	}
-	return messageRequestDS
+	return messageRequestDS,false
 }
 
-func GetUserPhone(userId string) string{
-	db:=database.GetDB()
+func GetUserPhone(db *gorm.DB,userId string) (string,bool){
 	user:=User{}
-	db.Table("users").Select("phone").Where("user_id=?",userId).Find(&user)
-	fmt.Println("GetuserPhone:->"+user.Phone)
-	return user.Phone
+	err:=db.Table("users").Select("phone").Where("user_id=?",userId).Find(&user).Error
+	if(gorm.IsRecordNotFoundError(err)){
+		return user.Phone,false
+	}
+	if(err!=nil){
+		return user.Phone,true
+	}
+	return user.Phone,false
 }
 
-func UpdateMessageRequestDB(phone string,senderPhone string,action string,actionRequestId string,updatedAt string) (string,string,MessageRequest){
-	db:=database.GetDB()
+func UpdateMessageRequestDB(db *gorm.DB,phone string,senderPhone string,action string,actionRequestId string,updatedAt string) (string,string,MessageRequest,bool){
 	messageRequest:=MessageRequest{}
-	db.Where("sender_phone=? AND phone=?",senderPhone,phone).Find(&messageRequest)
-	if(messageRequest.SenderPhone==""){
-		return "","",messageRequest
-	}else if(messageRequest.ActionRequestId==actionRequestId){
-		return messageRequest.SenderUserId,messageRequest.UpdatedAt,messageRequest
+	err:=db.Where("sender_phone=? AND phone=?",senderPhone,phone).Find(&messageRequest).Error
+	if(gorm.IsRecordNotFoundError(err)){
+		return "","",messageRequest,false
+	}
+	if(err!=nil){
+		return "","",messageRequest,true
+	}
+
+	if(messageRequest.ActionRequestId==actionRequestId){
+		return messageRequest.SenderUserId,messageRequest.UpdatedAt,messageRequest,false
 	}else{
 		messageRequest.Status=action
 		messageRequest.UpdatedAt=updatedAt
 		messageRequest.ActionRequestId=actionRequestId
-		db.Save(&messageRequest)
-		return messageRequest.SenderUserId,messageRequest.UpdatedAt,messageRequest
+		err:=db.Save(&messageRequest).Error
+		if(err!=nil){
+			return "","",messageRequest,true
+		}
+		return messageRequest.SenderUserId,messageRequest.UpdatedAt,messageRequest,false
 	}
 }
 
-func InsertChatDetail(userId1 string,userId2 string,requestId string) (int,string){
-	db:=database.GetDB()
+func InsertChatDetail(db *gorm.DB,userId1 string,userId2 string,requestId string) (string,bool){
 	chatDetail:=ChatDetail{}
 	chatDetail.CreatedAt=util.GetTime()
 	chatDetail.ChatId=util.GenerateToken()
 	chatDetail.ChatType="one-to-one"
 	chatDetail.RequestId=requestId
-	code:=200
 
 	chatDetailTemp1:=ChatDetail{}
-	db.Where("actual_user_id=? AND request_id=?",userId1,requestId).Find(&chatDetailTemp1)
+	err:=db.Where("actual_user_id=? AND request_id=?",userId1,requestId).Find(&chatDetailTemp1).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return "",true
+	}
 	chatDetailTemp2:=ChatDetail{}
-	db.Where("actual_user_id=? AND request_id=?",userId2,requestId).Find(&chatDetailTemp2)
+	err=db.Where("actual_user_id=? AND request_id=?",userId2,requestId).Find(&chatDetailTemp2).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return "",true
+	}
 
 	if(chatDetailTemp1.ChatId!=""){
 		chatDetail.ChatId=chatDetailTemp1.ChatId
@@ -276,46 +317,44 @@ func InsertChatDetail(userId1 string,userId2 string,requestId string) (int,strin
 		chatDetail.ActualUserId=userId1
 		err:=db.Create(&chatDetail).Error
 		if(err!=nil){
-			fmt.Print("InsertChatDetail Error 1:")
-			fmt.Println(err)
-			code=1006
+			return "",true
 		}
 	}
 	if(chatDetailTemp2.ChatId==""){
 		chatDetail.ActualUserId=userId2
 		err:=db.Create(&chatDetail).Error
 		if(err!=nil){
-			fmt.Print("InsertChatDetail Error 2:")
-			fmt.Println(err)
-			code=1006
+			return "",true
 		}
 	}
 	
 
-	return code,chatDetail.ChatId
+	return chatDetail.ChatId,false
 }
 
-func IsPhoneNumberExist(phone string) string{
-	db:=database.GetDB()
+func IsPhoneNumberExist(db *gorm.DB,phone string) (string,bool){
 	user:=User{}
-	db.Table("users").Where("phone=?",phone).Find(&user)
-	if(user.UserId==""){
-		return "No"
+	err:=db.Table("users").Where("phone=?",phone).Find(&user).Error
+	if(gorm.IsRecordNotFoundError(err)){
+		return "No",false
 	}
-	return "Yes"
+	if(err!=nil){
+		return "No",true
+	}
+	return "Yes",false
 }
 
-func InsertIntoChatFromMessageRequest(chatId string,requestId string,messageRequest MessageRequest) int{
-	db:=database.GetDB()
-
+func InsertIntoChatFromMessageRequest(db *gorm.DB,chatId string,requestId string,messageRequest MessageRequest) bool{
 	userId:=messageRequest.SenderUserId
 	messageId:=messageRequest.MessageId
 	messageContent:=messageRequest.MessageContent
 	messageType:=messageRequest.MessageType
 	createdAt:=messageRequest.CreatedAt
 	chat:=Chat{}
-	db.Where("user_id=? AND chat_id=? AND message_id=?",userId,chatId,messageId).Find(&chat)
-	code:=200
+	err:=db.Where("user_id=? AND chat_id=? AND message_id=?",userId,chatId,messageId).Find(&chat).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return true
+	}
 	if(chat.ChatId==""){
 		chat.UserId=userId
 		chat.ChatId=chatId
@@ -326,17 +365,16 @@ func InsertIntoChatFromMessageRequest(chatId string,requestId string,messageRequ
 		chat.CreatedAt=createdAt
 		err:=db.Create(&chat).Error
 		if(err!=nil){
-			fmt.Print("InsertIntoChatFromMessageRequest Error :")
-			fmt.Println(err)
-			code=1006
+			return true
 		}
 
 	}
 
-	return code
+	return false
 }
 // func UpdateMessageRequestDB(userid string,userPhone string,action string,actionRequestId string,updatedAt string)(string,string){
 // 	db:=database.GetDB()
 // 	messageRequest:=MessageRequest{}
 
 // }
+

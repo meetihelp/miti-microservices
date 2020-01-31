@@ -1,68 +1,109 @@
 package Profile
 
 import(
-	"fmt"
 	"net/http"
-	// "log"
+	"log"
 	"io/ioutil"
-	// "strings"
 	"encoding/json"
    util "miti-microservices/Util"
    auth "miti-microservices/Authentication"
    database "miti-microservices/Database"
+   "bytes"
 )
 
 func UpdatePreference(w http.ResponseWriter, r *http.Request){
 	ipAddress:=util.GetIPAddress(r)
-	header:=UpdatePreferenceResponseHeader{}
-	util.GetHeader(r,&header)
+	header:=UpdatePreferenceHeader{}
 
+	content:=UpdatePreferenceResponse{}
+	statusCode:=0
 
-	sessionId:=header.Cookie
+	responseHeader:=UpdatePreferenceResponseHeader{}
+	var data map[string]string
+
 	db:=database.DBConnection()
-	userId,dErr:=util.GetUserIdFromSession2(db,sessionId)
-	// if dErr=="Error"{
-	// 	fmt.Println("Session Does not exist")
-	// 	util.Message(w,1003)
-	// 	return
-	// }
+	list:=[]bool{false,false,false,false,false,false}
+	errorList:=util.GetErrorList(list)
+
+	util.GetHeader(r,&header)
+	sessionId:=header.Cookie
+
+	userId,dErr,dbError:=util.GetUserIdFromTemporarySession3(db,sessionId)
+	errorList.DatabaseError=dbError
+	util.APIHitLog("UpdatePreference",ipAddress,sessionId)
 	if dErr=="Error"{
-		userId,dErr=util.GetUserIdFromTemporarySession2(db,sessionId)
-		if dErr=="Error"{
-			util.Message(w,1003)
-			return
-		}
+		errorList.TemporarySessionError=true
 	}
 
 	requestBody,err:=ioutil.ReadAll(r.Body)
-	if err!=nil{
-		fmt.Println("Could not read body")
-		util.Message(w,1000)
-		return 
+	if (err!=nil && !util.ErrorListStatus(errorList)){
+		errorList.BodyReadError=true
+	}
+
+	preferenceRequestData:=UpdatePreferenceRequest{}
+	if(!util.ErrorListStatus(errorList)){
+		err:=json.Unmarshal(requestBody, &preferenceRequestData)
+		if(err!=nil){
+			errorList.UnmarshallingError=true
+		}
+	}
+
+	if(!util.ErrorListStatus(errorList)){
+		sanatizationStatus:=Sanatize(preferenceRequestData)
+		if sanatizationStatus =="Error"{
+			errorList.SanatizationError=true
+		}
+	}
+
+	var preferenceStatus int
+	if(!util.ErrorListStatus(errorList)){
+		preferenceStatus,dbError=UpdatePreferecePResponseDB(db,userId,preferenceRequestData)		
+		errorList.DatabaseError=dbError
+	}
+
+	if(!util.ErrorListStatus(errorList)){
+		dbError=auth.UpdatePreferencetatus(db,userId,preferenceStatus)	
+		errorList.DatabaseError=dbError
+	}
+
+	if(preferenceStatus>=6){
+		if(!util.ErrorListStatus(errorList)){
+			dbError=util.InsertSessionValue(db,sessionId,userId,ipAddress)
+			errorList.DatabaseError=dbError
+		}
+		if(!util.ErrorListStatus(errorList)){
+			dbError=util.DeleteTemporarySession(db,sessionId)
+			errorList.DatabaseError=dbError
+		}
+		
+        
 	}
 	
-	// var data map[string]string
-	// data:=QuestionResponse{}
-	data:=PreferenceRequest{}
-	if err := json.Unmarshal(requestBody, &data); err != nil {
+	code:=util.GetCode(errorList)
+	if(code==200){
+		content.Code=statusCode
+	}else{
+		content.Code=code
+	}
+	responseHeader.ContentType="application/json"
+    headerBytes:=new(bytes.Buffer)
+    json.NewEncoder(headerBytes).Encode(responseHeader)
+    responseHeaderBytes:=headerBytes.Bytes()
+    if err := json.Unmarshal(responseHeaderBytes, &data); err != nil {
         panic(err)
     }
-
-    preferenceStatus:=UpdatePreferecePResponseDB(userId,data)
-	auth.UpdatePreferencetatus(userId,preferenceStatus)
-    
-	// preferenceStatus:=UpdatePreferecePResponseDB(userId,data)
-	// auth.UpdatePreferencetatus(userId,preferenceStatus)
-	// // UpdateIPIPScore(userId)
-	if(preferenceStatus>=6){
-		util.InsertSessionValue(db,sessionId,userId,ipAddress)
-        util.DeleteTemporarySession(db,sessionId)
+    w=util.GetResponseFormatHeader(w,data)
+	p:=&content
+	util.ResponseLog("UpdateIPIP",ipAddress,sessionId,content.Code,*p)
+	enc := json.NewEncoder(w)
+	err= enc.Encode(p)
+	if err != nil {
+		log.Fatal(err)
 	}
-	util.Message(w,200)
 	db.Close()
 }
 
-func getDataInInterestForm(interest Interest,data PreferenceRequest) (int,Interest){
+func getDataInInterestForm(interest Interest,data UpdatePreferenceRequest) (int,Interest){
 	preferenceStatus:=data.Page
 	if(preferenceStatus==1){
 		interest.InterestIndoorPassive1=data.I1

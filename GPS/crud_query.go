@@ -4,6 +4,7 @@ import(
 	util "miti-microservices/Util"
 	database "miti-microservices/Database"
 	"math"
+	"github.com/jinzhu/gorm"
 	// "time"
 	// "fmt"
 )
@@ -11,7 +12,7 @@ import(
 func GetUserListByLocationDB(location Location,distance float64) ([]string){
 	db:=database.GetDB()
 	profile:=[]UserLocation{}
-	city:=GetCity(location)
+	city,_:=GetCity(db,location)
 	db.Where("city=?",city).Find(&profile)
 	var userList []string
 	personLocation:=Location{}
@@ -28,8 +29,8 @@ func GetUserListByLocationDB(location Location,distance float64) ([]string){
 
 func UpdateUserLocationDB(userId string,location Location){
 	db:=database.GetDB()
-	city:=GetCity(location)
-	pincode:=GetPincode(location,city)
+	city,_:=GetCity(db,location)
+	pincode,_:=GetPincode(db,location,city)
 	db.Table("profiles").Where("user_id=?",userId).Update("pincode",pincode)
 	userLocation:=UserLocation{}
 	db.Where("user_id=?",userId).Find(&userLocation)
@@ -46,47 +47,49 @@ func UpdateUserLocationDB(userId string,location Location){
 		Longitude:location.Longitude,City:city,UpdatedAt:updatedAt})
 }
 
-func GetEventListByLocationDB(eventType string,location Location,distance float64) ([]string){
-	db:=database.GetDB()
-	event:=[]EventLocation{}
-	city:=GetCity(location)
-	db.Where("city=? AND event_type=?",city,eventType).Find(&event)
-	var eventList []string
-	eventLocation:=Location{}
-	for _,e:=range event{
-		eventLocation.Latitude=e.Latitude
-		eventLocation.Longitude=e.Longitude
-		d:=CalculateDistance(location,eventLocation)
-		if d<distance{
-			eventList=append(eventList,e.EventId)	
-		}
-	}
-	return eventList
-}
+// func GetEventListByLocationDB(eventType string,location Location,distance float64) ([]string){
+// 	db:=database.GetDB()
+// 	event:=[]EventLocation{}
+// 	city:=GetCity(location)
+// 	db.Where("city=? AND event_type=?",city,eventType).Find(&event)
+// 	var eventList []string
+// 	eventLocation:=Location{}
+// 	for _,e:=range event{
+// 		eventLocation.Latitude=e.Latitude
+// 		eventLocation.Longitude=e.Longitude
+// 		d:=CalculateDistance(location,eventLocation)
+// 		if d<distance{
+// 			eventList=append(eventList,e.EventId)	
+// 		}
+// 	}
+// 	return eventList
+// }
 
-func InsertEventLocation(eventId string,eventType string,latitude string,longitude string) string{
-	db:=database.GetDB()
-	eventLocation:=EventLocation{}
-	eventLocation.EventId=eventId
-	eventLocation.EventType=eventType
-	eventLocation.Latitude=latitude
-	eventLocation.Longitude=longitude
-	location:=Location{}
-	location.Latitude=latitude
-	location.Longitude=longitude
-	eventLocation.City=GetCity(location)
-	db.Create(&eventLocation)
-	return "Ok"
-}
+// func InsertEventLocation(eventId string,eventType string,latitude string,longitude string) string{
+// 	db:=database.GetDB()
+// 	eventLocation:=EventLocation{}
+// 	eventLocation.EventId=eventId
+// 	eventLocation.EventType=eventType
+// 	eventLocation.Latitude=latitude
+// 	eventLocation.Longitude=longitude
+// 	location:=Location{}
+// 	location.Latitude=latitude
+// 	location.Longitude=longitude
+// 	eventLocation.City=GetCity(location)
+// 	db.Create(&eventLocation)
+// 	return "Ok"
+// }
 
-func GetCity(location Location) string{
-	db:=database.GetDB()
+func GetCity(db *gorm.DB,location Location) (string,bool){
 	locationCity:=Location{}
 	min_distance:=math.MaxFloat64
 	min_city:="Could Not Find"
 
 	cityList:=[]LocationMean{}
-	db.Find(&cityList)
+	err:=db.Find(&cityList).Error
+	if(err!=nil){
+		return "",true
+	}
 
 	for _,locationMean:=range cityList{
 		locationCity.Latitude=locationMean.Latitude
@@ -102,13 +105,15 @@ func GetCity(location Location) string{
 		}
 		
 	}
-	return min_city
+	return min_city,false
 }
 
-func GetPincode(location Location,city string) string{
-	db:=database.GetDB()
+func GetPincode(db *gorm.DB,location Location,city string) (string,bool){
 	cityPincode:=[]CityPincode{}
-	db.Table("city_pincodes").Where("region_name=? OR district_name=?",city,city).Find(&cityPincode)
+	err:=db.Table("city_pincodes").Where("region_name=? OR district_name=?",city,city).Find(&cityPincode).Error
+	if(err!=nil){
+		return "",true
+	}
 	locationRegion:=Location{}
 	min_distance:=math.MaxFloat64
 	pincode:="Could Not Find"
@@ -126,19 +131,24 @@ func GetPincode(location Location,city string) string{
 		}
 		
 	}
-	return pincode
+	return pincode,false
 }
 
-func UpdateUserCurrentLocation(userId string,latitude string,longitude string){
-	db:=database.GetDB()
+func UpdateUserCurrentLocation(db *gorm.DB,userId string,latitude string,longitude string) bool{
 	userCurrentLocationTemp:=UserCurrentLocation{}
 	userCurrentLocation:=UserCurrentLocation{}
 	location:=Location{}
 	location.Latitude=latitude
 	location.Longitude=longitude
 
-	city:=GetCity(location)
-	pincode:=GetPincode(location,city)
+	city,dbError:=GetCity(db,location)
+	if(dbError){
+		return true
+	}
+	pincode,dbError:=GetPincode(db,location,city)
+	if(dbError){
+		return true
+	}
 
 	userCurrentLocation.UserId=userId
 	userCurrentLocation.Latitude=latitude
@@ -147,17 +157,30 @@ func UpdateUserCurrentLocation(userId string,latitude string,longitude string){
 	userCurrentLocation.City=city
 	userCurrentLocation.Pincode=pincode
 
-	db.Where("user_id=?",userId).Find(&userCurrentLocationTemp)
-	if(userCurrentLocationTemp.UserId==""){
-		db.Create(&userCurrentLocation)
-	}else{
-		db.Save(&userCurrentLocation)
+	err:=db.Where("user_id=?",userId).Find(&userCurrentLocationTemp).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return true
 	}
+	if(userCurrentLocationTemp.UserId==""){
+		err:=db.Create(&userCurrentLocation).Error
+		if(err!=nil){
+			return true
+		}
+	}else{
+		err:=db.Save(&userCurrentLocation).Error
+		if(err!=nil){
+			return true
+		}
+	}
+
+	return false
 }
 
-func GetUserCurrentPincode(userId string) string{
-	db:=database.GetDB()
+func GetUserCurrentPincode(db *gorm.DB,userId string) (string,bool){
 	userCurrentLocation:=UserCurrentLocation{}
-	db.Where("user_id=?",userId).Find(&userCurrentLocation)
-	return userCurrentLocation.Pincode
+	err:=db.Where("user_id=?",userId).Find(&userCurrentLocation).Error
+	if(err!=nil){
+		return "",true
+	}
+	return userCurrentLocation.Pincode,false
 }
