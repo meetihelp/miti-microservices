@@ -83,6 +83,9 @@ func InsertOTP(db *gorm.DB,userId string,sessionId string) (string,bool){
 	otp:=util.GenerateOTP()
 	otpVerification:=OTPVerification{}
 	err:=db.Where("user_id=?",userId).Find(&otpVerification).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return "",true
+	}
 	if(otpVerification.UserId!=""){
 		resendCount:=otpVerification.ResendCount+1
 		err=db.Model(&otpVerification).Where("user_id = ?", userId).Update("resend_count", resendCount).Error
@@ -90,9 +93,6 @@ func InsertOTP(db *gorm.DB,userId string,sessionId string) (string,bool){
 			return "",true	
 		}
 		return otp,false
-	}
-	if(err!=nil){
-		return "",true
 	}
 	otpVerification.UserId=userId
 	otpVerification.SessionId=sessionId
