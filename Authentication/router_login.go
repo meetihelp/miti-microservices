@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"bytes"
 	"log"
+	"fmt"
 )
 
 
@@ -56,20 +57,24 @@ func Login(w http.ResponseWriter,r *http.Request){
 			errorList.SanatizationError=true
 		}
 	}
-
+	fmt.Println("in line 59 of login")
 	if(!errorList.SanatizationError){
+		fmt.Println("inside if of login line 61")
 		userId,dbError:=EnterUserData(db,userData)
 		errorList.DatabaseError=dbError
 		var otpCode string
 		if(!errorList.DatabaseError){
+			fmt.Println("inside if of login line 67")
 			sessionId,dbError=util.InsertTemporarySession(db,userId,ipAddress)
 			errorList.DatabaseError=dbError	
 		}
 		if(!errorList.DatabaseError){
+			fmt.Println("inside if of login line 72")
 			otpCode,dbError=InsertOTP(db,userId,sessionId)
 			errorList.DatabaseError=dbError	
 		}
 		if(!errorList.DatabaseError){	
+			fmt.Println("inside if of login line 77")
 			 _,err:=SendOTP(userData.Phone,otpCode)
 	        if(err==nil){
 	            statusCode=200
