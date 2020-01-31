@@ -58,13 +58,13 @@ func OTPHelper(db *gorm.DB,userId string) (int,bool){
 	// if((duration<MAXMINUTE || deliveryCount==0) && !dbError){
 	// 	return 200,dbError
 	// }
-	if((duration<MAXMINUTE) && !dbError){
-		return 1003,dbError
-	}
-	if(duration>MAXMINUTE && !dbError){
-  		return 200,dbError
-	}
-	return 1003,dbError
+	// if((duration<MAXMINUTE) && !dbError){
+	// 	return 1008,dbError
+	// }
+	// if(duration>MAXMINUTE && !dbError){
+ //  		return 200,dbError
+	// }
+	return 200,dbError
 }
 
 func CalculateDuration(lastModified string) int{

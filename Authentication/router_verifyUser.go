@@ -32,6 +32,7 @@ func VerifyUser(w http.ResponseWriter,r *http.Request){
     errorList.DatabaseError=dbError
     util.APIHitLog("VerifyUser",ipAddress,sessionId)
     if (sessionErr=="Error"){
+        fmt.Println("VerifyUser Line 34")
         errorList.TemporarySessionError=true
     }
 
