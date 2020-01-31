@@ -37,7 +37,7 @@ func ReSendOTP(w http.ResponseWriter,r *http.Request){
 
     var phone string
     // var status string
-    code:=0
+    var code int
     if(!errorList.TemporarySessionError && !errorList.DatabaseError){
     	phone,_,dbError=GetPhoneFromUserId(db,userId)
         errorList.DatabaseError=dbError

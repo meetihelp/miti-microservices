@@ -7,6 +7,7 @@ import(
     database "miti-microservices/Database"
     "encoding/json"
     "bytes"
+    "fmt"
 )
 
 func VerifyUser(w http.ResponseWriter,r *http.Request){
@@ -30,37 +31,45 @@ func VerifyUser(w http.ResponseWriter,r *http.Request){
     userId,sessionErr,dbError:=util.GetUserIdFromTemporarySession3(db,sessionId)
     errorList.DatabaseError=dbError
     util.APIHitLog("VerifyUser",ipAddress,sessionId)
-    if (sessionErr=="Error" && !errorList.DatabaseError){
+    if (sessionErr=="Error"){
         errorList.TemporarySessionError=true
     }
 
     var phone string
     var status string
-    code:=0
     if(!errorList.TemporarySessionError && !errorList.DatabaseError){
+        fmt.Println("Verify User Line 40")
         phone,status,dbError=GetPhoneFromUserId(db,userId)
         errorList.DatabaseError=dbError
+        var code int
         if(!errorList.DatabaseError){
+            fmt.Println("Verify User Line 45")
             code,dbError=OTPHelper(db,userId)
             errorList.DatabaseError=dbError
         }
 
         if(status=="Ok" && !errorList.DatabaseError){
+            fmt.Println("Verify User Line 51")
             if(code==200){
+                fmt.Println("Verify User Line 53")
                 otpCode,dbError:=InsertOTP(db,userId,sessionId)
                 errorList.DatabaseError=dbError
                 if(!errorList.DatabaseError){
+                    fmt.Println("Verify User Line 57")
                     _,err:=SendOTP(phone,otpCode)
                     if(err==nil){
+                        fmt.Println("Verify User Line 60")
                         statusCode=200
                         moveTo=0
                     }else{
+                        fmt.Println("Verify User Line 64")
                         //Error in sending otp
                         statusCode=1007
                         moveTo=0
                     }
                 }
             }else{
+                fmt.Println("Verify User Line 71")
                 statusCode=code
                 moveTo=0
             }
@@ -68,10 +77,12 @@ func VerifyUser(w http.ResponseWriter,r *http.Request){
         }
     }
 
-    code=util.GetCode(errorList)
+    code:=util.GetCode(errorList)
     if(code==200){
+        fmt.Println("Verify User Line 80")
         content.Code=statusCode
     }else{
+        fmt.Println("Verify User Line 84")
         content.Code=code
     }
     content.Message=util.GetMessageDecode(content.Code)

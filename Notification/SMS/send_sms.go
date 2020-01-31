@@ -14,8 +14,8 @@ func GetAuth() string{
 	return os.Getenv("msg91_authkey")
 }
 func SendSMS(phone string,otp string) (*http.Response,error){
-	// base, err := url.Parse("http://api.msg91.com/api/v5/otp")
-	base, err := url.Parse("")
+	base, err := url.Parse("http://api.msg91.com/api/v5/otp")
+	// base, err := url.Parse("")
 	if err != nil {
 		return nil,err
 	}
@@ -33,7 +33,7 @@ func SendSMS(phone string,otp string) (*http.Response,error){
 	q.Add("otp_expiry","10")
 	base.RawQuery = q.Encode()
 	client:=util.GetClient(2)
-	resp, err1:=client.Post(base.String(),"",nil)
+	resp, err1:=client.Get(base.String())
 	fmt.Println(resp)
 	if err1!=nil {
 		log.Print(err)
@@ -42,8 +42,8 @@ func SendSMS(phone string,otp string) (*http.Response,error){
 }
 
 func ReSendSMSHelper(phone string){
-	// base, err := url.Parse("http://api.msg91.com/api/v5/otp/retry")
-	base, err := url.Parse("")
+	base, err := url.Parse("http://api.msg91.com/api/v5/otp/retry")
+	// base, err := url.Parse("")
 	if err != nil {
 		return
 	}
@@ -56,7 +56,7 @@ func ReSendSMSHelper(phone string){
 	q.Add("authkey", authk)
 	q.Add("mobile",phone)
 	base.RawQuery = q.Encode()
-	resp, err1:=http.Post(base.String(),"",nil)
+	resp, err1:=http.Get(base.String())
 	fmt.Println(resp)
 	if err1!=nil {
 		log.Print(err)
