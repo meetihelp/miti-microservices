@@ -6,6 +6,7 @@ import(
 	"log"
 	"fmt"
 	"os"
+	"strings"
 	util "miti-microservices/Util"
 	
 )
@@ -29,8 +30,8 @@ func SendSMS(phone string,otp string) (*http.Response,error){
 	q.Add("template_id","5dfa1cdbd6fc054db941c67a")
 
 	// q.Add("invisible", "1")
-	q.Add("otp",otp)
-	q.Add("mobile",phone)
+	q.Add("otp",strings.TrimSpace(otp))
+	q.Add("mobile",strings.TrimSpace(phone))
 	// q.Add("otp_expiry","10")
 	base.RawQuery = q.Encode()
 	client:=util.GetClient(2)
