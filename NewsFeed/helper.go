@@ -47,28 +47,28 @@ func SendArticle(w http.ResponseWriter,articleData NewsFeedArticleResponse){
 	}
 }
 
-func SendNewsArticle(w http.ResponseWriter,data []News){
-	w.Header().Set("Content-Type", "application/json")
-	enc := json.NewEncoder(w)
-	msg:=util.GetMessageDecode(200)
-	news:=[]NewsResponse{}
-	for _,d:=range data{
-		n:=NewsResponse{}
-		n.Id=d.Id
-		n.Summary=d.Summary
-		n.Sentiment=d.Sentiment
-		n.Location=d.Location
-		n.Event=d.Event
-		n.Label=d.Label
-		n.Title=d.Title
-		n.ImageURL=d.ImageURL
-		n.Flag=d.Flag
-		n.ArticleURL=d.ReferenceArticleURL
-		news=append(news,n)
-	}
-	p:=&NewsArticleResponse{Code:200,Message:msg,NewsData:news}
-	err:= enc.Encode(p)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
+// func SendNewsArticle(w http.ResponseWriter,data []News){
+// 	w.Header().Set("Content-Type", "application/json")
+// 	enc := json.NewEncoder(w)
+// 	msg:=util.GetMessageDecode(200)
+// 	news:=[]NewsResponse{}
+// 	for _,d:=range data{
+// 		n:=NewsResponse{}
+// 		n.Id=d.Id
+// 		n.Summary=d.Summary
+// 		n.Sentiment=d.Sentiment
+// 		n.Location=d.Location
+// 		n.Event=d.Event
+// 		n.Label=d.Label
+// 		n.Title=d.Title
+// 		n.ImageURL=d.ImageURL
+// 		n.Flag=d.Flag
+// 		n.ArticleURL=d.ReferenceArticleURL
+// 		news=append(news,n)
+// 	}
+// 	p:=&NewsArticleResponse{Code:200,Message:msg,NewsData:news}
+// 	err:= enc.Encode(p)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// }

@@ -2,8 +2,65 @@ package NewsFeed
 
 import(
 	database "miti-microservices/Database"
+	util "miti-microservices/Util"
 	"github.com/jinzhu/gorm"
 )
+
+func GetLabelId(db *gorm.DB,label string,userId string) (int64,bool){
+	userFeedStatus:=UserFeedStatus{}
+	err:=db.Where("label=? AND user_id=?",label,userId).Find(&userFeedStatus).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return userFeedStatus.Id,true
+	}
+	if(userFeedStatus.UserId==""){
+		userFeedStatus.UserId=userId
+		userFeedStatus.Label=label
+		userFeedStatus.Id=0
+		createdAt:=util.GetTime()
+		date:=util.GetDateFromTime(createdAt)
+		userFeedStatus.UpdatedAt=date
+		err:=db.Create(&userFeedStatus)
+		if(err!=nil){
+			return userFeedStatus.Id,true
+		}
+	}
+
+	return userFeedStatus.Id,false
+
+}
+
+func AreAllArticleDone(db *gorm.DB,userId string)(string,bool){
+	count:=0
+	userFeedStatus:=[]UserFeedStatus{}
+	today:=util.GetDateFromTime(util.GetTime())
+	err:=db.Where("user_id=? AND updated_at=?",userId,today).Find(&userFeedStatus).Count(&count).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return "No",true
+	}
+	if(count<40){
+		return "No",false
+	}
+	return "Yes",false
+}
+
+func GetGuiltyPleasure(db *gorm.DB,label string)([]GuiltyPleasure,bool){
+	guiltyPleasure:=[]GuiltyPleasure{}
+	userFeedStatus:=UserFeedStatus{}
+	err:=db.Order("id desc").Limit(1).Where("label=?",label).Find(&userFeedStatus).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return guiltyPleasure,true
+	}
+	id:=userFeedStatus.Id
+
+	err=db.Order("id").Limit(10).Where("label=? AND id>?",label,id).Find(&guiltyPleasure).Error
+	if(err!=nil){
+		return guiltyPleasure,true
+	}
+	return guiltyPleasure,false
+}
+
+
+
 func GetSummary(newsFeedId string) NewsFeedSummary{
 	db:=database.GetDB()
 	summaryData:=NewsFeedSummary{}

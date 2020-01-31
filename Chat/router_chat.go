@@ -89,6 +89,10 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 	}else{
 		statusCode=1002
 	}
+
+	if(!util.ErrorListStatus(errorList)){
+		statusCode=200
+	}
 	
 	code:=util.GetCode(errorList)
 	if(code==200){

@@ -37,6 +37,11 @@ type ResendOTPHeader struct{
 	Cookie string `header:"Miti-Cookie"`	
 }
 
+//Get TempUser Id
+type GetTempUserIdHeader struct{
+	Cookie string `header:"Miti-Cookie"`
+}
+
 //Last
 
 
@@ -72,10 +77,6 @@ type SMSHeader struct{
 }
 
 
-
-type GetTempUserIdHeader struct{
-	Cookie string `header:"Miti-Cookie"`
-}
 
 type GetPhoneStatusHeader struct{
 	Cookie string `header:"Miti-Cookie"`	

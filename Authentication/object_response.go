@@ -71,6 +71,16 @@ type ResendOTPResponseHeader struct{
 	ContentType string `json:"Content-Type"`
 }
 
+type GetTempUserIdResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	UserId string `json:"UserId"`
+}
+
+type GetTempUserIdResponseHeader struct{
+	ContentType string `json:"Content-Type"`
+}
+
 //Last
 
 
@@ -95,11 +105,7 @@ type OTPResponseHeader struct{
 
 
 
-type TempUserResponse struct{
-	Code int `json:"Code"`
-	Message string `json:"Message"`
-	UserId string `json:"UserId"`
-}
+
 // type TempUserResponse struct{
 // 	Code int `json:"Code"`
 // 	Message string `json:"Message"`

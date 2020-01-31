@@ -1,5 +1,24 @@
 package NewsFeed
 
+
+//GetNewsFeedArticle
+type GetNewsFeedArticleHeader struct{
+	Cookie string `header:"Miti-Cookie"`
+}
+
+type GetNewsArticleDS struct{
+	// Id int64 `json:"Id"`
+	Label string `json:"Label"`
+}
+
+
+
+
+
+
+
+
+
 type GetNewsFeedSummaryHeader struct{
 	Cookie string `header:"Miti-Cookie"`
 }
@@ -8,9 +27,7 @@ type GetNewsFeedSummaryDS struct{
 	NewsFeedId string `json:"NewsFeedId"`
 }
 
-type GetNewsFeedArticleHeader struct{
-	Cookie string `header:"Miti-Cookie"`
-}
+
 
 type GetNewsFeedArticleDS struct{
 	NewsFeedId string `json:"NewsFeedId"`
@@ -25,9 +42,7 @@ type NewsFeedReactionDS struct{
 	Reaction string `json:"Reaction"`
 }
 
-type GetNewsArticleDS struct{
-	Id int64 `json:"Id"`
-}
+
 
 type UploadNewsFeedImageHeader struct{
 	Cookie string `header:"Miti-Cookie"`	

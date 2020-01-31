@@ -52,7 +52,7 @@ func Server(runMethod string){
 	// r.HandleFunc("/updatePassword",apnaauth.UpdatePassword).Methods("POST")
 	
 	
-	// r.HandleFunc("/getTemporaryUserId",apnaauth.GetTemporaryUserId).Methods("GET")
+	r.HandleFunc("/getTemporaryUserId",apnaauth.GetTemporaryUserId).Methods("GET")
 	// r.HandleFunc("/getPhoneStatus",apnaauth.GetPhoneStatus).Methods("POST")
 	
 	
@@ -119,7 +119,7 @@ func Server(runMethod string){
 
 	//NewsFeed related APIs
 	r.HandleFunc("/getNewsArticleList",newsfeed.GetNewsArticle).Methods("POST")
-	r.HandleFunc("/getNewsArticle",newsfeed.GetNewsFeedArticle).Methods("POST")
+	// r.HandleFunc("/getNewsArticle",newsfeed.GetNewsFeedArticle).Methods("POST")
 	r.HandleFunc("/newsFeedReaction",newsfeed.UpdateNewsFeedReaction).Methods("POST")
 	r.HandleFunc("/uploadNewsFeedImage",newsfeed.UploadNewsFeedImage).Methods("POST")
 	// r.HandleFunc("/getNewsArticle",newsfeed.GetNewsArticle).Methods("POST")

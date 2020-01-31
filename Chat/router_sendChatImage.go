@@ -193,7 +193,7 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 		fmt.Println("SendChatImage line 194")
 		content.Code=code
 	}
-	content.Message=util.GetMessageDecode(code)
+	content.Message=util.GetMessageDecode(content.Code)
 	content.ImageId=userImageData.ImageId
 	content.RequestId=requestId
 	content.MessageId=chatResponse.MessageId
