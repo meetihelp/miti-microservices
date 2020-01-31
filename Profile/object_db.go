@@ -3,7 +3,7 @@ package Profile
 import (
 	// "log"
 	// "fmt"
-	// database "miti-microservices/Database"
+	database "miti-microservices/Database"
 // 	"github.com/jinzhu/gorm"
 //  _ 	"github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -142,8 +142,8 @@ type CheckInterest struct{
 
 
 func init(){
-	// db:=database.GetDB()
-	// db.AutoMigrate(&Profile{})
+	db:=database.GetDB()
+	db.AutoMigrate(&Profile{})
 	// db.AutoMigrate(&Match{})
 	// db.AutoMigrate(&QuestionResponse{})	
 	// db.AutoMigrate(&Question{})

@@ -30,6 +30,9 @@ func EnterProfileData(db *gorm.DB,profileData Profile) bool{
 		if(profileData.DateOfBirth!=""){
 			tempProfile.DateOfBirth=profileData.DateOfBirth
 		}
+		if(profileData.Email!=""){
+			tempProfile.Email=profileData.Email
+		}
 		if(profileData.Job!=""){
 			tempProfile.Job=profileData.Job
 		}
