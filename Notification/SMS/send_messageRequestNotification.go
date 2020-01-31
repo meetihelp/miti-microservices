@@ -30,8 +30,13 @@ func MessageRequestNotificaton(senderName string,senderPhone string,phone string
 	q.Add("otp_expiry","10")
 	base.RawQuery = q.Encode()
 	client:=util.GetClient(2)
-	resp, err1:=client.Post(base.String(),"",nil)
-	fmt.Println(resp)
+	resp, err1:=client.Get(base.String())
+	fmt.Println(base.String())
+	fmt.Println(resp.Body)
+	if err1!=nil {
+		log.Print(err)
+	}
+	
 	if err1!=nil {
 		log.Print(err)
 	}
