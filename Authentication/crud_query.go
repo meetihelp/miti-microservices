@@ -67,11 +67,13 @@ func EnterUserData(db *gorm.DB,userData LoginRequest) (string,bool){
 		user.CreatedAt =util.GetTime()
 		err=db.Create(&user).Error
 		if(err!=nil){
+			fmt.Println(err)
 			return "",true
 		}
 		return user.UserId,false
 	}
 	if(err!=nil){
+		fmt.Println(err)
 		return "",true
 	}
 	return user.UserId,false
