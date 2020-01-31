@@ -201,10 +201,7 @@ func GetTempUserIdFromChatId(userId string,chatId string) string{
 func InsertMessageRequestDB(db *gorm.DB,userId string,senderName string,senderPhone string,phone string,requestId string,messageType string,messageContent string,createdAt string) (string,bool){
 	messageRequest:=MessageRequest{}
 	err:=db.Where("sender_user_id=? AND phone=?",userId,phone).Find(&messageRequest).Error
-	if(gorm.IsRecordNotFoundError(err)){
-		return "",false
-	}
-	if(err!=nil){
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
 		return "",true
 	}
 	if(messageRequest.SenderUserId==""){
@@ -218,7 +215,10 @@ func InsertMessageRequestDB(db *gorm.DB,userId string,senderName string,senderPh
 		messageRequest.MessageContent=messageContent
 		messageRequest.CreatedAt=createdAt
 		messageRequest.Status="Wait"
-		db.Create(&messageRequest)
+		err:=db.Create(&messageRequest).Error
+		if(err!=nil){
+			return "",true
+		}
 		return createdAt,false
 	}else{
 		return messageRequest.CreatedAt,false
