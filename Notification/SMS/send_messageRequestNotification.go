@@ -8,7 +8,9 @@ import(
 )
 func MessageRequestNotificaton(senderName string,senderPhone string,phone string) (*http.Response,error){
 	fmt.Println("Message Request Sending by "+senderName+" by phone->"+senderPhone+" to phone->"+phone)
-
+	if(len(senderName)>9){
+		senderName=senderName[:9]
+	}
 
 	base, err := url.Parse("")
 	if err != nil {
@@ -24,7 +26,7 @@ func MessageRequestNotificaton(senderName string,senderPhone string,phone string
 		return nil,err
 	}
 	q.Add("authkey", authk)
-	q.Add("template_id","5e342d7cd6fc051f774a3493")
+	q.Add("template_id","5e3472f8d6fc055db360e0d7")
 	q.Add("otp_expiry","10")
 	base.RawQuery = q.Encode()
 	client:=util.GetClient(2)

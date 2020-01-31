@@ -1,5 +1,6 @@
 package Authentication
 import (
+	"fmt"
 	"net/http"
 	util "miti-microservices/Util"
 	database "miti-microservices/Database"
@@ -37,47 +38,59 @@ func LoadingPage(w http.ResponseWriter,r *http.Request){
 	//Querying for Session Status
 	userId,loginStatus,dbError:=util.GetUserIdFromSession3(db,sessionId)
 	errorList.DatabaseError=dbError
-	if (loginStatus=="Ok" && !errorList.DatabaseError){
+	sessionFlag:=0
+	if (loginStatus=="Ok" && !util.ErrorListStatus(errorList)){
+		fmt.Println("LoadingPage line 40")
 		util.SessionLog("LoadingPage",ipAddress,sessionId,"Success")
 		errorList.SessionError=false
 		statusCode=200
 		moveTo=6
+		sessionFlag=1
 	}
 
 	//Querying for temporary session status
-	if(!errorList.SessionError && !errorList.DatabaseError){
+	if(!util.ErrorListStatus(errorList) && sessionFlag==0){
+		fmt.Println("LoadingPage line 50")
 		util.SessionLog("LoadingPage",ipAddress,sessionId,"Fail")
 		userId,loginStatus,errorList.DatabaseError=util.GetUserIdFromTemporarySession3(db,sessionId)
 		if(loginStatus=="Ok"){
+			fmt.Println("LoadingPage line 54")
 			util.TemporarySessionLog("LoadingPage",ipAddress,sessionId,"Success")
 			errorList.TemporarySessionError=false
 		}else{
+			fmt.Println("LoadingPage line 58")
 			errorList.TemporarySessionError=true
 			moveTo=2
 		}
 	}
 
-	if(errorList.TemporarySessionError){
+	if(errorList.TemporarySessionError && sessionFlag==0){
+		fmt.Println("LoadingPage line 65")
 		util.TemporarySessionLog("LoadingPage",ipAddress,sessionId,"Fail")
 
 	}
 
 
 	//Checking ProfileCreation Status
-	if(!errorList.TemporarySessionError && !errorList.DatabaseError){
+	if(!util.ErrorListStatus(errorList) && sessionFlag==0){
+		fmt.Println("LoadingPage line 73")
 		IsUserVerified,IsProfileCreated,Preference,dbError:=LoadingPageQuery(db,userId)
 		errorList.DatabaseError=dbError
 		preference=Preference
-		if(!IsUserVerified && !errorList.DatabaseError){
+		if(!IsUserVerified && !util.ErrorListStatus(errorList)){
+			fmt.Println("LoadingPage line 78")
 			statusCode=1004
 			moveTo=3
-		}else if(!IsProfileCreated && !errorList.DatabaseError){
+		}else if(!IsProfileCreated && !util.ErrorListStatus(errorList)){
+			fmt.Println("LoadingPage line 82")
 			statusCode=1005
 			moveTo=4
-		}else if(Preference<NUM_OF_PREFERENCE && !errorList.DatabaseError){
+		}else if(Preference<NUM_OF_PREFERENCE && !util.ErrorListStatus(errorList)){
+			fmt.Println("LoadingPage line 86")
 			statusCode=1003
 			moveTo=5
 		}else{
+			fmt.Println("LoadingPage line 90")
 			statusCode=1004
 			moveTo=3
 		}
@@ -86,8 +99,10 @@ func LoadingPage(w http.ResponseWriter,r *http.Request){
 	//Setting Response
 	code:=util.GetCode(errorList)
 	if(code==200){
+		fmt.Println("LoadingPage line 99")
 		content.Code=statusCode
 	}else{
+		fmt.Println("LoadingPage line 102")
 		content.Code=code
 	}
 	content.Message=util.GetMessageDecode(content.Code)
