@@ -52,7 +52,7 @@ func GetGuiltyPleasure(db *gorm.DB,label string)([]GuiltyPleasure,bool){
 	}
 	id:=userFeedStatus.Id
 
-	err=db.Order("id").Limit(10).Where("label=? AND id>?",label,id).Find(&guiltyPleasure).Error
+	err=db.Table("guilty_pleasure").Order("id").Limit(10).Where("label=? AND id>?",label,id).Find(&guiltyPleasure).Error
 	if(err!=nil){
 		return guiltyPleasure,true
 	}

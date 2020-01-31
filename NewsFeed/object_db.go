@@ -73,14 +73,14 @@ type NewsFeedReaction struct{
 type UserFeedStatus struct{
 	UserId string `gorm:"primary_key;varchar" json:"UserId"`
 	Label string `gorm:"primary_key;varchar" json:"Label"`
-	Id int64 `gorm:"varchar" json:"Id"`
+	Id int64 `gorm:"primary_key;varchar" json:"Id"`
 	UpdatedAt string `gorm:"varchar" json:"UpdatedAt"`
 }
 
 func init(){
 	db:=database.GetDB()
 	db.AutoMigrate(&UserFeedStatus{})
-	db.AutoMigrate(&GuiltyPleasure{})
+	// db.AutoMigrate(&GuiltyPleasure{})
 	// db.AutoMigrate(&News{})
 	// // db.AutoMigrate(&NewsFeed{})
 	// // db.AutoMigrate(&NewsFeedSummary{})
