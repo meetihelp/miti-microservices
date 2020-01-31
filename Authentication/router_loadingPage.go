@@ -51,11 +51,14 @@ func LoadingPage(w http.ResponseWriter,r *http.Request){
 		if(loginStatus=="Ok"){
 			util.TemporarySessionLog("LoadingPage",ipAddress,sessionId,"Success")
 			errorList.TemporarySessionError=false
+		}else{
+			moveTo=2
 		}
 	}
 
 	if(errorList.TemporarySessionError){
 		util.TemporarySessionLog("LoadingPage",ipAddress,sessionId,"Fail")
+
 	}
 
 
