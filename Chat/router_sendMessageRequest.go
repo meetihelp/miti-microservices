@@ -1,6 +1,7 @@
 package Chat
 
 import(
+	"fmt"
 	"net/http"
 	"log"
 	"io/ioutil"
@@ -25,7 +26,7 @@ func SendMessageRequest(w http.ResponseWriter,r *http.Request){
 
 	db:=database.DBConnection()
 	//Session,TemporarySession,Body,Unmarshal,Sanatize,Database
-	list:=[]bool{true,false,false,false,false,false}
+	list:=[]bool{false,false,false,false,false,false}
 	errorList:=util.GetErrorList(list)
 
 	sessionId:=header.Cookie
@@ -33,16 +34,19 @@ func SendMessageRequest(w http.ResponseWriter,r *http.Request){
 	errorList.DatabaseError=dbError
 	util.APIHitLog("SendMessageRequest",ipAddress,sessionId)
 	if dErr=="Error"{
+		fmt.Println("SendMessageRequest line 37")
 		errorList.SessionError=true
 	}
 
 	requestBody,err:=ioutil.ReadAll(r.Body)
 	if (err!=nil && !util.ErrorListStatus(errorList)){
+		fmt.Println("SendMessageRequest line 43")
 		errorList.BodyReadError=true
 	}
 	
 	sendMessageRequestData:=SendMessageRequestDS{}
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("SendMessageRequest line 49")
 		profileRequestErr:=json.Unmarshal(requestBody,&sendMessageRequestData)
 		if(profileRequestErr!=nil){
 			errorList.UnmarshallingError=true
@@ -50,6 +54,7 @@ func SendMessageRequest(w http.ResponseWriter,r *http.Request){
 	}
 
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("SendMessageRequest line 57")
 		sanatizationErr:=Sanatize(sendMessageRequestData)
 		if(sanatizationErr=="Error"){
 			errorList.SanatizationError=true
@@ -58,8 +63,10 @@ func SendMessageRequest(w http.ResponseWriter,r *http.Request){
 	var phone string
 	var phoneErr string
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("SendMessageRequest line 66")
 		phoneErr,phone=util.GetPhoneInFormat(sendMessageRequestData.Phone)
 		if(phoneErr=="Error"){
+			fmt.Println("SendMessageRequest line 69")
 			errorList.LogicError=true
 			statusCode=1002
 		}
@@ -67,6 +74,7 @@ func SendMessageRequest(w http.ResponseWriter,r *http.Request){
 	requestId:=sendMessageRequestData.RequestId
 	var senderPhone string
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("SendMessageRequest line 77")
 		senderPhone,dbError=GetUserPhone(db,userId)
 		errorList.DatabaseError=dbError
 	}
@@ -75,31 +83,42 @@ func SendMessageRequest(w http.ResponseWriter,r *http.Request){
 	messageContent:=sendMessageRequestData.MessageContent
 	var senderName string
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("SendMessageRequest line 86")
 		senderName,dbError=profile.GetUserName(db,userId)
 		errorList.DatabaseError=dbError
 	}
 	createdAt:=util.GetTime()
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("SendMessageRequest line 92")
 		createdAt,dbError=InsertMessageRequestDB(db,userId,senderName,senderPhone,phone,requestId,messageType,messageContent,createdAt)
 		errorList.DatabaseError=dbError	
 	}
 	
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("SendMessageRequest line 98")
 		availability,dbError:=IsPhoneNumberExist(db,phone)
 		errorList.DatabaseError=dbError
 		if(availability=="No"){
+			fmt.Println("SendMessageRequest line 102")
 			_,err:=sms.MessageRequestNotificaton(senderName,senderPhone,phone)
 			if(err!=nil){
+				fmt.Println("SendMessageRequest line 105")
 				statusCode=1007
 			}
 		}	
 	}
 	
+	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("SendMessageRequest line 112")
+		statusCode=200
+	}
 	
 	code:=util.GetCode(errorList)
 	if(code==200){
+		fmt.Println("SendMessageRequest line 118")
 		content.Code=statusCode
 	}else{
+		fmt.Println("SendMessageRequest line 121")
 		content.Code=code
 	}
 	content.Message=util.GetMessageDecode(code)

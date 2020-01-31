@@ -68,6 +68,10 @@ func ProfileCreation(w http.ResponseWriter, r *http.Request){
 		dbError:=EnterProfileData(db,profileData)
 		errorList.DatabaseError=dbError
 	}
+
+	if(!util.ErrorListStatus(errorList)){
+		statusCode=200
+	}
 	
 	
 	code:=util.GetCode(errorList)
@@ -76,6 +80,7 @@ func ProfileCreation(w http.ResponseWriter, r *http.Request){
 	}else{
 		content.Code=code
 	}
+	content.Message=util.GetMessageDecode(content.Code)
 	responseHeader.ContentType="application/json"
     headerBytes:=new(bytes.Buffer)
     json.NewEncoder(headerBytes).Encode(responseHeader)

@@ -1,5 +1,6 @@
 package Chat 
 import(
+	"fmt"
 	"net/http"
 	util "miti-microservices/Util"
 	database "miti-microservices/Database"
@@ -22,7 +23,7 @@ func GetChatAfterIndex(w http.ResponseWriter,r *http.Request){
 
 	db:=database.DBConnection()
 	//Session,TemporarySession,Body,Unmarshal,Sanatize,Database
-	list:=[]bool{true,false,false,false,false,false}
+	list:=[]bool{false,false,false,false,false,false}
 	errorList:=util.GetErrorList(list)
 
 	util.GetHeader(r,&getChatAfterIndexHeader)
@@ -32,16 +33,19 @@ func GetChatAfterIndex(w http.ResponseWriter,r *http.Request){
 	errorList.DatabaseError=dbError
 	util.APIHitLog("GetChatAfterIndex",ipAddress,sessionId)
 	if (getChatStatus=="Error"){
+		fmt.Println("GetChatAfterIndex line 36")
 		errorList.SessionError=true
 	}
 
 	requestBody,err:=ioutil.ReadAll(r.Body)
 	if (err!=nil && !errorList.SessionError){
+		fmt.Println("GetChatAfterIndex line 42")
 		errorList.BodyReadError=true
 	}
 
 	chatData:=GetChatRequest{}
 	if(!errorList.BodyReadError){
+		fmt.Println("GetChatAfterIndex line 48")
 		errUserData:=json.Unmarshal(requestBody,&chatData)
 		if errUserData!=nil{
 			errorList.UnmarshallingError=true		
@@ -49,6 +53,7 @@ func GetChatAfterIndex(w http.ResponseWriter,r *http.Request){
 	}
 
 	if(!errorList.UnmarshallingError){
+		fmt.Println("GetChatAfterIndex line 56")
 		util.BodyLog("GetChatAfterIndex",ipAddress,sessionId,chatData)	
 		sanatizationStatus :=Sanatize(chatData)
 		if(sanatizationStatus=="Error"){
@@ -58,20 +63,31 @@ func GetChatAfterIndex(w http.ResponseWriter,r *http.Request){
 	
 	var chat []Chat
 	if(!errorList.SanatizationError){
+		fmt.Println("GetChatAfterIndex line 66")
 		status,dbError:=CheckCorrectChat(db,userId,chatData.ChatId)
 		errorList.DatabaseError=dbError
 		if(status=="Error"){
+			fmt.Println("GetChatAfterIndex line 70")
 			statusCode=1002
 		}else if(status=="Ok" && !errorList.DatabaseError){
+			fmt.Println("GetChatAfterIndex line 73")
 			chat,dbError=GetChatAfterTimeMessages(db,chatData.ChatId,chatData.NumOfChat,chatData.CreatedAt)
 			errorList.DatabaseError=dbError
 		}
 	}
 
+	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("GetChatAfterIndex line 80")
+		statusCode=200
+	}
+
+	
 	code:=util.GetCode(errorList)
 	if(code==200){
+		fmt.Println("GetChatAfterIndex line 87")
 		content.Code=statusCode
 	}else{
+		fmt.Println("GetChatAfterIndex line 90")
 		content.Code=code
 	}
 	content.Message=util.GetMessageDecode(code)

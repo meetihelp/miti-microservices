@@ -1,12 +1,12 @@
 package Chat
 
 import(
+	"fmt"
 	"net/http"
 	util "miti-microservices/Util"
 	image "miti-microservices/Media/Image"
 	database "miti-microservices/Database"
 	"io/ioutil"
-	"fmt"
 	"encoding/json"
 	"os"
 	"log"
@@ -27,7 +27,7 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 
 	db:=database.DBConnection()
 	//Session,TemporarySession,Body,Unmarshal,Sanatize,Database
-	list:=[]bool{true,false,false,false,false,false}
+	list:=[]bool{false,false,false,false,false,false}
 	errorList:=util.GetErrorList(list)
 
 	util.GetHeader(r,&sendChatImageHeader)
@@ -47,23 +47,27 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 	errorList.DatabaseError=dbError
 	util.APIHitLog("SendChatImage",ipAddress,sessionId)
 	if (getChatStatus=="Error"){
+		fmt.Println("SendChatImage line 51")
 		errorList.SessionError=true
 	}
 
 	file, _, err := r.FormFile("myFile")
 	errorStatus:=util.ErrorListStatus(errorList)
     if(err!=nil && !errorStatus){
+    	fmt.Println("SendChatImage line 58")
         errorList.BodyReadError=true
     }
 
 	buffer, err := ioutil.ReadAll(file)
 	errorStatus=util.ErrorListStatus(errorList)
     if(err!=nil && !errorStatus){
+    	fmt.Println("SendChatImage line 65")
         errorList.BodyReadError=true
     }
 
     errorStatus=util.ErrorListStatus(errorList)
     if(!errorStatus){
+    	fmt.Println("SendChatImage line 71")
     	sanatize:=Sanatize(sendChatImageHeader)
 		if(sanatize=="Error"){
 			errorList.SanatizationError=true
@@ -78,33 +82,41 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 	status:="Error"
 	userImageData:=image.UserImage{}
 	if(!errorStatus){
+		fmt.Println("SendChatImage line 86")
 		userImageData,status,dbError=image.GetUserImageByRequestId(db,userId,requestId)	
 		errorList.DatabaseError=dbError
 	}
 
 	errorStatus=util.ErrorListStatus(errorList)
 	if(status=="Error" && !errorStatus){
+		fmt.Println("SendChatImage line 93")
 		imageId:=util.GenerateToken()
 		generatedName:=util.GenerateToken()
 		filename:=generatedName+"."+format
 		bucket:=""
 		fmt.Println("AccessType:"+accessType)
 		if(accessType=="private"){
+			fmt.Println("SendChatImage line 100")
 			bucket=image.GetPrivateImageBucket()
 			fmt.Println("Bucket:"+bucket)
 		}else if(accessType=="public"){
+			fmt.Println("SendChatImage line 104")
 			bucket=image.GetPublicImageBucket()
 		}else{
+			fmt.Println("SendChatImage line 107")
 			statusCode=1002
 			errorList.LogicError=true
 		}
 
 		errorStatus=util.ErrorListStatus(errorList)
 		if(!errorStatus){
+			fmt.Println("SendChatImage line 114")
 			size,err:=image.UploadToS3(buffer,filename,bucket,format)	
 			if(err!=nil){
+				fmt.Println("SendChatImage line 117")
 				statusCode=3001
 			}else{
+				fmt.Println("SendChatImage line 120")
 				userImageData.UserId=userId
 				userImageData.ImageId=imageId
 				userImageData.AccessType=accessType
@@ -125,12 +137,15 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 		}
 
 		if(accessType=="public"){
+			fmt.Println("SendChatImage line 141")
 			PublicCloudFront:=os.Getenv("publicImageCloudFront")
 			url=PublicCloudFront+"/"+filename
 		}
 
 	}else{
+		fmt.Println("SendChatImage line 147")
 		if(accessType=="public"){
+			fmt.Println("SendChatImage line 149")
 			PublicCloudFront:=os.Getenv("publicImageCloudFront")
 			filename:=userImageData.GeneratedName+"."+userImageData.Format
 			url=PublicCloudFront+"/"+filename
@@ -140,6 +155,7 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 
 	unSyncedChat:=[]Chat{}
 	if(imageUploadStatus=="Yes"){
+		fmt.Println("SendChatImage line 159")
 		chat:=Chat{}
 		chat.UserId=userId
 		chat.ChatId=chatId
@@ -153,21 +169,28 @@ func SendChatImage(w http.ResponseWriter, r *http.Request){
 		chatResponse,unSyncedChat,dbError=ChatInsertDB(db,chat,lastUpdate)
 		errorList.DatabaseError=dbError
 		if(chat.CreatedAt==chatResponse.CreatedAt){
+			fmt.Println("SendChatImage line 173")
 			dbError:=UpdateChatTime(db,chat.ChatId,chat.CreatedAt)
 			errorList.DatabaseError=dbError
 		}
 		statusCode=200
 	}else{
+		fmt.Println("SendChatImage line 179")
 		statusCode=3001
 	}
 	
-
+	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("SendChatImage line 184")
+		statusCode=200
+	}
 
 	
 	code:=util.GetCode(errorList)
 	if(code==200){
+		fmt.Println("SendChatImage line 191")
 		content.Code=statusCode
 	}else{
+		fmt.Println("SendChatImage line 194")
 		content.Code=code
 	}
 	content.Message=util.GetMessageDecode(code)

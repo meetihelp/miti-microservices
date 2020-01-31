@@ -99,6 +99,7 @@ func UpdatePreference(w http.ResponseWriter, r *http.Request){
 		fmt.Println("UpdatePreference line 98")
 		content.Code=code
 	}
+	content.Message=util.GetMessageDecode(content.Code)
 	responseHeader.ContentType="application/json"
     headerBytes:=new(bytes.Buffer)
     json.NewEncoder(headerBytes).Encode(responseHeader)

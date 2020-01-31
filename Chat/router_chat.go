@@ -1,6 +1,7 @@
 package Chat
 
 import (
+	"fmt"
 	"net/http"
 	database "miti-microservices/Database"
 	util "miti-microservices/Util"
@@ -32,18 +33,21 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 	util.APIHitLog("ChatInsert",ipAddress,sessionId)
 
 	if (loginStatus=="Error"){
+		fmt.Println("ChatInsert line 36")
 		errorList.SessionError=true
 	}
 
 	requestBody,err:=ioutil.ReadAll(r.Body)
 	// errorStatus:=util.ErrorListStatus(errorList)
 	if (err!=nil && !util.ErrorListStatus(errorList)){
+		fmt.Println("ChatInsert line 43")
 		errorList.BodyReadError=true
 	}
 
 	chatData :=ChatRequest{}
 	errorStatus:=util.ErrorListStatus(errorList)
 	if(!errorStatus){
+		fmt.Println("ChatInsert line 50")
 		errUserData:=json.Unmarshal(requestBody,&chatData)
 		if(errUserData!=nil){
 			errorList.UnmarshallingError=true
@@ -52,6 +56,7 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 
 	errorStatus=util.ErrorListStatus(errorList)
 	if(!errorStatus){
+		fmt.Println("ChatInsert line 59")
 		util.BodyLog("ChatInsert",ipAddress,sessionId,chatData)
 		sanatizationStatus :=Sanatize(chatData)
 		if(sanatizationStatus=="Error"){
@@ -73,9 +78,11 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 	var unSyncedChat []Chat
 	var chatResponse Chat
 	if(!errorStatus){
+		fmt.Println("ChatInsert line 81")
 		chatResponse,unSyncedChat,dbError=ChatInsertDB(db,chat,lastUpdate)
 		errorList.DatabaseError=dbError
 		if(chat.CreatedAt==chatResponse.CreatedAt && !dbError){
+			fmt.Println("ChatInsert line 85")
 			dbError:=UpdateChatTime(db,chatData.ChatId,chatData.CreatedAt)
 			errorList.DatabaseError=dbError
 		}
@@ -85,8 +92,10 @@ func ChatInsert(w http.ResponseWriter,r *http.Request){
 	
 	code:=util.GetCode(errorList)
 	if(code==200){
+		fmt.Println("ChatInsert line 95")
 		content.Code=statusCode
 	}else{
+		fmt.Println("ChatInsert line 98")
 		content.Code=code
 	}
 	content.Message=util.GetMessageDecode(code)
