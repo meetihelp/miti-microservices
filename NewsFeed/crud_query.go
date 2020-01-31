@@ -19,7 +19,7 @@ func GetLabelId(db *gorm.DB,label string,userId string) (int64,bool){
 		createdAt:=util.GetTime()
 		date:=util.GetDateFromTime(createdAt)
 		userFeedStatus.UpdatedAt=date
-		err:=db.Create(&userFeedStatus)
+		err:=db.Create(&userFeedStatus).Error
 		if(err!=nil){
 			return userFeedStatus.Id,true
 		}
@@ -59,7 +59,21 @@ func GetGuiltyPleasure(db *gorm.DB,label string)([]GuiltyPleasure,bool){
 	return guiltyPleasure,false
 }
 
-
+func UpdateUserNewsFeedStatus(db *gorm.DB,userId string,label string,newsId []int64) bool{
+	updatedAt:=util.GetDateFromTime(util.GetTime())
+	for _,id:=range newsId{
+		userFeedStatus:=UserFeedStatus{}
+		userFeedStatus.UserId=userId
+		userFeedStatus.Label=label
+		userFeedStatus.UpdatedAt=updatedAt
+		userFeedStatus.Id=id
+		err:=db.Create(&userFeedStatus).Error
+		if(err!=nil){
+			return true
+		}
+	}
+	return false
+}
 
 func GetSummary(newsFeedId string) NewsFeedSummary{
 	db:=database.GetDB()

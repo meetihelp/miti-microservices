@@ -35,17 +35,20 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 	errorList.DatabaseError=dbError
 	util.APIHitLog("GetNewsArticle",ipAddress,sessionId)
 	if status=="Error"{
+		fmt.Println("GetNewsArticle line 38")
 		errorList.SessionError=true
 	}
 
 	//Read body data
 	requestBody,err:=ioutil.ReadAll(r.Body)
 	if (err!=nil && !util.ErrorListStatus(errorList)){
+		fmt.Println("GetNewsArticle line 45")
 		errorList.BodyReadError=true
 	}
 
 	getNewsFeedArticleData :=GetNewsArticleDS{}
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("GetNewsArticle line 51")
 		errGetNewsFeedArticleData:=json.Unmarshal(requestBody,&getNewsFeedArticleData)
 		if errGetNewsFeedArticleData!=nil{
 			errorList.UnmarshallingError=true
@@ -53,6 +56,7 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 	}
 	
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("GetNewsArticle line 59")
 		sanatizationStatus :=Sanatize(getNewsFeedArticleData)
 		if(sanatizationStatus=="Error"){
 			errorList.SanatizationError=true
@@ -67,6 +71,7 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 	var isDone string
 	numOfArticle:=0
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("GetNewsArticle line 74")
 		isDone,dbError=AreAllArticleDone(db,userId)
 		errorList.DatabaseError=dbError
 		if(isDone=="Yes"){
@@ -84,20 +89,30 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 		numOfLabelArticle=numOfArticle
 	}
 
+	newsId:=make([]int64,0)
 	if(!util.ErrorListStatus(errorList) && isDone=="No"){
-		guiltyPleasure,dbError=getGuiltyPleasure(db,cache,nextLabel,id,numOfLabelArticle)
+		fmt.Println("GetNewsArticle line 94")
+		guiltyPleasure,newsId,dbError=getGuiltyPleasure(db,cache,nextLabel,id,numOfLabelArticle)
 		errorList.DatabaseError=dbError
 	}
 
+	if(!util.ErrorListStatus(errorList) && isDone=="No"){
+		fmt.Println("GetNewsArticle line 100")
+		dbError=UpdateUserNewsFeedStatus(db,userId,label,newsId)
+		errorList.DatabaseError=dbError
+	}
 
 	if(!util.ErrorListStatus(errorList) && isDone=="No"){
+		fmt.Println("GetNewsArticle line 106")
 		statusCode=200
 	}
 	
 	code:=util.GetCode(errorList)
 	if(code==200){
+		fmt.Println("GetNewsArticle line 112")
 		content.Code=statusCode
 	}else{
+		fmt.Println("GetNewsArticle line 115")
 		content.Code=code
 	}
 	content.Message=util.GetMessageDecode(content.Code)
@@ -137,7 +152,7 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 }
 
 
-func getGuiltyPleasure(db *gorm.DB,cache *gocache.Cache,label string,id int64,numOfArticle int)([]GuiltyPleasure,bool){
+func getGuiltyPleasure(db *gorm.DB,cache *gocache.Cache,label string,id int64,numOfArticle int)([]GuiltyPleasure,[]int64,bool){
 	x,found:=cache.Get(label)
 	guiltyPleasure:= []GuiltyPleasure{}
 	var dbError bool
@@ -152,17 +167,19 @@ func getGuiltyPleasure(db *gorm.DB,cache *gocache.Cache,label string,id int64,nu
 
 	guiltyPleasureResponse:=make([]GuiltyPleasure,0)
 	count:=0
+	newsId:=make([]int64,0)
 	for _,g:=range guiltyPleasure{
 		if(count>numOfArticle){
 			break
 		}
 		if(g.Id>id){
 			guiltyPleasureResponse=append(guiltyPleasureResponse,g)
+			newsId=append(newsId,g.Id)
 			count++
 		}
 	}
 
-	return guiltyPleasureResponse,dbError
+	return guiltyPleasureResponse,newsId,dbError
 }
 
 func GetNextLabel(label string) string{
