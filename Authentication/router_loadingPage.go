@@ -26,7 +26,7 @@ func LoadingPage(w http.ResponseWriter,r *http.Request){
 	//Creating DB Connection for Router
 	db:=database.DBConnection()
 	//Session,TemporarySession,Body,Unmarshal,Sanatize,Database
-	list:=[]bool{false,true,false,false,false,false}
+	list:=[]bool{false,false,false,false,false,false}
 	errorList:=util.GetErrorList(list)
 
 	//Unmarshalling Header
@@ -52,6 +52,7 @@ func LoadingPage(w http.ResponseWriter,r *http.Request){
 			util.TemporarySessionLog("LoadingPage",ipAddress,sessionId,"Success")
 			errorList.TemporarySessionError=false
 		}else{
+			errorList.TemporarySessionError=true
 			moveTo=2
 		}
 	}
