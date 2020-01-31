@@ -1,5 +1,6 @@
 package SMS
 import(
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"log"
@@ -12,7 +13,7 @@ func MessageRequestNotificaton(senderName string,senderPhone string,phone string
 		senderName=senderName[:9]
 	}
 
-	base, err := url.Parse("")
+	base, err := url.Parse("https://api.msg91.com/api/v5/otp")
 	if err != nil {
 		return nil,err
 	}
@@ -32,11 +33,14 @@ func MessageRequestNotificaton(senderName string,senderPhone string,phone string
 	client:=util.GetClient(2)
 	resp, err1:=client.Get(base.String())
 	fmt.Println(base.String())
-	fmt.Println(resp.Body)
-	if err1!=nil {
-		log.Print(err)
-	}
-	
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        fmt.Println(err)
+    }
+    bodyString := string(bodyBytes)
+    fmt.Println(bodyString)
+
 	if err1!=nil {
 		log.Print(err)
 	}

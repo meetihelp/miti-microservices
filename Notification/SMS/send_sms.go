@@ -1,6 +1,7 @@
 package SMS
 
 import(
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"log"
@@ -37,7 +38,14 @@ func SendSMS(phone string,otp string) (*http.Response,error){
 	client:=util.GetClient(2)
 	fmt.Println(base.String());
 	resp, err1:=client.Get(base.String())
-	fmt.Println(resp.Body)
+	
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        fmt.Println(err)
+    }
+    bodyString := string(bodyBytes)
+    fmt.Println(bodyString)
+
 	if err1!=nil {
 		log.Print(err)
 	}

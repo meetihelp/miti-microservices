@@ -93,7 +93,7 @@ func InsertOTP(db *gorm.DB,userId string,sessionId string) (string,bool){
 		if(err!=nil){
 			return "",true	
 		}
-		return otp,false
+		return otpVerification.OTP,false
 	}
 	otpVerification.UserId=userId
 	otpVerification.SessionId=sessionId
