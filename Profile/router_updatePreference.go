@@ -1,6 +1,7 @@
 package Profile
 
 import(
+	"fmt"
 	"net/http"
 	"log"
 	"io/ioutil"
@@ -32,16 +33,19 @@ func UpdatePreference(w http.ResponseWriter, r *http.Request){
 	errorList.DatabaseError=dbError
 	util.APIHitLog("UpdatePreference",ipAddress,sessionId)
 	if dErr=="Error"{
+		fmt.Println("UpdatePreference line 35")
 		errorList.TemporarySessionError=true
 	}
 
 	requestBody,err:=ioutil.ReadAll(r.Body)
 	if (err!=nil && !util.ErrorListStatus(errorList)){
+		fmt.Println("UpdatePreference line 41")
 		errorList.BodyReadError=true
 	}
 
 	preferenceRequestData:=UpdatePreferenceRequest{}
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("UpdatePreference line47 ")
 		err:=json.Unmarshal(requestBody, &preferenceRequestData)
 		if(err!=nil){
 			errorList.UnmarshallingError=true
@@ -49,6 +53,7 @@ func UpdatePreference(w http.ResponseWriter, r *http.Request){
 	}
 
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("UpdatePreference line 55")
 		sanatizationStatus:=Sanatize(preferenceRequestData)
 		if sanatizationStatus =="Error"{
 			errorList.SanatizationError=true
@@ -57,34 +62,41 @@ func UpdatePreference(w http.ResponseWriter, r *http.Request){
 
 	var preferenceStatus int
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("UpdatePreference line 64")
 		preferenceStatus,dbError=UpdatePreferecePResponseDB(db,userId,preferenceRequestData)		
 		errorList.DatabaseError=dbError
 	}
 
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("UpdatePreference line 70")
 		dbError=auth.UpdatePreferencetatus(db,userId,preferenceStatus)	
 		errorList.DatabaseError=dbError
 	}
 
 	if(preferenceStatus>=6){
 		if(!util.ErrorListStatus(errorList)){
+			fmt.Println("UpdatePreference line 77")
 			dbError=util.InsertSessionValue(db,sessionId,userId,ipAddress)
 			errorList.DatabaseError=dbError
 		}
 		if(!util.ErrorListStatus(errorList)){
+			fmt.Println("UpdatePreference line 82")
 			dbError=util.DeleteTemporarySession(db,sessionId)
 			errorList.DatabaseError=dbError
 		}     
 	}
 
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("UpdatePreference line 89")
 		statusCode=200
 	}
 	
 	code:=util.GetCode(errorList)
 	if(code==200){
+		fmt.Println("UpdatePreference line 95")
 		content.Code=statusCode
 	}else{
+		fmt.Println("UpdatePreference line 98")
 		content.Code=code
 	}
 	responseHeader.ContentType="application/json"
@@ -96,7 +108,7 @@ func UpdatePreference(w http.ResponseWriter, r *http.Request){
     }
     w=util.GetResponseFormatHeader(w,data)
 	p:=&content
-	util.ResponseLog("UpdateIPIP",ipAddress,sessionId,content.Code,*p)
+	util.ResponseLog("UpdatePreference",ipAddress,sessionId,content.Code,*p)
 	enc := json.NewEncoder(w)
 	err= enc.Encode(p)
 	if err != nil {
