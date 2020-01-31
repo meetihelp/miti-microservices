@@ -45,7 +45,7 @@ func LoadingPage(w http.ResponseWriter,r *http.Request){
 	}
 
 	//Querying for temporary session status
-	if(errorList.SessionError && !errorList.DatabaseError){
+	if(!errorList.SessionError && !errorList.DatabaseError){
 		util.SessionLog("LoadingPage",ipAddress,sessionId,"Fail")
 		userId,loginStatus,errorList.DatabaseError=util.GetUserIdFromTemporarySession3(db,sessionId)
 		if(loginStatus=="Ok"){
