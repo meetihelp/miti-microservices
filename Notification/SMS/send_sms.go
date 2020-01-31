@@ -31,7 +31,7 @@ func SendSMS(phone string,otp string) (*http.Response,error){
 
 	// q.Add("invisible", "1")
 	q.Add("otp",strings.TrimSpace(otp))
-	q.Add("mobile",strings.TrimSpace(phone))
+	q.Add("mobile",strings.Trim(phone,"'"))
 	// q.Add("otp_expiry","10")
 	base.RawQuery = q.Encode()
 	client:=util.GetClient(2)

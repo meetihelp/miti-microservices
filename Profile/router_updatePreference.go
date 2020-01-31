@@ -74,9 +74,11 @@ func UpdatePreference(w http.ResponseWriter, r *http.Request){
 		if(!util.ErrorListStatus(errorList)){
 			dbError=util.DeleteTemporarySession(db,sessionId)
 			errorList.DatabaseError=dbError
-		}
-		
-        
+		}     
+	}
+
+	if(!util.ErrorListStatus(errorList)){
+		statusCode=200
 	}
 	
 	code:=util.GetCode(errorList)
