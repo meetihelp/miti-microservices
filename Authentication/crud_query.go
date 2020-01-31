@@ -65,7 +65,7 @@ func EnterUserData(db *gorm.DB,userData LoginRequest) (string,bool){
 		user.IPIPStatus=0
 		user.PreferenceCreationStatus=0
 		user.CreatedAt =util.GetTime()
-		err=db.Create(&userData).Error
+		err=db.Create(&user).Error
 		if(err!=nil){
 			return "",true
 		}
