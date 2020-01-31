@@ -16,6 +16,7 @@ func Login(w http.ResponseWriter,r *http.Request){
 
 	//Initializing response variables
 	content:=LoginResponse{}
+	statusCode:=0
 	moveTo:=0
 
 	//Intializing response header variables
@@ -68,18 +69,26 @@ func Login(w http.ResponseWriter,r *http.Request){
 			otpCode,dbError=InsertOTP(db,userId,sessionId)
 			errorList.DatabaseError=dbError	
 		}
-		if(!errorList.DatabaseError){
-			_=SendOTP(userData.Phone,otpCode)	
+		if(!errorList.DatabaseError){	
+			 _,err:=SendOTP(userData.Phone,otpCode)
+	        if(err==nil){
+	            statusCode=200
+	            moveTo=3
+	        }else{
+	            //Error in sending otp
+	            statusCode=1007
+	            moveTo=0
+	        }
 		}      
 	}
 
 	code:=util.GetCode(errorList)
-	if(code==200){
-		moveTo=3
-	}
-
-	content.Code=code
-	content.Message=util.GetMessageDecode(code)
+    if(code==200){
+        content.Code=statusCode
+    }else{
+        content.Code=code
+    }
+	content.Message=util.GetMessageDecode(content.Code)
 	content.MoveTo=moveTo
 	loginResponseHeader.MitiCookie=sessionId
 	loginResponseHeader.ContentType="application/json"

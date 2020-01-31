@@ -20,7 +20,6 @@ func EncodeToString(max int) string {
     return string(b)
 }
 func GenerateOTP() string{
-	// ret := EncodeToString(5)
-	// return ret
-    return "12345"
+	ret := EncodeToString(5)
+	return ret
 }

@@ -14,6 +14,7 @@ type Profile struct{
 	DateOfBirth string `gorm:"type:varchar(100)" validate:"required" json:"DateOfBirth"`
 	Job string `gorm:"type:varchar(30)" validate:"required" "json:"Job"`
 	ProfilePicID string `gorm:"type:varchar" json:"ProfilePicId"`
+	Email string `gorm:"type:varchar" json:"Email"`
 	// ProfilePicURL string `gorm:"type:varchar(100)"  json:"ProfilePicURl"`
 	Gender string `gorm:"type:varchar(10)" validate:"required" json:"Gender"`
 	Sex string `gorm:"type:varchar(10)"  json:"Sex"`

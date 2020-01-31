@@ -50,12 +50,14 @@ func VerifyUser(w http.ResponseWriter,r *http.Request){
                 otpCode,dbError:=InsertOTP(db,userId,sessionId)
                 errorList.DatabaseError=dbError
                 if(!errorList.DatabaseError){
-                    err:=SendOTP(phone,otpCode)
-                    if(err=="Ok"){
+                    _,err:=SendOTP(phone,otpCode)
+                    if(err==nil){
                         statusCode=200
                         moveTo=0
                     }else{
                         //Error in sending otp
+                        statusCode=1007
+                        moveTo=0
                     }
                 }
             }else{

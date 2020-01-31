@@ -1,12 +1,12 @@
 package Authentication
 
 import(
-	// "net/http"
+	"net/http"
 	// "io/ioutil"
 	// "encoding/json"	
 	// util "miti-microservices/Util"
 	"github.com/jinzhu/gorm"
-	// sms "miti-microservices/Notification/SMS"
+	sms "miti-microservices/Notification/SMS"
 	// "log"
 	"time"
 	// "reflect"
@@ -33,12 +33,10 @@ const (
 // 	}
 // }
 
-func SendOTP(phone string,otp string)(string){
-	return "Ok"
+
+func SendOTP(phone string,otp string)(*http.Response,error){
+	return sms.SendSMS(phone,otp)
 }
-// func SendOTP(phone string,otp string)(*http.Response,error){
-// 	return sms.SendSMS(phone,otp)
-// }
 
 func OTPHelper(db *gorm.DB,userId string) (int,bool){
 	otp,dbError:=GetOTPDetails(db,userId)
@@ -56,9 +54,12 @@ func OTPHelper(db *gorm.DB,userId string) (int,bool){
 		return 3001,dbError
 	}
 	
-	deliveryCount:=otp.DeliverCount
-	if((duration<MAXMINUTE || deliveryCount==0) && !dbError){
-		return 200,dbError
+	// deliveryCount:=otp.DeliverCount
+	// if((duration<MAXMINUTE || deliveryCount==0) && !dbError){
+	// 	return 200,dbError
+	// }
+	if((duration<MAXMINUTE) && !dbError){
+		return 1003,dbError
 	}
 	if(duration>MAXMINUTE && !dbError){
   		return 200,dbError
