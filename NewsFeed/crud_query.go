@@ -1,6 +1,7 @@
 package NewsFeed
 
 import(
+	"fmt"
 	database "miti-microservices/Database"
 	util "miti-microservices/Util"
 	"github.com/jinzhu/gorm"
@@ -34,6 +35,8 @@ func AreAllArticleDone(db *gorm.DB,userId string)(string,int,bool){
 	userFeedStatus:=[]UserFeedStatus{}
 	today:=util.GetDateFromTime(util.GetTime())
 	err:=db.Where("user_id=? AND updated_at=?",userId,today).Find(&userFeedStatus).Count(&count).Error
+	fmt.Print(today+"->Count:")
+	fmt.Println(count)
 	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
 		return "No",0,true
 	}
