@@ -16,6 +16,7 @@ import (
 	social "miti-microservices/Social"
 	security "miti-microservices/Security"
 	privacy "miti-microservices/Privacy"
+	others "miti-microservices/Others"
 	// sms "miti-microservices/Notification/SMS"
 	"os"
 )
@@ -33,12 +34,12 @@ func Server(runMethod string){
 	// r.HandleFunc("/createMatch",apnaauth.CreateMatch).Methods("GET")
 
 	//Authentication related APIs
-	r.HandleFunc("/loadingPage",apnaauth.LoadingPage).Methods("GET")
-	r.HandleFunc("/login",apnaauth.Login).Methods("POST")
-	r.HandleFunc("/otpStatus",apnaauth.OTPStatus).Methods("GET")
-	r.HandleFunc("/generateOTP",apnaauth.VerifyUser).Methods("GET")
-	r.HandleFunc("/verifyOTP",apnaauth.VerifyOTPUserverification).Methods("POST")
-	r.HandleFunc("/resendOTP",apnaauth.ReSendOTP).Methods("GET")
+	r.HandleFunc("/auth/loadingPage",apnaauth.LoadingPage).Methods("GET")
+	r.HandleFunc("/auth/login",apnaauth.Login).Methods("POST")
+	r.HandleFunc("/auth/otpStatus",apnaauth.OTPStatus).Methods("GET")
+	r.HandleFunc("/auth/generateOTP",apnaauth.VerifyUser).Methods("GET")
+	r.HandleFunc("/auth/verifyOTP",apnaauth.VerifyOTPUserverification).Methods("POST")
+	r.HandleFunc("/auth/resendOTP",apnaauth.ReSendOTP).Methods("GET")
 	// r.HandleFunc("/register",apnaauth.Register).Methods("POST")
 	// r.HandleFunc("/generateOTP",apnaauth.VerifyUser).Methods("GET")
 	
@@ -52,7 +53,7 @@ func Server(runMethod string){
 	// r.HandleFunc("/updatePassword",apnaauth.UpdatePassword).Methods("POST")
 	
 	
-	r.HandleFunc("/getTemporaryUserId",apnaauth.GetTemporaryUserId).Methods("GET")
+	r.HandleFunc("/profile/getTemporaryUserId",apnaauth.GetTemporaryUserId).Methods("GET")
 	// r.HandleFunc("/getPhoneStatus",apnaauth.GetPhoneStatus).Methods("POST")
 	
 	
@@ -71,12 +72,12 @@ func Server(runMethod string){
 
 
 	//Profile related APIs
-	r.HandleFunc("/profileCreation",profile.ProfileCreation).Methods("POST")
+	r.HandleFunc("/profile/profileCreation",profile.ProfileCreation).Methods("POST")
 	r.HandleFunc("/getQuestion",profile.GetQuestion).Methods("POST")
 	r.HandleFunc("/insertQuestion",profile.InsertQuestion).Methods("POST")
-	r.HandleFunc("/updateIPIPResponse",profile.UpdateIPIPResponse).Methods("POST")
-	r.HandleFunc("/getProfile",profile.GetProfile).Methods("POST")
-	r.HandleFunc("/updatePreference",profile.UpdatePreference).Methods("Post")
+	r.HandleFunc("/profile/updateIPIPResponse",profile.UpdateIPIPResponse).Methods("POST")
+	r.HandleFunc("/profile/getProfile",profile.GetProfile).Methods("POST")
+	r.HandleFunc("/profile/updatePreference",profile.UpdatePreference).Methods("Post")
 	r.HandleFunc("/profileReaction",profile.ProfileReaction).Methods("POST")
 	r.HandleFunc("/createStatus",profile.CreateStatus).Methods("POST")
 	r.HandleFunc("/getStatus",profile.GetStatus).Methods("POST")
@@ -100,10 +101,10 @@ func Server(runMethod string){
 	
 	
 	//GPS related APIs
-	r.HandleFunc("/updateUserLocation",gps.UpdateUserLocation).Methods("POST")
+	r.HandleFunc("/profile/updateUserLocation",gps.UpdateUserLocation).Methods("POST")
 	// r.HandleFunc("/getUserListByLocation",gps.GetUserListByLocation).Methods("POST")
 	// r.HandleFunc("/getEventListByLocation",gps.GetEventListByLocation).Methods("POST")
-	r.HandleFunc("/updateUserLocation",gps.UpdateUserLocation).Methods("POST")
+	// r.HandleFunc("/updateUserLocation",gps.UpdateUserLocation).Methods("POST")
 
 	//Event related APIs
 	// r.HandleFunc("/createEvent",event.CreateEvent).Methods("POST")
@@ -134,6 +135,8 @@ func Server(runMethod string){
 	r.HandleFunc("/social/getInGroupPool",social.GetInGroupPool).Methods("POST")
 	r.HandleFunc("/social/groupPoolStatus",social.GroupPoolStatusRouter).Methods("POST")
 	// r.HandleFunc("/cancelGroupPool",social.CancelGroupPoolRouter).Methods("POST")
+
+	r.HandleFunc("/deleteProfile",others.DeleteProfile).Methods("POST")
 	
 	http.Handle("/", r)
 	certificates:=os.Getenv("SSLCertificatePath")

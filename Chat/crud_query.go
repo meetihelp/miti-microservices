@@ -3,6 +3,7 @@ package Chat
 import(
 	util "miti-microservices/Util"
 	database "miti-microservices/Database"
+	profile "miti-microservices/Profile"
 	"github.com/jinzhu/gorm"
 )
 
@@ -288,7 +289,7 @@ func UpdateMessageRequestDB(db *gorm.DB,phone string,senderPhone string,action s
 	}
 }
 
-func InsertChatDetail(db *gorm.DB,userId1 string,userId2 string,requestId string) (string,bool){
+func InsertChatDetailMessageRequest(db *gorm.DB,userId1 string,userId2 string,requestId string) (string,bool){
 	chatDetail:=ChatDetail{}
 	chatDetail.CreatedAt=util.GetTime()
 	chatDetail.ChatId=util.GenerateToken()
@@ -315,15 +316,28 @@ func InsertChatDetail(db *gorm.DB,userId1 string,userId2 string,requestId string
 
 	if(chatDetailTemp1.ChatId==""){
 		chatDetail.ActualUserId=userId1
-		err:=db.Create(&chatDetail).Error
-		if(err!=nil){
+		name,dbError:=profile.GetUserName(db,userId2)
+		chatDetail.Name=name
+		if(!dbError){
+			err:=db.Create(&chatDetail).Error
+			if(err!=nil){
+				return "",true
+			}	
+		}else{
 			return "",true
 		}
+		
 	}
 	if(chatDetailTemp2.ChatId==""){
 		chatDetail.ActualUserId=userId2
-		err:=db.Create(&chatDetail).Error
-		if(err!=nil){
+		name,dbError:=profile.GetUserName(db,userId1)
+		chatDetail.Name=name
+		if(!dbError){
+			err:=db.Create(&chatDetail).Error
+			if(err!=nil){
+				return "",true
+			}	
+		}else{
 			return "",true
 		}
 	}

@@ -82,7 +82,7 @@ func ActionMessageRequest(w http.ResponseWriter,r *http.Request){
 		updatedAt=updatedAtTemp
 		var chatId string
 		if(!util.ErrorListStatus(errorList)){
-			chatId,dbError=InsertChatDetail(db,userId,userId2,actionRequestId)
+			chatId,dbError=InsertChatDetailMessageRequest(db,userId,userId2,actionRequestId)
 			errorList.DatabaseError=dbError
 		}
 		if(!util.ErrorListStatus(errorList)){
