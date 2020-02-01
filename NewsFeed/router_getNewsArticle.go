@@ -72,7 +72,7 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 	numOfArticle:=0
 	if(!util.ErrorListStatus(errorList)){
 		fmt.Println("GetNewsArticle line 74")
-		isDone,dbError=AreAllArticleDone(db,userId)
+		isDone,numOfArticle,dbError=AreAllArticleDone(db,userId)
 		errorList.DatabaseError=dbError
 		if(isDone=="Yes"){
 			statusCode=5000
@@ -84,35 +84,37 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 	
 	numOfLabelArticle:=0
 	if(numOfArticle>2){
+		fmt.Println("GetNewsArticle line 87")
 		numOfLabelArticle=2
 	}else{
+		fmt.Println("GetNewsArticle line 90")
 		numOfLabelArticle=numOfArticle
 	}
 
 	newsId:=make([]int64,0)
 	if(!util.ErrorListStatus(errorList) && isDone=="No"){
-		fmt.Println("GetNewsArticle line 94")
+		fmt.Println("GetNewsArticle line 96")
 		guiltyPleasure,newsId,dbError=getGuiltyPleasure(db,cache,nextLabel,id,numOfLabelArticle)
 		errorList.DatabaseError=dbError
 	}
 
 	if(!util.ErrorListStatus(errorList) && isDone=="No"){
-		fmt.Println("GetNewsArticle line 100")
+		fmt.Println("GetNewsArticle line 102")
 		dbError=UpdateUserNewsFeedStatus(db,userId,label,newsId)
 		errorList.DatabaseError=dbError
 	}
 
 	if(!util.ErrorListStatus(errorList) && isDone=="No"){
-		fmt.Println("GetNewsArticle line 106")
+		fmt.Println("GetNewsArticle line 108")
 		statusCode=200
 	}
 	
 	code:=util.GetCode(errorList)
 	if(code==200){
-		fmt.Println("GetNewsArticle line 112")
+		fmt.Println("GetNewsArticle line 114")
 		content.Code=statusCode
 	}else{
-		fmt.Println("GetNewsArticle line 115")
+		fmt.Println("GetNewsArticle line 117")
 		content.Code=code
 	}
 	content.Message=util.GetMessageDecode(content.Code)
@@ -159,8 +161,9 @@ func getGuiltyPleasure(db *gorm.DB,cache *gocache.Cache,label string,id int64,nu
 	if(!found){
 		fmt.Println("Cache miss for "+label)
 		guiltyPleasure,dbError=GetGuiltyPleasure(db,label)
+		cache.Set(label,guiltyPleasure,0)
 	}else{
-		fmt.Println("Cache hit for foodPorn")
+		fmt.Println("Cache hit for "+label)
 		guiltyPleasure=x.([]GuiltyPleasure)
 		dbError=false
 	}

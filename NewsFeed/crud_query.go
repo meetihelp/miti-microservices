@@ -29,18 +29,18 @@ func GetLabelId(db *gorm.DB,label string,userId string) (int64,bool){
 
 }
 
-func AreAllArticleDone(db *gorm.DB,userId string)(string,bool){
+func AreAllArticleDone(db *gorm.DB,userId string)(string,int,bool){
 	count:=0
 	userFeedStatus:=[]UserFeedStatus{}
 	today:=util.GetDateFromTime(util.GetTime())
 	err:=db.Where("user_id=? AND updated_at=?",userId,today).Find(&userFeedStatus).Count(&count).Error
 	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
-		return "No",true
+		return "No",0,true
 	}
 	if(count<40){
-		return "No",false
+		return "No",count,false
 	}
-	return "Yes",false
+	return "Yes",count,false
 }
 
 func GetGuiltyPleasure(db *gorm.DB,label string)([]GuiltyPleasure,bool){
@@ -52,7 +52,7 @@ func GetGuiltyPleasure(db *gorm.DB,label string)([]GuiltyPleasure,bool){
 	}
 	id:=userFeedStatus.Id
 
-	err=db.Table("guilty_pleasure").Order("id").Limit(10).Where("label=? AND id>?",label,id).Find(&guiltyPleasure).Error
+	err=db.Table("guilty_pleasure").Order("id").Limit(20).Where("label=? AND id>?",label,id).Find(&guiltyPleasure).Error
 	if(err!=nil){
 		return guiltyPleasure,true
 	}
