@@ -46,19 +46,23 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 	util.APIHitLog("UploadImage",ipAddress,sessionId)
 	if getChatStatus=="Error"{
 		errorList.SessionError=true
+		fmt.Println("Upload Image line 49")
 	}
 
 	file, _, err := r.FormFile("myFile")
     if(err!=nil && !util.ErrorListStatus(errorList)){
+    	fmt.Println("Upload Image line 54")
         errorList.BodyReadError=true
     }
 
 	buffer, err := ioutil.ReadAll(file)
     if(err!=nil && !util.ErrorListStatus(errorList)){
+    	fmt.Println("Upload Image line 60")
         errorList.BodyReadError=true
     }
 
     if(!util.ErrorListStatus(errorList)){
+    	fmt.Println("Upload Image line 65")
     	sanatize:=Sanatize(uploadImageHeader)
 		if(sanatize=="Error"){
 			errorList.SanatizationError=true
@@ -70,6 +74,7 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 	status:="Error"
 	userImageData:=UserImage{}
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("Upload Image line 77")
 		userImageData,status,dbError=GetUserImageByRequestId(db,userId,requestId)	
 		errorList.DatabaseError=dbError
 	}
@@ -77,6 +82,7 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 	var imageId string
 	createdAt:=util.GetTime()
 	if(status=="Error" && !util.ErrorListStatus(errorList)){
+		fmt.Println("Upload Image line 85")
 		imageId=util.GenerateToken()
 		generatedName:=util.GenerateToken()
 		filename:=generatedName+"."+format
@@ -87,6 +93,7 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 			fmt.Println("Bucket:"+bucket)
 		}else if(accessType=="public"){
 			bucket=GetPublicImageBucket()
+			fmt.Println("Upload Image line 96")
 		}else{
 			statusCode=1002
 			errorList.LogicError=true
@@ -133,8 +140,10 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 	
 	code:=util.GetCode(errorList)
 	if(code==200){
+		fmt.Println("Upload Image line 141")
 		content.Code=statusCode
 	}else{
+		fmt.Println("Upload Image line 145")
 		content.Code=code
 	}
 	content.Message=util.GetMessageDecode(content.Code)

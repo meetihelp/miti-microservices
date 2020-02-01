@@ -60,14 +60,14 @@ func Server(runMethod string){
 
 
 	//Chat related APIs
-	r.HandleFunc("/getChatDetail",apnachat.GetChatDetailroute).Methods("POST")
+	r.HandleFunc("/chat/getChatDetail",apnachat.GetChatDetailroute).Methods("POST")
 	// r.HandleFunc("/getChat",apnachat.GetChat).Methods("POST")
-	r.HandleFunc("/chat",apnachat.ChatInsert).Methods("POST")
-	r.HandleFunc("/getChatAfterIndex",apnachat.GetChatAfterIndex).Methods("POST")
-	r.HandleFunc("/sendChatImage",apnachat.SendChatImage).Methods("POST")
-	r.HandleFunc("/sendMessageRequest",apnachat.SendMessageRequest).Methods("POST")
-	r.HandleFunc("/getMessageRequest",apnachat.GetMessageRequest).Methods("POST")
-	r.HandleFunc("/actionMessageRequest",apnachat.ActionMessageRequest).Methods("POST")
+	r.HandleFunc("/chat/chat",apnachat.ChatInsert).Methods("POST")
+	r.HandleFunc("/chat/getChatAfterIndex",apnachat.GetChatAfterIndex).Methods("POST")
+	r.HandleFunc("/chat/sendChatImage",apnachat.SendChatImage).Methods("POST")
+	r.HandleFunc("/chat/sendMessageRequest",apnachat.SendMessageRequest).Methods("POST")
+	r.HandleFunc("/chat/getMessageRequest",apnachat.GetMessageRequest).Methods("POST")
+	r.HandleFunc("/chat/actionMessageRequest",apnachat.ActionMessageRequest).Methods("POST")
 
 
 	//Profile related APIs
@@ -85,18 +85,18 @@ func Server(runMethod string){
 	
 
 	//Security Related APIs
-	r.HandleFunc("/createPrimaryTrustChain",security.CreatePrimaryTrustChain).Methods("POST")
-	r.HandleFunc("/createSecondaryTrustChain",security.CreateSecondaryTrustChain).Methods("POST")
-	r.HandleFunc("/deletePrimaryTrustChain",security.DeletePrimaryTrustChain).Methods("POST")
-	r.HandleFunc("/deletePrimaryTrustChain",security.DeleteSecondaryTrustChain).Methods("POST")
-	r.HandleFunc("/getPrimaryTrustChain",security.GetPrimaryTrustChain).Methods("GET")
-	r.HandleFunc("/alertMessage",security.AlertMessage).Methods("POST")
+	r.HandleFunc("/security/createPrimaryTrustChain",security.CreatePrimaryTrustChain).Methods("POST")
+	r.HandleFunc("/security/createSecondaryTrustChain",security.CreateSecondaryTrustChain).Methods("POST")
+	r.HandleFunc("/security/deletePrimaryTrustChain",security.DeletePrimaryTrustChain).Methods("POST")
+	r.HandleFunc("/security/deletePrimaryTrustChain",security.DeleteSecondaryTrustChain).Methods("POST")
+	r.HandleFunc("/security/getPrimaryTrustChain",security.GetPrimaryTrustChain).Methods("GET")
+	r.HandleFunc("/security/alertMessage",security.AlertMessage).Methods("POST")
 
 	//Privacy Related APIs
-	r.HandleFunc("/uploadBoardContent",privacy.UploadBoardContent).Methods("POST")
-	r.HandleFunc("/shareBoard",privacy.ShareBoard).Methods("POST")
-	r.HandleFunc("/shareBoardContnet",privacy.ShareBoardContent).Methods("POST")
-	r.HandleFunc("/getBoardContent",privacy.GetBoardContent).Methods("POST")
+	r.HandleFunc("/diary/uploadBoardContent",privacy.UploadBoardContent).Methods("POST")
+	r.HandleFunc("/diary/shareBoard",privacy.ShareBoard).Methods("POST")
+	r.HandleFunc("/diary/shareBoardContnet",privacy.ShareBoardContent).Methods("POST")
+	r.HandleFunc("/diary/getBoardContent",privacy.GetBoardContent).Methods("POST")
 	
 	
 	//GPS related APIs
@@ -110,26 +110,26 @@ func Server(runMethod string){
 	// r.HandleFunc("/getEventById",event.GetEventById).Methods("POST")
 
 	// //Image related APIs
-	r.HandleFunc("/uploadImage",image.UploadImage).Methods("POST")
-	r.HandleFunc("/getImageById",image.GetImageById).Methods("POST")
+	r.HandleFunc("/image/uploadImage",image.UploadImage).Methods("POST")
+	r.HandleFunc("/image/getImageById",image.GetImageById).Methods("POST")
 	// r.HandleFunc("/uploadProfilePic",image.UploadProfilePic).Methods("POST")
 	// r.HandleFunc("/getEventImageList",image.GetEventImageList).Methods("POST")
 	// r.HandleFunc("/getUserImageList",image.GetUserImageList).Methods("POST")
 
 
 	//NewsFeed related APIs
-	r.HandleFunc("/getNewsArticleList",newsfeed.GetNewsArticle).Methods("POST")
+	r.HandleFunc("/feed/getNewsArticleList",newsfeed.GetNewsArticle).Methods("POST")
 	// r.HandleFunc("/getNewsArticle",newsfeed.GetNewsFeedArticle).Methods("POST")
-	r.HandleFunc("/newsFeedReaction",newsfeed.UpdateNewsFeedReaction).Methods("POST")
-	r.HandleFunc("/uploadNewsFeedImage",newsfeed.UploadNewsFeedImage).Methods("POST")
+	r.HandleFunc("/feed/newsFeedReaction",newsfeed.UpdateNewsFeedReaction).Methods("POST")
+	r.HandleFunc("/feed/uploadNewsFeedImage",newsfeed.UploadNewsFeedImage).Methods("POST")
 	// r.HandleFunc("/getNewsArticle",newsfeed.GetNewsArticle).Methods("POST")
 	// r.HandleFunc("/getNewsFeedSummary",newsfeed.GetNewsFeedSummary).Methods("POST")
 	// r.HandleFunc("/getNewsFeedArticle",newsfeed.GetNewsFeedArticle).Methods("POST")
 	// r.HandleFunc("/newsFeedReaction",newsfeed.UpdateNewsFeedReaction).Methods("POST")
 
 	//Social related APIs
-	r.HandleFunc("/getPoolStatus",social.PoolStatusRouter).Methods("POST")
-	r.HandleFunc("/getInPool",social.GetInPool).Methods("GET")
+	r.HandleFunc("/social/getPoolStatus",social.PoolStatusRouter).Methods("POST")
+	r.HandleFunc("/social/getInPool",social.GetInPool).Methods("GET")
 	// r.HandleFunc("/cancelPool",social.CancelPoolRouter).Methods("GET")
 	// r.HandleFunc("/getInGroupPool",social.GetInGroupPool).Methods("POST")
 	// r.HandleFunc("/groupPoolStatus",social.GroupPoolStatusRouter).Methods("POST")
