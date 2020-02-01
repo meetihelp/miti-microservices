@@ -4,6 +4,7 @@ import(
 	"gopkg.in/go-playground/validator.v9"
 	// "gopkg.in/go-playground/validator"
 	"fmt"
+	"strings"
 )
 
 
@@ -13,7 +14,7 @@ type SanatizeData interface{
 
 
 func(sendChatImageHeader SendChatImageHeader) doSanitization() string{
-	if(sendChatImageHeader.AccessType!="public" && sendChatImageHeader.AccessType!="private"){
+	if(strings.ToLower(sendChatImageHeader.AccessType)!="public" && strings.ToLower(sendChatImageHeader.AccessType)!="private"){
 		return "Error"
 	}
 	return "Ok"

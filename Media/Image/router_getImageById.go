@@ -8,6 +8,7 @@ import(
 	"encoding/json"
 	"log"
 	"bytes"
+	"fmt"
 )
 
 func GetImageById(w http.ResponseWriter, r *http.Request){
@@ -30,25 +31,30 @@ func GetImageById(w http.ResponseWriter, r *http.Request){
 	errorList.DatabaseError=dbError
 	util.APIHitLog("GetImageById",ipAddress,sessionId)
 	if getChatStatus=="Error"{
+		fmt.Println("GetImageById Line 33")
 		errorList.SessionError=true
 	}
 
 	//Read body data
 	requestBody,err:=ioutil.ReadAll(r.Body)
 	if (err!=nil && !util.ErrorListStatus(errorList)){
+		fmt.Println("GetImageById Line 40")
 		errorList.BodyReadError=true 
 	}
 
 	getImageByIdData :=GetImageByIdRequest{}
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("GetImageById Line 46")
 		errUserData:=json.Unmarshal(requestBody,&getImageByIdData)
 		if(errUserData!=nil){
 			errorList.UnmarshallingError=true	
 		}
 		
 	}
+	fmt.Println(getImageByIdData)
 
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("GetImageById Line 56")
 		sanatize:=Sanatize(getImageByIdData)
 		if(sanatize=="Error"){
 			errorList.SanatizationError=true
@@ -59,6 +65,7 @@ func GetImageById(w http.ResponseWriter, r *http.Request){
 	var userId2 string
 	var access string
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("GetImageById Line 67")
 		userId2,access,dbError=IsUserPermittedToSeeImage(db,userId,imageId)	
 		errorList.DatabaseError=dbError
 		if(access=="Error"){
@@ -68,14 +75,20 @@ func GetImageById(w http.ResponseWriter, r *http.Request){
 
 	var imageURL string
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("GetImageById Line 77")
 		imageURL,dbError=GetImageURL(db,userId2,imageId)
 		errorList.DatabaseError=dbError
 	}
 	
+	if(!util.ErrorListStatus(errorList)){
+		statusCode=200
+	}
 	code:=util.GetCode(errorList)
 	if(code==200){
+		fmt.Println("GetImageById Line 87")
 		content.Code=statusCode
 	}else{
+		fmt.Println("GetImageById Line 90")
 		content.Code=code
 	}
 	content.Message=util.GetMessageDecode(content.Code)
