@@ -278,6 +278,57 @@ func GetProfileDB(db *gorm.DB,userId string) (Profile,bool){
 	}
 	return profile,false
 }
+
+func GetUserInterest(db *gorm.DB,userId string) ([]string,bool){
+	interest:=Interest{}
+	interestArray:=make([]string,0)
+	err:=db.Where("user_id=?",userId).Find(&interest).Error
+	if(err!=nil){
+		return interestArray,true
+	}
+
+	if(interest.InterestIndoorPassive1!=""){
+		interestArray=append(interestArray,interest.InterestIndoorPassive1)
+	}
+	if(interest.InterestIndoorPassive2!=""){
+		interestArray=append(interestArray,interest.InterestIndoorPassive2)
+	}
+	if(interest.InterestIndoorActive1!=""){
+		interestArray=append(interestArray,interest.InterestIndoorActive1)
+	}
+	if(interest.InterestIndoorActive2!=""){
+		interestArray=append(interestArray,interest.InterestIndoorActive2)
+	}
+
+	if(interest.InterestOutdoorPassive1!=""){
+		interestArray=append(interestArray,interest.InterestOutdoorPassive1)
+	}
+	if(interest.InterestOutdoorPassive2!=""){
+		interestArray=append(interestArray,interest.InterestOutdoorPassive2)
+	}
+	if(interest.InterestOutdoorActive1!=""){
+		interestArray=append(interestArray,interest.InterestOutdoorActive1)
+	}
+	if(interest.InterestOutdoorActive2!=""){
+		interestArray=append(interestArray,interest.InterestOutdoorActive2)
+	}
+	if(interest.InterestOthers1!=""){
+		interestArray=append(interestArray,interest.InterestOthers1)
+	}
+	if(interest.InterestOthers2!=""){
+		interestArray=append(interestArray,interest.InterestOthers2)
+	}
+	if(interest.InterestIdeology1!=""){
+		interestArray=append(interestArray,interest.InterestIdeology1)
+	}
+	if(interest.InterestIdeology2!=""){
+		interestArray=append(interestArray,interest.InterestIdeology2)
+	}
+
+	return interestArray,false
+}
+
+
 //LAST
 
 
@@ -508,27 +559,7 @@ func GetStatusDB(chatId string) []StatusResponse{
 	return statusList
 }
 
-func GetUserInterest(userId string) []string{
-	db:=database.GetDB()
-	interest:=Interest{}
-	db.Where("user_id=?",userId).Find(&interest)
 
-	interestList:=make([]string,0)
-	interestList=append(interestList,interest.InterestOutdoorPassive1)
-	interestList=append(interestList,interest.InterestOutdoorPassive2)
-	interestList=append(interestList,interest.InterestOutdoorActive1)
-	interestList=append(interestList,interest.InterestOutdoorActive2)
-	interestList=append(interestList,interest.InterestIndoorPassive1)
-	interestList=append(interestList,interest.InterestIndoorPassive2)
-	interestList=append(interestList,interest.InterestIndoorActive1)
-	interestList=append(interestList,interest.InterestIndoorActive2)
-	interestList=append(interestList,interest.InterestOthers1)
-	interestList=append(interestList,interest.InterestOthers2)
-	interestList=append(interestList,interest.InterestIdeology1)
-	interestList=append(interestList,interest.InterestIdeology2)
-
-	return interestList
-}
 
 func GetUserName(db *gorm.DB,userId string) (string,bool){
 	profile:=Profile{}

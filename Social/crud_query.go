@@ -160,7 +160,7 @@ func GroupPoolStatusDB(userId string) ([]string,[]GroupPoolStatusHelper){
 		groupPoolStatusHelper=append(groupPoolStatusHelper,groupPoolStatusHelperTemp)
 	}
 
-	interest:=profile.GetUserInterest(userId)
+	interest,_:=profile.GetUserInterest(db,userId)
 
 	return interest,groupPoolStatusHelper
 }

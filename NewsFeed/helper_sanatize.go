@@ -16,6 +16,9 @@ func(getNewsFeedArticleData GetNewsArticleDS) doSanitization() string{
 		fmt.Println(err.Error())
 		return "Error"
 	}
+	// if(getNewsFeedArticleData.Label==""){
+	// 	return "Error"
+	// }
 	return "Ok"
 }
 

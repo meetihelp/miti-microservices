@@ -9,6 +9,7 @@ import(
 	util "miti-microservices/Util"
 	database "miti-microservices/Database"
 	getNewsArticleCache "miti-microservices/Database/Cache/NewsFeedCache"
+	profile "miti-microservices/Profile"
 	"io/ioutil"
 	"encoding/json"
 	"bytes"
@@ -64,10 +65,16 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 	}
 
 	label:=getNewsFeedArticleData.Label
-	id,dbError:=GetLabelId(db,label,userId)
-	errorList.DatabaseError=dbError
+	if(label==""){
+		label="FoodPorn"
+	}
+	var id int64
+	if(!util.ErrorListStatus(errorList)){
+		id,dbError=GetLabelId(db,label,userId)
+		errorList.DatabaseError=dbError	
+	}
+	
 
-	nextLabel:=GetNextLabel(label)
 	var isDone string
 	numOfArticle:=0
 	if(!util.ErrorListStatus(errorList)){
@@ -79,7 +86,15 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 		}
 	}
 
-	guiltyPleasure:=[]GuiltyPleasure{}
+	var interest []string
+	if(!util.ErrorListStatus(errorList) && isDone=="No"){
+		interest,dbError=profile.GetUserInterest(db,userId)
+		errorList.DatabaseError=dbError
+	}
+	nextLabel:=GetNextLabel(label,interest)
+
+
+	news:=[]News{}
 	cache:=getNewsArticleCache.GetNewsArticleCache()
 	
 	numOfLabelArticle:=0
@@ -93,17 +108,9 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 
 	newsId:=make([]int64,0)
 	if(!util.ErrorListStatus(errorList) && isDone=="No"){
+		news,newsId,dbError=getNews(db,cache,nextLabel,id,numOfLabelArticle)
+		errorList.DatabaseError=dbError
 		fmt.Println("GetNewsArticle line 96")
-		table:=GetTable(nextLabel)
-		if(table=="GuiltyPleasure"){
-			guiltyPleasure,newsId,dbError=getGuiltyPleasure(db,cache,nextLabel,id,numOfLabelArticle)
-			errorList.DatabaseError=dbError	
-		}else if(table=="News"){
-			guiltyPleasure,newsId,dbError=getNews(db,cache,nextLabel,id,numOfLabelArticle)
-			errorList.DatabaseError=dbError	
-		}else{
-			statusCode=1002
-		}
 		
 	}
 
@@ -128,7 +135,7 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 	}
 	content.Message=util.GetMessageDecode(content.Code)
 	newsResponse:=make([]NewsResponse,0)
-	for _,g:=range guiltyPleasure{
+	for _,g:=range news{
 		n:=NewsResponse{}
 		n.Id=g.Id
 		n.Summary=g.Summary
@@ -194,7 +201,7 @@ func getGuiltyPleasure(db *gorm.DB,cache *gocache.Cache,label string,id int64,nu
 	return guiltyPleasureResponse,newsId,dbError
 }
 
-func getNews(db *gorm.DB,cache *gocache.Cache,label string,id int64,numOfArticle int)([]GuiltyPleasure,[]int64,bool){
+func getNews(db *gorm.DB,cache *gocache.Cache,label string,id int64,numOfArticle int)([]News,[]int64,bool){
 	x,found:=cache.Get(label)
 	news:= []News{}
 	var dbError bool
@@ -208,7 +215,7 @@ func getNews(db *gorm.DB,cache *gocache.Cache,label string,id int64,numOfArticle
 		dbError=false
 	}
 
-	guiltyPleasureResponse:=make([]GuiltyPleasure,0)
+	newsResponse:=make([]News,0)
 	count:=0
 	newsId:=make([]int64,0)
 	for _,g:=range news{
@@ -216,16 +223,26 @@ func getNews(db *gorm.DB,cache *gocache.Cache,label string,id int64,numOfArticle
 			break
 		}
 		if(g.Id>id){
-			guiltyPleasureResponse=append(guiltyPleasureResponse,GuiltyPleasure(g))
+			newsResponse=append(newsResponse,g)
 			newsId=append(newsId,g.Id)
 			count++
 		}
 	}
 
-	return guiltyPleasureResponse,newsId,dbError
+	return newsResponse,newsId,dbError
 }
 
-func GetNextLabel(label string) string{
+func GetNextLabel(label string,interest []string) (string){
+	for index,interestLabel :=range interest{
+		if(label==interestLabel){
+			if(index!=len(interest)-1){
+				return interest[index+1]
+			}else{
+				return "FoodPorn"
+			}
+		}
+	}
+
 	if(label==""){
 		return "FoodPorn"
 	}
@@ -238,7 +255,7 @@ func GetNextLabel(label string) string{
 	}
 
 	if(label=="travel"){
-		return "FoodPorn"
+		return interest[0]
 	}
 
 	return "FoodPorn"
