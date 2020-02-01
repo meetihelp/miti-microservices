@@ -60,8 +60,8 @@ func EnterInPooL(db *gorm.DB,userId string,pincode string,createdAt string,gende
 	return poolStatusResponse,false
 }
 
-func EnterInGroupPooL(userId string,pincode string,interest string,createdAt string,gender string,sex string) GroupPoolStatusHelper{
-	db:=database.GetDB()
+func EnterInGroupPooL(db *gorm.DB,userId string,pincode string,interest string,createdAt string,gender string,sex string) (GroupPoolStatusHelper,bool){
+	groupPoolStatusHelper:=GroupPoolStatusHelper{}
 	poolWait:=GroupPoolWaiting{}
 	poolWait.UserId=userId
 	poolWait.Pincode=pincode
@@ -69,20 +69,25 @@ func EnterInGroupPooL(userId string,pincode string,interest string,createdAt str
 	poolWait.CreatedAt=createdAt
 	poolWait.Gender=gender
 	poolWait.Sex=sex
-	_=db.Create(&poolWait).Error
+	err:=db.Create(&poolWait).Error
+	if(err!=nil){
+		return groupPoolStatusHelper,true
+	}
 
 	groupPoolStatus:=GroupPoolStatus{}
-	db.Where("user_id=? AND interest=?",userId,interest).Find(&groupPoolStatus)
+	err=db.Where("user_id=? AND interest=?",userId,interest).Find(&groupPoolStatus).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return groupPoolStatusHelper,true
+	}
 	if(groupPoolStatus.UserId==""){
 		groupPoolStatus.UserId=userId
 		groupPoolStatus.Status="Waiting"
 		groupPoolStatus.Interest=interest
 	}
-	groupPoolStatusHelper:=GroupPoolStatusHelper{}
 	groupPoolStatusHelper.ChatId=groupPoolStatus.ChatId
 	groupPoolStatusHelper.Status=groupPoolStatus.Status
 
-	return groupPoolStatusHelper
+	return groupPoolStatusHelper,false
 }
 func DeleteWaitPool(userId string) {
 	db:=database.GetDB()
@@ -167,34 +172,45 @@ func GroupPoolStatusDB(db *gorm.DB,userId string) ([]string,[]GroupPoolStatusHel
 	return interest,groupPoolStatusHelper,dbError
 }
 
-func GetGroupAvailabilty(userId string,pincode string,interest string,requestId string) (string,string){
-	db:=database.GetDB()
+func GetGroupAvailabilty(db *gorm.DB,userId string,pincode string,interest string,requestId string) (string,string,bool){
 	groupStats:=GroupStats{}
 	group:=Group{}
-	db.Where("user_id=? AND pincode=? AND interest=? AND request_id=?",userId,pincode,interest,requestId).Find(&group)
+	err:=db.Where("user_id=? AND pincode=? AND interest=? AND request_id=?",userId,pincode,interest,requestId).Find(&group).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return "","",true
+	}
 	if(group.UserId!=""){
-		return "already",group.ChatId
+		return "already",group.ChatId,false
 	}
-	db.Where("pincode=? AND interest=? AND number_of_member<?",pincode,interest,MAX_NUMBER_OF_MEMBER)
+	err=db.Where("pincode=? AND interest=? AND number_of_member<?",pincode,interest,MAX_NUMBER_OF_MEMBER).Find(&groupStats).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return "","",true
+	}
 	if(groupStats.ChatId!=""){
-		return groupStats.ChatId,"permanent"
+		return groupStats.ChatId,"permanent",false
 	}
-	db.Where("pincode=? AND interest=? AND number_of_temporary_member<?",pincode,interest,MAX_NUMBER_OF_TEMPORARY_MEMBER).Find(&groupStats)
+	err=db.Where("pincode=? AND interest=? AND number_of_temporary_member<?",pincode,interest,MAX_NUMBER_OF_TEMPORARY_MEMBER).Find(&groupStats).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return "","",true
+	}
 	if(groupStats.ChatId==""){
-		chatId,status:=CreateNewGroup(pincode,interest)
-		if(chatId==""){
-			return "","None"
+		chatId,status,dbError:=CreateNewGroup(db,pincode,interest)
+		if(!dbError){
+			if(chatId==""){
+				return "","None",false
+			}else {
+				return chatId,status,false
+			}
 		}else{
-			return chatId,status
+			return "","",true
 		}
-		
+			
 	}else{
-		return groupStats.ChatId,"temporary"
+		return groupStats.ChatId,"temporary",false
 	}
 }
 
-func CreateNewGroup(pincode string,interest string) (string,string){
-	db:=database.GetDB()
+func CreateNewGroup(db *gorm.DB,pincode string,interest string) (string,string,bool){
 	createdAt:=util.GetTime()
 	chatDetail:=ChatDetail{}
 	chatDetail.ChatId=util.GenerateToken()
@@ -203,21 +219,39 @@ func CreateNewGroup(pincode string,interest string) (string,string){
 	chatDetail.Name=util.GetGroupName(interest)
 
 	groupStats:=GroupStats{}
-	db.Where("pincode=? AND interest=? AND number_of_temporary_member=?",pincode,interest,MAX_NUMBER_OF_TEMPORARY_MEMBER).Find(&groupStats)
+	err:=db.Where("pincode=? AND interest=? AND number_of_temporary_member=?",pincode,interest,MAX_NUMBER_OF_TEMPORARY_MEMBER).Find(&groupStats).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return "","",true
+	}
 	group:=[]Group{}
 	chatId:=groupStats.ChatId
-	db.Where("pincode=? AND interest=? AND chat_id=?",pincode,interest,chatId).Find(&group)
-	db.Table("group_stats").Where("chat_id=?",chatId).Update("number_of_temporary_member",0)
+	err=db.Where("pincode=? AND interest=? AND chat_id=?",pincode,interest,chatId).Find(&group).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return "","",true
+	}
+	err=db.Table("group_stats").Where("chat_id=?",chatId).Update("number_of_temporary_member",0).Error
+	if(err!=nil){
+		return "","",true
+	}
 	count:=0
 
 
 	for _,member:=range group{
 		userId:=member.UserId
 		chatId:=member.ChatId
-		db.Table("group").Where("user_id=? AND interest=?",userId,interest).Updates(Group{ChatId:chatDetail.ChatId,Membership:"permanent",CreatedAt:createdAt})
-		db.Where("actual_user_id=? AND chat_id=?",userId,chatId).Delete(&ChatDetail{})
+		err=db.Table("group").Where("user_id=? AND interest=?",userId,interest).Updates(Group{ChatId:chatDetail.ChatId,Membership:"permanent",CreatedAt:createdAt}).Error
+		if(err!=nil){
+			return "","",true
+		}
+		err=db.Where("actual_user_id=? AND chat_id=?",userId,chatId).Delete(&ChatDetail{}).Error
+		if(err!=nil){
+			return "","",true
+		}
 		chatDetail.ActualUserId=userId
-		db.Create(&chatDetail)
+		err=db.Create(&chatDetail).Error
+		if(err!=nil){
+			return "","",true
+		}
 		count++;
 	}
 
@@ -228,16 +262,19 @@ func CreateNewGroup(pincode string,interest string) (string,string){
 	newGroupStats.Interest=interest
 	newGroupStats.Pincode=pincode
 	newGroupStats.CreatedAt=createdAt
-	db.Create(&newGroupStats)
+	err=db.Create(&newGroupStats).Error
+	if(err!=nil){
+		return "","",true
+	}
 
 
-	return chatDetail.ChatId,"permanent"
+	return chatDetail.ChatId,"permanent",false
 }
 
 
 
-func InsertInGroup(chatId string,pincode string,userId string,membership string,interest string,requestId string) GroupPoolStatusHelper{
-	db:=database.GetDB()
+func InsertInGroup(db *gorm.DB,chatId string,pincode string,userId string,membership string,interest string,requestId string) (GroupPoolStatusHelper,bool){
+	groupPoolStatusHelper:=GroupPoolStatusHelper{}
 	createdAt:=util.GetTime()
 	group:=Group{}
 	group.UserId=userId
@@ -248,9 +285,15 @@ func InsertInGroup(chatId string,pincode string,userId string,membership string,
 	group.RequestId=requestId
 	group.Membership=membership
 	groupTemp:=Group{}
-	db.Where("user_id=? AND interest=?",userId,interest).Find(&groupTemp)
+	err:=db.Where("user_id=? AND interest=?",userId,interest).Find(&groupTemp).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return groupPoolStatusHelper,true
+	}
 	if(groupTemp.UserId==""){
-		db.Create(&group)
+		err=db.Create(&group).Error
+		if(err!=nil){
+			return groupPoolStatusHelper,true
+		}
 
 		chatDetails:=ChatDetail{}
 		chatDetails.ActualUserId=userId
@@ -258,19 +301,34 @@ func InsertInGroup(chatId string,pincode string,userId string,membership string,
 		chatDetails.CreatedAt=createdAt
 		chatDetails.ChatType="Group"
 		chatDetails.Name=util.GetGroupName(interest)
-		db.Create(&chatDetails)
+		err=db.Create(&chatDetails).Error
+		if(err!=nil){
+			return groupPoolStatusHelper,true
+		}
 	}else{
-		db.Table("chat_details").Where("actual_user_id=? AND chat_id=?",userId,chatId).Update("chat_id",chatId)
-		db.Table("groups").Where("user_id=? AND chat_id=?",userId,chatId).Updates(group)
+		err=db.Table("chat_details").Where("actual_user_id=? AND chat_id=?",userId,chatId).Update("chat_id",chatId).Error
+		if(err!=nil){
+			return groupPoolStatusHelper,true
+		}
+		err=db.Table("groups").Where("user_id=? AND chat_id=?",userId,chatId).Updates(group).Error
+		if(err!=nil){
+			return groupPoolStatusHelper,true
+		}
 	}
 	groupStats:=GroupStats{}
 	db.Where("chat_id=?",chatId).Find(&groupStats)
 	if(membership=="temporary"){
 		numberOfTemporaryMember:=groupStats.NumberOfTemporaryMember+1
-		db.Model(&groupStats).Where("chat_id=?",chatId).Update("number_of_temporary_member",numberOfTemporaryMember)
+		err=db.Model(&groupStats).Where("chat_id=?",chatId).Update("number_of_temporary_member",numberOfTemporaryMember).Error
+		if(err!=nil){
+			return groupPoolStatusHelper,true
+		}
 	}else if(membership=="permanent"){
 		numberOfMember:=groupStats.NumberOfMember+1
-		db.Model(&groupStats).Where("chat_id=?",chatId).Update("number_of_member",numberOfMember)
+		err=db.Model(&groupStats).Where("chat_id=?",chatId).Update("number_of_member",numberOfMember).Error
+		if(err!=nil){
+			return groupPoolStatusHelper,true
+		}
 	}
 
 	groupPoolStatus:=GroupPoolStatus{}
@@ -281,28 +339,40 @@ func InsertInGroup(chatId string,pincode string,userId string,membership string,
 	groupPoolStatus.Status=membership
 
 	groupPoolStatusTemp:=GroupPoolStatus{}
-	db.Where("user_id=? AND interest=?",userId,interest).Find(&groupPoolStatusTemp)
+	err=db.Where("user_id=? AND interest=?",userId,interest).Find(&groupPoolStatusTemp).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return groupPoolStatusHelper,true
+	}
 	if(groupPoolStatusTemp.UserId==""){
-		db.Create(&groupPoolStatus)
+		err=db.Create(&groupPoolStatus).Error
+		if(err!=nil){
+			return groupPoolStatusHelper,true
+		}
 	}else{
-		db.Table("group_pool_statuses").Where("user_id=? AND interest=?",userId,interest).Updates(groupPoolStatus)
+		err=db.Table("group_pool_statuses").Where("user_id=? AND interest=?",userId,interest).Updates(groupPoolStatus).Error
+		if(err!=nil){
+			return groupPoolStatusHelper,true
+		}
 	}
 
-	groupPoolStatusHelper:=GroupPoolStatusHelper{}
+	
 	groupPoolStatusHelper.ChatId=chatId
 	groupPoolStatusHelper.Status=membership
 
-	return groupPoolStatusHelper
+	return groupPoolStatusHelper,false
 }
 
-func GetGroupPoolStatus(userId string,pincode string,interest string) GroupPoolStatusHelper{
-	db:=database.GetDB()
+func GetGroupPoolStatus(db *gorm.DB,userId string,pincode string,interest string) (GroupPoolStatusHelper,bool){
 	group:=Group{}
-	db.Where("user_id=? AND pincode=? AND interest=?",userId,pincode,interest).Find(&group)
 	groupPoolStatusHelper:=GroupPoolStatusHelper{}
+	err:=db.Where("user_id=? AND pincode=? AND interest=?",userId,pincode,interest).Find(&group).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return groupPoolStatusHelper,true
+	}
+	
 	groupPoolStatusHelper.ChatId=group.ChatId
 	groupPoolStatusHelper.Status=group.Membership
 	groupPoolStatusHelper.Interest=group.Interest
 	groupPoolStatusHelper.CreatedAt=group.CreatedAt
-	return groupPoolStatusHelper
+	return groupPoolStatusHelper,false
 }

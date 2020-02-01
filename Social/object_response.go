@@ -37,6 +37,20 @@ type GroupPoolStatusResponseHeader struct{
 	ContentType string `json:"Content-Type"`
 }
 
+type GetInGroupPoolResponse struct{
+	Code int `json:"Code"`
+	Message string `json:"Message"`
+	Interest string `json:"Interest"`
+	Status GroupPoolStatusHelper `json:"Status"`
+	CreatedAt string `json:"CreatedAt"`
+	RequestId string `json:"RequestId"`
+}
+
+type GetInGroupPoolResponseHeader struct{
+	ContentType string `json:"Content-Type"`
+}
+
+
 
 //Last
 
@@ -50,14 +64,7 @@ type PoolStatusHelper struct{
 	Status string `json:"Status"`
 }
 
-type GetInGroupPoolResponse struct{
-	Code int `json:"Code"`
-	Message string `json:"Message"`
-	Interest string `json:"Interest"`
-	Status GroupPoolStatusHelper `json:"Status"`
-	CreatedAt string `json:"CreatedAt"`
-	RequestId string `json:"RequestId"`
-}
+
 
 type GroupPoolStatusHelper struct{
 	ChatId string `json:"ChatId"`

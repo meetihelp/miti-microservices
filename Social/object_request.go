@@ -26,6 +26,16 @@ type GroupPoolStatusRequest struct{
 	Longitude string `json:"Longitude"`
 }
 
+//Get in Group Pool
+type GetInGroupPoolHeader struct{
+	Cookie string `header:"Miti-Cookie"`	
+}
+
+type GetInGroupPoolRequest struct{
+	RequestId string `json:"RequestId"`
+	Interest string `json:"Interest"`
+}
+
 //Last
 
 
@@ -39,14 +49,7 @@ type GroupPoolStatusRequest struct{
 // 	RequestId string `json:"RequestId"`
 // }
 
-type GetInGroupPoolHeader struct{
-	Cookie string `header:"Miti-Cookie"`	
-}
 
-type GetInGroupPoolRequest struct{
-	RequestId string `json:"RequestId"`
-	Interest string `json:"Interest"`
-}
 
 type CancelPoolHeader struct{
 	Cookie string `header:"Miti-Cookie"`	

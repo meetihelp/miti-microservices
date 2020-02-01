@@ -131,8 +131,8 @@ func Server(runMethod string){
 	r.HandleFunc("/social/getPoolStatus",social.PoolStatusRouter).Methods("POST")
 	r.HandleFunc("/social/getInPool",social.GetInPool).Methods("GET")
 	// r.HandleFunc("/cancelPool",social.CancelPoolRouter).Methods("GET")
-	// r.HandleFunc("/getInGroupPool",social.GetInGroupPool).Methods("POST")
-	// r.HandleFunc("/groupPoolStatus",social.GroupPoolStatusRouter).Methods("POST")
+	r.HandleFunc("/social/getInGroupPool",social.GetInGroupPool).Methods("POST")
+	r.HandleFunc("/social/groupPoolStatus",social.GroupPoolStatusRouter).Methods("POST")
 	// r.HandleFunc("/cancelGroupPool",social.CancelGroupPoolRouter).Methods("POST")
 	
 	http.Handle("/", r)
