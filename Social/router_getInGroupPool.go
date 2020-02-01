@@ -66,7 +66,7 @@ func GetInGroupPool(w http.ResponseWriter, r *http.Request){
 		}
 	}
 	
-	var pincode string
+	pincode:="Error"
 	if(!util.ErrorListStatus(errorList)){
 		fmt.Println("GetInGroupPool Line 69")
 		pincode,dbError=gps.GetUserCurrentPincode(db,userId)	
@@ -90,13 +90,13 @@ func GetInGroupPool(w http.ResponseWriter, r *http.Request){
 	groupPoolStatus:=GroupPoolStatusHelper{}
 	var chatId string
 	var groupAvailabilty string
-	if(!util.ErrorListStatus(errorList)){
+	if(!util.ErrorListStatus(errorList) && pincode!="Error"){
 		fmt.Println("GetInGroupPool Line 92")
 		chatId,groupAvailabilty,dbError=GetGroupAvailabilty(db,userId,pincode,interest,requestId)
 		errorList.DatabaseError=dbError
 	}
 	
-	if(!util.ErrorListStatus(errorList)){
+	if(!util.ErrorListStatus(errorList) && pincode!="Error"){
 		fmt.Println("GetInGroupPool Line 98")
 		if(groupAvailabilty=="already"){
 			fmt.Println("GetInGroupPool Line 100")
@@ -107,10 +107,15 @@ func GetInGroupPool(w http.ResponseWriter, r *http.Request){
 		}else if(groupAvailabilty=="permanent"){
 			fmt.Println("GetInGroupPool Line 106")
 			groupPoolStatus,dbError=InsertInGroup(db,chatId,pincode,userId,"permanent",interest,requestId)
-		}else{
+		}else if(groupAvailabilty=="temporary"){
 			fmt.Println("GetInGroupPool Line 109")
 			groupPoolStatus,dbError=InsertInGroup(db,chatId,pincode,userId,"temporary",interest,requestId)
 		}
+		errorList.DatabaseError=dbError
+	}
+
+	if(!util.ErrorListStatus(errorList) && pincode=="Error"){
+		groupPoolStatus,dbError=InsertInGroup(db,chatId,pincode,userId,"temporary",interest,requestId)
 		errorList.DatabaseError=dbError
 	}
 

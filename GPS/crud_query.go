@@ -116,7 +116,7 @@ func GetPincode(db *gorm.DB,location Location,city string) (string,bool){
 	}
 	locationRegion:=Location{}
 	min_distance:=math.MaxFloat64
-	pincode:="Could Not Find"
+	pincode:="Error"
 	for _,c:=range cityPincode{
 		locationRegion.Latitude=c.Latitude
 		locationRegion.Longitude=c.Longitude
