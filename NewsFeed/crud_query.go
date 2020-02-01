@@ -59,6 +59,22 @@ func GetGuiltyPleasure(db *gorm.DB,label string)([]GuiltyPleasure,bool){
 	return guiltyPleasure,false
 }
 
+func GetNews(db *gorm.DB,label string)([]News,bool){
+	news:=[]News{}
+	userFeedStatus:=UserFeedStatus{}
+	err:=db.Order("id desc").Limit(1).Where("label=?",label).Find(&userFeedStatus).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return news,true
+	}
+	id:=userFeedStatus.Id
+
+	err=db.Table("news").Order("id").Limit(20).Where("label=? AND id>?",label,id).Find(&news).Error
+	if(err!=nil){
+		return news,true
+	}
+	return news,false
+}
+
 func UpdateUserNewsFeedStatus(db *gorm.DB,userId string,label string,newsId []int64) bool{
 	updatedAt:=util.GetDateFromTime(util.GetTime())
 	for _,id:=range newsId{

@@ -94,8 +94,17 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 	newsId:=make([]int64,0)
 	if(!util.ErrorListStatus(errorList) && isDone=="No"){
 		fmt.Println("GetNewsArticle line 96")
-		guiltyPleasure,newsId,dbError=getGuiltyPleasure(db,cache,nextLabel,id,numOfLabelArticle)
-		errorList.DatabaseError=dbError
+		table:=GetTable(nextLabel)
+		if(table=="GuiltyPleasure"){
+			guiltyPleasure,newsId,dbError=getGuiltyPleasure(db,cache,nextLabel,id,numOfLabelArticle)
+			errorList.DatabaseError=dbError	
+		}else if(table=="News"){
+			guiltyPleasure,newsId,dbError=getNews(db,cache,nextLabel,id,numOfLabelArticle)
+			errorList.DatabaseError=dbError	
+		}else{
+			statusCode=1002
+		}
+		
 	}
 
 	if(!util.ErrorListStatus(errorList) && isDone=="No"){
@@ -104,7 +113,7 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 		errorList.DatabaseError=dbError
 	}
 
-	if(!util.ErrorListStatus(errorList) && isDone=="No"){
+	if(!util.ErrorListStatus(errorList) && isDone=="No" && statusCode==0){
 		fmt.Println("GetNewsArticle line 108")
 		statusCode=200
 	}
@@ -185,6 +194,37 @@ func getGuiltyPleasure(db *gorm.DB,cache *gocache.Cache,label string,id int64,nu
 	return guiltyPleasureResponse,newsId,dbError
 }
 
+func getNews(db *gorm.DB,cache *gocache.Cache,label string,id int64,numOfArticle int)([]GuiltyPleasure,[]int64,bool){
+	x,found:=cache.Get(label)
+	news:= []News{}
+	var dbError bool
+	if(!found){
+		fmt.Println("Cache miss for "+label)
+		news,dbError=GetNews(db,label)
+		cache.Set(label,news,0)
+	}else{
+		fmt.Println("Cache hit for "+label)
+		news=x.([]News)
+		dbError=false
+	}
+
+	guiltyPleasureResponse:=make([]GuiltyPleasure,0)
+	count:=0
+	newsId:=make([]int64,0)
+	for _,g:=range news{
+		if(count>numOfArticle){
+			break
+		}
+		if(g.Id>id){
+			guiltyPleasureResponse=append(guiltyPleasureResponse,GuiltyPleasure(g))
+			newsId=append(newsId,g.Id)
+			count++
+		}
+	}
+
+	return guiltyPleasureResponse,newsId,dbError
+}
+
 func GetNextLabel(label string) string{
 	if(label==""){
 		return "FoodPorn"
@@ -194,9 +234,29 @@ func GetNextLabel(label string) string{
 	}
 
 	if(label=="memes"){
+		return "travel"
+	}
+
+	if(label=="travel"){
 		return "FoodPorn"
 	}
 
 	return "FoodPorn"
 
+}
+
+func GetTable(label string) string{
+	if(label==""){
+		return "Error"
+	}
+
+	if(label=="FoodPorn"){
+		return "GuiltyPleasure"
+	}
+
+	if(label=="memes"){
+		return "GuiltyPleasure"
+	}
+
+	return "News"
 }
