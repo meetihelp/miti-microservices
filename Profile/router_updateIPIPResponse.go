@@ -80,6 +80,10 @@ func UpdateIPIPResponse(w http.ResponseWriter, r *http.Request){
 		dbError:=UpdateIPIPScore(db,userId)
 		errorList.DatabaseError=dbError
 	}
+
+	if(!util.ErrorListStatus(errorList)){
+		statusCode=200
+	}
 	
 	
 	code:=util.GetCode(errorList)

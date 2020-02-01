@@ -27,19 +27,20 @@ type GetInPoolResponseHeader struct{
 	ContentType string `json:"Content-Type"`
 }
 
-
-//Last
-
 type GroupPoolStatusResponse struct{
 	Code int `json:"Code"`
 	Message string `json:"Message"`
-	// ChatId string `json:"ChatId"`
 	Interest []string `json:"Interest"`
 	Status []GroupPoolStatusHelper `json:"Status"`
-	// CreatedAt string `json:"CreatedAt"`
-	// MatchTime string `json:"MatchTime"`
-	IPIP int `json:"IPIP"`
+} 
+type GroupPoolStatusResponseHeader struct{
+	ContentType string `json:"Content-Type"`
 }
+
+
+//Last
+
+
 
 
 

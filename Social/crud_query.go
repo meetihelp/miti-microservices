@@ -3,7 +3,7 @@ package Social
 import(
 	database "miti-microservices/Database"
 	profile "miti-microservices/Profile"
-	"fmt"
+	// "fmt"
 	util "miti-microservices/Util"
 	"github.com/jinzhu/gorm"
 )
@@ -11,7 +11,7 @@ import(
 func PoolStatusDB(db *gorm.DB,userId string) (PoolStatus,bool){
 	poolStatus:=PoolStatus{}
 	err:=db.Where("user_id=?",userId).Find(&poolStatus).Error
-	if(err!=nil && gorm.IsRecordNotFoundError(err)){
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
 		return poolStatus,true
 	}
 	return poolStatus,false
@@ -144,13 +144,15 @@ func DeleteFromGroupPoolHelper(areaCode string,gender string,number_of_person in
 }
 
 
-func GroupPoolStatusDB(userId string) ([]string,[]GroupPoolStatusHelper){
-	db:=database.GetDB()
+func GroupPoolStatusDB(db *gorm.DB,userId string) ([]string,[]GroupPoolStatusHelper,bool){
 	groupPoolStatus:=[]GroupPoolStatus{}
-	err:=db.Where("user_id=?",userId).Find(&groupPoolStatus).Error
-	fmt.Print("PoolStatusDB:")
-	fmt.Println(err)
 	groupPoolStatusHelper:=[]GroupPoolStatusHelper{}
+	var interest []string
+	err:=db.Where("user_id=?",userId).Find(&groupPoolStatus).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return interest,groupPoolStatusHelper,true
+	}
+	
 	for _,g:=range groupPoolStatusHelper{
 		groupPoolStatusHelperTemp:=GroupPoolStatusHelper{}
 		groupPoolStatusHelperTemp.ChatId=g.ChatId
@@ -160,9 +162,9 @@ func GroupPoolStatusDB(userId string) ([]string,[]GroupPoolStatusHelper){
 		groupPoolStatusHelper=append(groupPoolStatusHelper,groupPoolStatusHelperTemp)
 	}
 
-	interest,_:=profile.GetUserInterest(db,userId)
+	interest,dbError:=profile.GetUserInterest(db,userId)
 
-	return interest,groupPoolStatusHelper
+	return interest,groupPoolStatusHelper,dbError
 }
 
 func GetGroupAvailabilty(userId string,pincode string,interest string,requestId string) (string,string){
