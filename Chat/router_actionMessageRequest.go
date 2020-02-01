@@ -76,21 +76,28 @@ func ActionMessageRequest(w http.ResponseWriter,r *http.Request){
 	
 	updatedAt:=util.GetTime()
 	if(action=="accept" && !util.ErrorListStatus(errorList)){
+		
 		fmt.Println("ActionMessageRequest line 79")
 		userId2,updatedAtTemp,messageRequest,dbError:=UpdateMessageRequestDB(db,phone,senderPhone,action,actionRequestId,updatedAt)
 		errorList.DatabaseError=dbError
+		var status string
+		if(!util.ErrorListStatus(errorList)){
+			status,dbError=CheckIfAlreadyChatExist(db,userId,userId2)
+			errorList.DatabaseError=dbError
+		}
+		
 		updatedAt=updatedAtTemp
 		var chatId string
-		if(!util.ErrorListStatus(errorList)){
+		if(!util.ErrorListStatus(errorList) && status=="Ok"){
 			chatId,dbError=InsertChatDetailMessageRequest(db,userId,userId2,actionRequestId)
 			errorList.DatabaseError=dbError
 		}
-		if(!util.ErrorListStatus(errorList)){
+		if(!util.ErrorListStatus(errorList) && status=="Ok"){
 			dbError=InsertIntoChatFromMessageRequest(db,chatId,actionRequestId,messageRequest)	
 			errorList.DatabaseError=dbError
 		}
 
-		if(!util.ErrorListStatus(errorList)){
+		if(!util.ErrorListStatus(errorList) && status=="Ok"){
 			dbError=profile.InsertIntoMatch(db,userId,userId2)
 			errorList.DatabaseError=dbError
 		}

@@ -189,4 +189,5 @@ func DeleteProfile(w http.ResponseWriter, r *http.Request){
 		fmt.Print("Line 189")
 		fmt.Println(err)
 	}
+	db.Close()
 }

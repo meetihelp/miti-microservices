@@ -289,6 +289,28 @@ func UpdateMessageRequestDB(db *gorm.DB,phone string,senderPhone string,action s
 	}
 }
 
+func CheckIfAlreadyChatExist(db *gorm.DB,userId1 string,userId2 string)(string,bool){
+	chatDetail1:=[]ChatDetail{}
+	err:=db.Where("actual_user_id=?",userId1).Find(&chatDetail1).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return "Error",true
+	}
+
+	chatDetail2:=[]ChatDetail{}
+	err=db.Where("actual_user_id=?",userId2).Find(&chatDetail2).Error
+	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
+		return "Error",true
+	}
+
+	for _,c1:=range chatDetail1{
+		for _,c2:=range chatDetail2{
+			if(c1.ChatId==c2.ChatId){
+				return "Error",false
+			}
+		}
+	}
+	return "Ok",true
+}
 func InsertChatDetailMessageRequest(db *gorm.DB,userId1 string,userId2 string,requestId string) (string,bool){
 	chatDetail:=ChatDetail{}
 	chatDetail.CreatedAt=util.GetTime()
