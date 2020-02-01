@@ -95,7 +95,7 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 		interest,dbError=profile.GetUserInterest(db,userId)
 		errorList.DatabaseError=dbError
 	}
-	nextLabel:=GetNextLabel(label,interest)
+	
 
 
 	news:=[]News{}
@@ -111,11 +111,17 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 	}
 
 	newsId:=make([]int64,0)
-	if(!util.ErrorListStatus(errorList) && isDone=="No"){
-		news,newsId,dbError=getNews(db,cache,nextLabel,id,numOfLabelArticle)
-		errorList.DatabaseError=dbError
-		fmt.Println("GetNewsArticle line 117")
-		
+	if(isDone=="No"){
+		nextLabel:=label
+		for true{
+			if(util.ErrorListStatus(errorList) || len(news)>0){
+				break
+			}
+			nextLabel=GetNextLabel(nextLabel,interest)
+			news,newsId,dbError=getNews(db,cache,nextLabel,id,numOfLabelArticle)
+			errorList.DatabaseError=dbError
+			fmt.Println("GetNewsArticle line 117")
+		}		
 	}
 
 	if(!util.ErrorListStatus(errorList) && isDone=="No"){
