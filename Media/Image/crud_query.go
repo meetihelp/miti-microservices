@@ -1,6 +1,7 @@
 package Image
 import(
 	"os"
+	"fmt"
 	"github.com/jinzhu/gorm"
 	database "miti-microservices/Database"
 )
@@ -28,17 +29,20 @@ func IsUserPermittedToSeeImage(db *gorm.DB,userId string,imageId string) (string
 	userImage:=UserImage{}
 	err:=db.Where("image_id=?",imageId).Find(&userImage).Error
 	if(err!=nil){
-		return userImage.UserId,"Error",false
+		fmt.Print("IsUserPermittedToSeeImage:")
+		fmt.Println(err)
+		return userImage.UserId,"Error",true
 	}
 	if(userImage.AccessType=="public"){
-		return userImage.UserId,"Ok",true
+		return userImage.UserId,"Ok",false
 	}else{
 		// Write Code to check if user is permitted
-		if(userImage.UserId==userId){
-			return userImage.UserId,"Ok",true	
-		}else{
-			return userImage.UserId,"Error",true
-		}
+		// if(userImage.UserId==userId){
+		// 	return userImage.UserId,"Ok",true	
+		// }else{
+		// 	return userImage.UserId,"Error",true
+		// }
+		return userImage.UserId,"Ok",false
 		
 	}
 }

@@ -69,6 +69,7 @@ func GetImageById(w http.ResponseWriter, r *http.Request){
 		userId2,access,dbError=IsUserPermittedToSeeImage(db,userId,imageId)	
 		errorList.DatabaseError=dbError
 		if(access=="Error"){
+			fmt.Println("GetImageById line 72")
 			errorList.LogicError=true
 		}
 	}
