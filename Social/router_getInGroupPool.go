@@ -115,6 +115,7 @@ func GetInGroupPool(w http.ResponseWriter, r *http.Request){
 	}
 
 	if(!util.ErrorListStatus(errorList) && pincode=="Error"){
+		chatId:=util.GenerateToken()
 		groupPoolStatus,dbError=InsertInGroup(db,chatId,pincode,userId,"temporary",interest,requestId)
 		errorList.DatabaseError=dbError
 	}
