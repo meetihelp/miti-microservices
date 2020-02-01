@@ -137,6 +137,9 @@ func UploadImage(w http.ResponseWriter, r *http.Request){
 		}
 	}
 
+	if(!util.ErrorListStatus(errorList)){
+		statusCode=200
+	}
 	
 	code:=util.GetCode(errorList)
 	if(code==200){

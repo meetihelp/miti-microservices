@@ -4,6 +4,7 @@ import(
 	"gopkg.in/go-playground/validator.v9"
 	// "gopkg.in/go-playground/validator"
 	"fmt"
+	"strings"
 )
 
 
@@ -19,7 +20,7 @@ func(uploadImageHeader UploadImageHeader) doSanitization() string{
 		fmt.Println(err.Error())
 		return "Error"
 	}
-	if(uploadImageHeader.AccessType!="public" && uploadImageHeader.AccessType!="private"){
+	if(strings.ToLower(uploadImageHeader.AccessType)!="public" && strings.ToLower(uploadImageHeader.AccessType)!="private"){
 		return "Error"
 	}
 	return "Ok"
