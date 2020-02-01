@@ -10,6 +10,7 @@ import(
    profile "miti-microservices/Profile"
    database "miti-microservices/Database"
    "bytes"
+   "fmt"
 )
 
 func PoolStatusRouter(w http.ResponseWriter, r *http.Request){
@@ -33,16 +34,19 @@ func PoolStatusRouter(w http.ResponseWriter, r *http.Request){
 	errorList.DatabaseError=dbError
 	util.APIHitLog("PoolStatus",ipAddress,sessionId)
 	if dErr=="Error"{
+		fmt.Println("PoolStatus Line 36")
 		errorList.SessionError=true
 	}
 
 	requestBody,err:=ioutil.ReadAll(r.Body)
 	if (err!=nil && !util.ErrorListStatus(errorList)){
 		errorList.BodyReadError=true
+		fmt.Println("PoolStatus Line 43")
 	}
 
 	poolStatusData:=PoolStatusRequest{}
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("PoolStatus Line 48")
 		errUserData:=json.Unmarshal(requestBody,&poolStatusData)
 		if(errUserData!=nil){
 			errorList.UnmarshallingError=true
@@ -52,29 +56,40 @@ func PoolStatusRouter(w http.ResponseWriter, r *http.Request){
 	latitude:=poolStatusData.Latitude
 	longitude:=poolStatusData.Longitude
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("PoolStatus Line 58")
 		dbError:=gps.UpdateUserCurrentLocation(db,userId,latitude,longitude)	
 		errorList.DatabaseError=dbError
 	}
 	
 	var poolStatus PoolStatus
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("PoolStatus Line 65")
 		poolStatus,dbError=PoolStatusDB(db,userId)
 		errorList.DatabaseError=dbError
 	}
 
 	var ipip int
 	if(!util.ErrorListStatus(errorList)){
+		fmt.Println("PoolStatus Line 72")
 		ipip,dbError=profile.CheckIPIPStatus(db,userId)
 		errorList.DatabaseError=dbError
 	}
 
+	if(!util.ErrorListStatus(errorList)){
+		statusCode=200
+		fmt.Println("PoolStatus Line 79")
+	}
+
 	code:=util.GetCode(errorList)
 	if(code==200){
+		fmt.Println("PoolStatus Line 84")
 		content.Code=statusCode
 		if(ipip<5){
+			fmt.Println("PoolStatus Line 87")
 			content.Code=2003
 		}
 	}else{
+		fmt.Println("PoolStatus Line 91")
 		content.Code=code
 	}
 	content.Message=util.GetMessageDecode(code)
