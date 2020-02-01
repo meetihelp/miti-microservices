@@ -309,7 +309,7 @@ func CheckIfAlreadyChatExist(db *gorm.DB,userId1 string,userId2 string)(string,b
 			}
 		}
 	}
-	return "Ok",true
+	return "Ok",false
 }
 func InsertChatDetailMessageRequest(db *gorm.DB,userId1 string,userId2 string,requestId string) (string,bool){
 	chatDetail:=ChatDetail{}
