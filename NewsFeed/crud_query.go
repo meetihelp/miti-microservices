@@ -70,7 +70,8 @@ func GetNews(db *gorm.DB,label string,id int64)([]News,bool){
 	// 	return news,true
 	// }
 	// id:=userFeedStatus.Id
-
+	fmt.Print("label:"+label+" id:")
+	fmt.Println(id)
 	err:=db.Table("news").Order("id").Limit(20).Where("label=? AND id>?",label,id).Find(&news).Error
 	if(err!=nil){
 		return news,true

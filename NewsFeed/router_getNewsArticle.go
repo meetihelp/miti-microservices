@@ -69,12 +69,7 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 		fmt.Println("GetNewsArticle line 69")
 		label="FoodPorn"
 	}
-	var id int64
-	if(!util.ErrorListStatus(errorList)){
-		fmt.Println("GetNewsArticle line 74")
-		id,dbError=GetLabelId(db,label,userId)
-		errorList.DatabaseError=dbError	
-	}
+	
 	
 
 	var isDone string
@@ -118,8 +113,17 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 				break
 			}
 			nextLabel=GetNextLabel(nextLabel,interest)
-			news,newsId,dbError=getNews(db,cache,nextLabel,id,numOfLabelArticle)
-			errorList.DatabaseError=dbError
+			var id int64
+			if(!util.ErrorListStatus(errorList)){
+				fmt.Println("GetNewsArticle line 74")
+				id,dbError=GetLabelId(db,nextLabel,userId)
+				errorList.DatabaseError=dbError	
+			}
+			if(!util.ErrorListStatus(errorList)){
+				news,newsId,dbError=getNews(db,cache,nextLabel,id,numOfLabelArticle)
+				errorList.DatabaseError=dbError	
+			}
+			
 			fmt.Println("GetNewsArticle line 117")
 		}		
 	}
