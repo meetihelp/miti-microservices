@@ -3,7 +3,7 @@ package NewsFeed
 import(
 	"net/http"
 	"log"
-	// "fmt"
+	"fmt"
 	gocache "github.com/patrickmn/go-cache"
 	"github.com/jinzhu/gorm"
 	util "miti-microservices/Util"
@@ -130,6 +130,7 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 
 	if(!util.ErrorListStatus(errorList) && isDone=="No"){
 		// fmt.Println("GetNewsArticle line 122")
+		fmt.Println(newsId)
 		dbError=UpdateUserNewsFeedStatus(db,userId,label,newsId)
 		errorList.DatabaseError=dbError
 	}
