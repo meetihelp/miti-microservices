@@ -106,8 +106,9 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 	}
 
 	newsId:=make([]int64,0)
+	var nextLabel string
 	if(isDone=="No"){
-		nextLabel:=label
+		nextLabel=label
 		for true{
 			if(util.ErrorListStatus(errorList) || len(news)>0){
 				break
@@ -135,7 +136,7 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 	if(!util.ErrorListStatus(errorList) && isDone=="No"){
 		// fmt.Println("GetNewsArticle line 122")
 		// fmt.Println(newsId)
-		dbError=UpdateUserNewsFeedStatus(db,userId,label,newsId)
+		dbError=UpdateUserNewsFeedStatus(db,userId,nextLabel,newsId)
 		errorList.DatabaseError=dbError
 	}
 
@@ -254,7 +255,7 @@ func getNews(db *gorm.DB,cache *gocache.Cache,label string,id int64,numOfArticle
 func GetNextLabel(label string,interest []string) (string){
 	for index,interestLabel :=range interest{
 		if(label==interestLabel){
-			if(index!=len(interest)-1 && label=="Reading"){
+			if(index!=len(interest)-1){
 				return interest[index+1]
 			}else{
 				return "FoodPorn"
