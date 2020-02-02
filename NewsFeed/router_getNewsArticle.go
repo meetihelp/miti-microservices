@@ -217,7 +217,7 @@ func getNews(db *gorm.DB,cache *gocache.Cache,label string,id int64,numOfArticle
 	var dbError bool
 	if(!found || len(news)==0){
 		fmt.Println("Cache miss for "+label)
-		news,dbError=GetNews(db,label)
+		news,dbError=GetNews(db,label,id)
 		cache.Set(label,news,0)
 	}else{
 		fmt.Println("Cache hit for "+label)
