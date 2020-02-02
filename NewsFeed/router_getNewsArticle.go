@@ -113,15 +113,19 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 				break
 			}
 			nextLabel=GetNextLabel(nextLabel,interest)
+			fmt.Println("Next Label:"+nextLabel)
 			var id int64
 			if(!util.ErrorListStatus(errorList)){
 				// fmt.Println("GetNewsArticle line 74")
 				id,dbError=GetLabelId(db,nextLabel,userId)
 				errorList.DatabaseError=dbError	
+				fmt.Println(id)
 			}
 			if(!util.ErrorListStatus(errorList)){
+				newsId=make([]int64,0)
 				news,newsId,dbError=getNews(db,cache,nextLabel,id,numOfLabelArticle)
 				errorList.DatabaseError=dbError	
+				fmt.Println(newsId)
 			}
 			
 			// fmt.Println("GetNewsArticle line 117")
@@ -130,7 +134,7 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 
 	if(!util.ErrorListStatus(errorList) && isDone=="No"){
 		// fmt.Println("GetNewsArticle line 122")
-		fmt.Println(newsId)
+		// fmt.Println(newsId)
 		dbError=UpdateUserNewsFeedStatus(db,userId,label,newsId)
 		errorList.DatabaseError=dbError
 	}
