@@ -40,7 +40,7 @@ func AreAllArticleDone(db *gorm.DB,userId string)(string,int,bool){
 	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
 		return "No",0,true
 	}
-	if(count<40){
+	if(count<500){
 		return "No",count,false
 	}
 	return "Yes",count,false
@@ -72,7 +72,7 @@ func GetNews(db *gorm.DB,label string,id int64)([]News,bool){
 	// id:=userFeedStatus.Id
 	fmt.Print("label:"+label+" id:")
 	fmt.Println(id)
-	err:=db.Table("news").Order("id").Limit(20).Where("label=? AND id>?",label,id).Find(&news).Error
+	err:=db.Table("news").Order("id").Limit(100).Where("label=? AND id>?",label,id).Find(&news).Error
 	if(err!=nil){
 		return news,true
 	}
@@ -88,9 +88,10 @@ func UpdateUserNewsFeedStatus(db *gorm.DB,userId string,label string,newsId []in
 		userFeedStatus.UpdatedAt=updatedAt
 		userFeedStatus.Id=id
 		err:=db.Create(&userFeedStatus).Error
-		if(err!=nil){
-			return true
-		}
+		// if(err!=nil){
+		// 	return true
+		// }
+		fmt.Println(err)
 	}
 	return false
 }

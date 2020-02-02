@@ -3,7 +3,7 @@ package NewsFeed
 import(
 	"net/http"
 	"log"
-	"fmt"
+	// "fmt"
 	gocache "github.com/patrickmn/go-cache"
 	"github.com/jinzhu/gorm"
 	util "miti-microservices/Util"
@@ -36,20 +36,20 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 	errorList.DatabaseError=dbError
 	util.APIHitLog("GetNewsArticle",ipAddress,sessionId)
 	if status=="Error"{
-		fmt.Println("GetNewsArticle line 39")
+		// fmt.Println("GetNewsArticle line 39")
 		errorList.SessionError=true
 	}
 
 	//Read body data
 	requestBody,err:=ioutil.ReadAll(r.Body)
 	if (err!=nil && !util.ErrorListStatus(errorList)){
-		fmt.Println("GetNewsArticle line 46")
+		// fmt.Println("GetNewsArticle line 46")
 		errorList.BodyReadError=true
 	}
 
 	getNewsFeedArticleData :=GetNewsArticleDS{}
 	if(!util.ErrorListStatus(errorList)){
-		fmt.Println("GetNewsArticle line 52")
+		// fmt.Println("GetNewsArticle line 52")
 		errGetNewsFeedArticleData:=json.Unmarshal(requestBody,&getNewsFeedArticleData)
 		if errGetNewsFeedArticleData!=nil{
 			errorList.UnmarshallingError=true
@@ -57,7 +57,7 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 	}
 	
 	if(!util.ErrorListStatus(errorList)){
-		fmt.Println("GetNewsArticle line 60")
+		// fmt.Println("GetNewsArticle line 60")
 		sanatizationStatus :=Sanatize(getNewsFeedArticleData)
 		if(sanatizationStatus=="Error"){
 			errorList.SanatizationError=true
@@ -66,7 +66,7 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 
 	label:=getNewsFeedArticleData.Label
 	if(label==""){
-		fmt.Println("GetNewsArticle line 69")
+		// fmt.Println("GetNewsArticle line 69")
 		label="FoodPorn"
 	}
 	
@@ -75,18 +75,18 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 	var isDone string
 	numOfArticle:=0
 	if(!util.ErrorListStatus(errorList)){
-		fmt.Println("GetNewsArticle line 82")
+		// fmt.Println("GetNewsArticle line 82")
 		isDone,numOfArticle,dbError=AreAllArticleDone(db,userId)
 		errorList.DatabaseError=dbError
 		if(isDone=="Yes"){
-			fmt.Println("GetNewsArticle line 87")
+			// fmt.Println("GetNewsArticle line 87")
 			statusCode=5000
 		}
 	}
 
 	var interest []string
 	if(!util.ErrorListStatus(errorList) && isDone=="No"){
-		fmt.Println("GetNewsArticle line 94")
+		// fmt.Println("GetNewsArticle line 94")
 		interest,dbError=profile.GetUserInterest(db,userId)
 		errorList.DatabaseError=dbError
 	}
@@ -98,10 +98,10 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 	
 	numOfLabelArticle:=0
 	if(numOfArticle>2){
-		fmt.Println("GetNewsArticle line 106")
+		// fmt.Println("GetNewsArticle line 106")
 		numOfLabelArticle=2
 	}else{
-		fmt.Println("GetNewsArticle line 109")
+		// fmt.Println("GetNewsArticle line 109")
 		numOfLabelArticle=numOfArticle
 	}
 
@@ -115,7 +115,7 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 			nextLabel=GetNextLabel(nextLabel,interest)
 			var id int64
 			if(!util.ErrorListStatus(errorList)){
-				fmt.Println("GetNewsArticle line 74")
+				// fmt.Println("GetNewsArticle line 74")
 				id,dbError=GetLabelId(db,nextLabel,userId)
 				errorList.DatabaseError=dbError	
 			}
@@ -124,27 +124,27 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 				errorList.DatabaseError=dbError	
 			}
 			
-			fmt.Println("GetNewsArticle line 117")
+			// fmt.Println("GetNewsArticle line 117")
 		}		
 	}
 
 	if(!util.ErrorListStatus(errorList) && isDone=="No"){
-		fmt.Println("GetNewsArticle line 122")
+		// fmt.Println("GetNewsArticle line 122")
 		dbError=UpdateUserNewsFeedStatus(db,userId,label,newsId)
 		errorList.DatabaseError=dbError
 	}
 
 	if(!util.ErrorListStatus(errorList) && isDone=="No" && statusCode==0){
-		fmt.Println("GetNewsArticle line 128")
+		// fmt.Println("GetNewsArticle line 128")
 		statusCode=200
 	}
 	
 	code:=util.GetCode(errorList)
 	if(code==200){
-		fmt.Println("GetNewsArticle line 134")
+		// fmt.Println("GetNewsArticle line 134")
 		content.Code=statusCode
 	}else{
-		fmt.Println("GetNewsArticle line 137")
+		// fmt.Println("GetNewsArticle line 137")
 		content.Code=code
 	}
 	content.Message=util.GetMessageDecode(content.Code)
@@ -189,11 +189,11 @@ func getGuiltyPleasure(db *gorm.DB,cache *gocache.Cache,label string,id int64,nu
 	guiltyPleasure:= []GuiltyPleasure{}
 	var dbError bool
 	if(!found){
-		fmt.Println("Cache miss for "+label)
+		// fmt.Println("Cache miss for "+label)
 		guiltyPleasure,dbError=GetGuiltyPleasure(db,label)
 		cache.Set(label,guiltyPleasure,0)
 	}else{
-		fmt.Println("Cache hit for "+label)
+		// fmt.Println("Cache hit for "+label)
 		guiltyPleasure=x.([]GuiltyPleasure)
 		dbError=false
 	}
@@ -220,11 +220,11 @@ func getNews(db *gorm.DB,cache *gocache.Cache,label string,id int64,numOfArticle
 	news:= []News{}
 	var dbError bool
 	if(!found || len(news)==0){
-		fmt.Println("Cache miss for "+label)
+		// fmt.Println("Cache miss for "+label)
 		news,dbError=GetNews(db,label,id)
 		cache.Set(label,news,0)
 	}else{
-		fmt.Println("Cache hit for "+label)
+		// fmt.Println("Cache hit for "+label)
 		news=x.([]News)
 		dbError=false
 	}
@@ -249,7 +249,7 @@ func getNews(db *gorm.DB,cache *gocache.Cache,label string,id int64,numOfArticle
 func GetNextLabel(label string,interest []string) (string){
 	for index,interestLabel :=range interest{
 		if(label==interestLabel){
-			if(index!=len(interest)-1){
+			if(index!=len(interest)-1 && label=="Reading"){
 				return interest[index+1]
 			}else{
 				return "FoodPorn"
