@@ -136,6 +136,8 @@ func GetNewsArticle(w http.ResponseWriter,r *http.Request){
 	if(!util.ErrorListStatus(errorList) && isDone=="No"){
 		// fmt.Println("GetNewsArticle line 122")
 		// fmt.Println(newsId)
+		fmt.Println("Updating User Feed Status For "+nextLabel)
+		fmt.Println(newsId)
 		dbError=UpdateUserNewsFeedStatus(db,userId,nextLabel,newsId)
 		errorList.DatabaseError=dbError
 	}
