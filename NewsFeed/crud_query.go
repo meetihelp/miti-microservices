@@ -9,21 +9,22 @@ import(
 
 func GetLabelId(db *gorm.DB,label string,userId string) (int64,bool){
 	userFeedStatus:=UserFeedStatus{}
-	err:=db.Order("id desc").Where("label=? AND user_id=?",label,userId).First(&userFeedStatus).Error
+	err:=db.Order("id desc").Where("label=? AND user_id=?",label,userId).Find(&userFeedStatus).Error
 	if(err!=nil && !gorm.IsRecordNotFoundError(err)){
 		return userFeedStatus.Id,true
 	}
 	if(userFeedStatus.UserId==""){
-		userFeedStatus.UserId=userId
-		userFeedStatus.Label=label
-		userFeedStatus.Id=0
-		createdAt:=util.GetTime()
-		date:=util.GetDateFromTime(createdAt)
-		userFeedStatus.UpdatedAt=date
-		err:=db.Create(&userFeedStatus).Error
-		if(err!=nil){
-			return userFeedStatus.Id,true
-		}
+		return 0,false
+		// userFeedStatus.UserId=userId
+		// userFeedStatus.Label=label
+		// userFeedStatus.Id=0
+		// createdAt:=util.GetTime()
+		// date:=util.GetDateFromTime(createdAt)
+		// userFeedStatus.UpdatedAt=date
+		// err:=db.Create(&userFeedStatus).Error
+		// if(err!=nil){
+		// 	return userFeedStatus.Id,true
+		// }
 	}
 
 	return userFeedStatus.Id,false
