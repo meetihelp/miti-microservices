@@ -306,11 +306,11 @@ func InsertInGroup(db *gorm.DB,chatId string,pincode string,userId string,member
 			return groupPoolStatusHelper,true
 		}
 	}else{
-		err=db.Table("chat_details").Where("actual_user_id=? AND chat_id=?",userId,chatId).Update("chat_id",chatId).Error
+		err=db.Table("chat_details").Where("actual_user_id=? AND chat_id=?",userId,groupTemp.ChatId).Update("chat_id",chatId).Error
 		if(err!=nil){
 			return groupPoolStatusHelper,true
 		}
-		err=db.Table("groups").Where("user_id=? AND chat_id=?",userId,chatId).Updates(group).Error
+		err=db.Table("groups").Where("user_id=? AND chat_id=?",userId,groupTemp.ChatId).Updates(group).Error
 		if(err!=nil){
 			return groupPoolStatusHelper,true
 		}
