@@ -3,6 +3,7 @@ package Social
 import(
 	database "miti-microservices/Database"
 	profile "miti-microservices/Profile"
+	chat "miti-microservices/Chat"
 	// "fmt"
 	util "miti-microservices/Util"
 	"github.com/jinzhu/gorm"
@@ -306,7 +307,7 @@ func InsertInGroup(db *gorm.DB,chatId string,pincode string,userId string,member
 			return groupPoolStatusHelper,true
 		}
 	}else{
-		err=db.Table("chat_details").Where("actual_user_id=? AND chat_id=?",userId,groupTemp.ChatId).Update("chat_id",chatId).Error
+		err=db.Table("chat_details").Where("actual_user_id=? AND chat_id=?",userId,groupTemp.ChatId).Updates(chat.ChatDetail{ChatId:chatId,CreatedAt:createdAt}).Error
 		if(err!=nil){
 			return groupPoolStatusHelper,true
 		}
