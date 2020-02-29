@@ -2,6 +2,7 @@
 package Util
 import(
 	database "miti-microservices/Database"
+	sessionCache "miti-microservices/Database/Cache/UtilCache"
 	"github.com/nu7hatch/gouuid"
 	"github.com/jinzhu/gorm"
 	"time"
@@ -67,11 +68,18 @@ func InsertTemporarySession(db *gorm.DB,UserId string,ipAddress string) (string,
 
 func GetUserIdFromSession(sessionId string) (string,string){
 	db:=database.GetDB()
-	session:=Session{}
-	db.Where("session_id=?",sessionId).First(&session)
-	if session.UserId==""{
-		return "","Error"
+	cache:=sessionCache.GetSessionCache()
+	x,found:=cache.Get(sessionId)
+	if(!found){
+		session:=Session{}
+		db.Where("session_id=?",sessionId).First(&session)
+		if session.UserId==""{
+			return "","Error"
+		}
+		cache.Set(sessionId,session,0)
+		return session.UserId,"Ok"
 	}
+	session:=x.(Session)	
 	return session.UserId,"Ok"
 }
 func GetUserIdFromTemporarySession(sessionId string) (string,string){
@@ -87,11 +95,18 @@ func GetUserIdFromTemporarySession(sessionId string) (string,string){
 
 func GetUserIdFromSession2(db *gorm.DB,sessionId string) (string,string){
 	// db:=database.GetDB()
-	session:=Session{}
-	db.Where("session_id=?",sessionId).First(&session)
-	if session.UserId==""{
-		return "","Error"
+	cache:=sessionCache.GetSessionCache()
+	x,found:=cache.Get(sessionId)
+	if(!found){
+		session:=Session{}
+		db.Where("session_id=?",sessionId).First(&session)
+		if session.UserId==""{
+			return "","Error"
+		}
+		cache.Set(sessionId,session,0)
+		return session.UserId,"Ok"
 	}
+	session:=x.(Session)	
 	return session.UserId,"Ok"
 }
 func GetUserIdFromTemporarySession2(db *gorm.DB,sessionId string) (string,string){
@@ -105,15 +120,23 @@ func GetUserIdFromTemporarySession2(db *gorm.DB,sessionId string) (string,string
 	return session.UserId,"Ok"
 }
 
-func GetUserIdFromSession3(db *gorm.DB,sessionId string) (string,string,bool){
-	session:=Session{}
-	err:=db.Where("session_id=?",sessionId).First(&session).Error
-	if gorm.IsRecordNotFoundError(err){
-		return "","Error",false
+func GetUserIdFromSession3(db *gorm.DB,sessionId string) (string,string,bool){		
+	cache:=sessionCache.GetSessionCache()
+	x,found:=cache.Get(sessionId)
+	if(!found){
+		session:=Session{}
+		err:=db.Where("session_id=?",sessionId).First(&session).Error
+			
+		if gorm.IsRecordNotFoundError(err){
+			return "","Error",false
+		}
+		if(err!=nil){
+			return "","Error",true
+		}
+		cache.Set(sessionId,session,0)
+		return session.UserId,"Ok",false
 	}
-	if(err!=nil){
-		return "","Error",true
-	}
+	session:=x.(Session)	
 	return session.UserId,"Ok",false
 }
 func GetUserIdFromTemporarySession3(db *gorm.DB,sessionId string) (string,string,bool){
