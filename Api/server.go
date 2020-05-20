@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log"
 	"github.com/gorilla/mux"
+	"golang.org/x/crypto/acme/autocert"
 	"net/http"
+	"crypto/tls"
 	profile "miti-microservices/Profile"
 	apnaauth "miti-microservices/Authentication"
 	apnachat "miti-microservices/Chat"
@@ -139,21 +141,48 @@ func Server(runMethod string){
 	r.HandleFunc("/deleteProfile",others.DeleteProfile).Methods("POST")
 	
 	http.Handle("/", r)
-	certificates:=os.Getenv("SSLCertificatePath")
-	crt:=certificates+"/all.crt"
-	key:=certificates+"/private.key"
+	certManager := autocert.Manager{
+            Prompt:     autocert.AcceptTOS,
+            //HostPolicy: autocert.HostWhitelist(domains...),
+    }
+    server := &http.Server{
+            Addr: ":https",
+            TLSConfig: &tls.Config{
+                    GetCertificate: certManager.GetCertificate,
+            },
+    }
+    go func() {
+            // serve HTTP, which will redirect automatically to HTTPS
+            h := certManager.HTTPHandler(nil)
+            log.Fatal(http.ListenAndServe(":http", h))
+    }()
+
+    // serve HTTPS!
+    //log.Fatal(server.ListenAndServeTLS("", ""))
+
+	// certificates:=os.Getenv("SSLCertificatePath")
+	// crt:=certificates+"/all.crt"
+	// key:=certificates+"/private.key"
 	if(runMethod=="Devlopment"){
 		port:=os.Getenv("DevlopmentPort")
 		url:="0.0.0.0:"+port
-		if err := http.ListenAndServeTLS(url,crt,key,nil); err != nil {
+		server.Addr=url
+		if err := server.ListenAndServeTLS("",""); err != nil {
 			log.Fatal(err)
 		}
+		// if err := http.ListenAndServeTLS(url,crt,key,nil); err != nil {
+		// 	log.Fatal(err)
+		// }
 	}else if(runMethod=="production"){
 		port:=os.Getenv("ProductionPort")
 		url:="0.0.0.0:"+port
-		if err := http.ListenAndServeTLS(url,crt,key,nil); err != nil {
+		server.Addr=url
+		if err := server.ListenAndServeTLS("",""); err != nil {
 			log.Fatal(err)
 		}
+		// if err := http.ListenAndServeTLS(url,crt,key,nil); err != nil {
+		// 	log.Fatal(err)
+		// }
 	}else{
 		log.Println("Run Method not correct")
 		return
